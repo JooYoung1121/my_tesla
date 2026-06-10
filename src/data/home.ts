@@ -27,6 +27,7 @@ export const navItems = [
   { label: "정보 보드", href: "#intel" },
   { label: "구매 계획", href: "#buying" },
   { label: "인수 준비", href: "#delivery" },
+  { label: "내 메모", href: "#my-notes" },
   { label: "카페 후보", href: "#cafes" },
   { label: "결정 노트", href: "#decisions" },
   { label: "오너 로그", href: "#owner-log" }
@@ -259,61 +260,71 @@ export const aliShoppingList = [
     item: "센터/후석 디스플레이 강화유리",
     range: "1만~3만 원",
     timing: "먼저 구매",
-    memo: "저렴하고 실패 리스크가 낮다. 2025~2026 Juniper/Highland 호환 표기를 확인한다."
+    memo: "저렴하고 실패 리스크가 낮다. 2025~2026 Juniper/Highland 호환 표기를 확인한다.",
+    url: "https://www.aliexpress.com/wholesale?SearchText=Tesla+Model+Y+Juniper+screen+protector"
   },
   {
     item: "TPE 바닥·트렁크 매트",
     range: "4만~12만 원",
     timing: "먼저 구매",
-    memo: "국내 브랜드 대비 저렴하지만 냄새, 들뜸, 고정 핀 위치 후기를 확인한다."
+    memo: "국내 브랜드 대비 저렴하지만 냄새, 들뜸, 고정 핀 위치 후기를 확인한다.",
+    url: "https://www.aliexpress.com/wholesale?SearchText=Tesla+Model+Y+Juniper+TPE+floor+mat"
   },
   {
     item: "루프 선쉐이드",
     range: "3만~11만 원",
     timing: "여름 전",
-    memo: "모델 Y 글라스 루프 체감 온도 때문에 여름 인수라면 우선순위가 높다."
+    memo: "모델 Y 글라스 루프 체감 온도 때문에 여름 인수라면 우선순위가 높다.",
+    url: "https://www.aliexpress.com/wholesale?SearchText=Tesla+Model+Y+Juniper+roof+sunshade"
   },
   {
     item: "짧은 머드플랩",
     range: "1만~3만 원",
     timing: "인수 전",
-    memo: "돌빵과 하단 오염 방지용. 너무 긴 제품은 간섭 후기를 확인한다."
+    memo: "돌빵과 하단 오염 방지용. 너무 긴 제품은 간섭 후기를 확인한다.",
+    url: "https://www.aliexpress.com/wholesale?SearchText=Tesla+Model+Y+Juniper+mud+flaps"
   },
   {
     item: "트렁크 문턱 보호대",
     range: "1만~3만 원",
     timing: "인수 후",
-    memo: "캐리어와 짐을 자주 싣는다면 체감된다. 접착식은 탈거 흔적을 고려한다."
+    memo: "캐리어와 짐을 자주 싣는다면 체감된다. 접착식은 탈거 흔적을 고려한다.",
+    url: "https://www.aliexpress.com/wholesale?SearchText=Tesla+Model+Y+trunk+sill+protector"
   },
   {
     item: "시트 하단 에어벤트 커버",
     range: "5천~1.5만 원",
     timing: "나중",
-    memo: "작은 물건이 뒷좌석 송풍구로 들어가는 것을 막는 용도다."
+    memo: "작은 물건이 뒷좌석 송풍구로 들어가는 것을 막는 용도다.",
+    url: "https://www.aliexpress.com/wholesale?SearchText=Tesla+Model+Y+seat+air+vent+cover"
   },
   {
     item: "센터 콘솔/스크린 하단 수납함",
     range: "1만~4만 원",
     timing: "나중",
-    memo: "수납 습관이 생긴 뒤 필요한 위치만 산다."
+    memo: "수납 습관이 생긴 뒤 필요한 위치만 산다.",
+    url: "https://www.aliexpress.com/wholesale?SearchText=Tesla+Model+Y+Juniper+center+console+organizer"
   },
   {
     item: "휠 커버",
     range: "6만~20만 원",
     timing: "보류",
-    memo: "외관 만족도는 높지만 고속 주행 소음, 체결력, 순정 휠 흠집 후기를 확인한다."
+    memo: "외관 만족도는 높지만 고속 주행 소음, 체결력, 순정 휠 흠집 후기를 확인한다.",
+    url: "https://www.aliexpress.com/wholesale?SearchText=Tesla+Model+Y+Juniper+wheel+cover"
   },
   {
     item: "Qi2 맥세이프 거치대",
     range: "3만~7만 원",
     timing: "보류",
-    memo: "차량 기본 무선 충전이 불편할 때만 산다. Qi2 인증 여부를 확인한다."
+    memo: "차량 기본 무선 충전이 불편할 때만 산다. Qi2 인증 여부를 확인한다.",
+    url: "https://www.aliexpress.com/wholesale?SearchText=Tesla+Model+Y+Qi2+MagSafe+mount"
   },
   {
     item: "전면 흡기구/카메라 커버류",
     range: "5천~2만 원",
     timing: "검증 후",
-    memo: "센서, 냉각, 배수에 영향을 줄 수 있는 제품은 후기 확인 전 구매하지 않는다."
+    memo: "센서, 냉각, 배수에 영향을 줄 수 있는 제품은 후기 확인 전 구매하지 않는다.",
+    url: "https://www.aliexpress.com/wholesale?SearchText=Tesla+Model+Y+Juniper+camera+cover"
   }
 ];
 
@@ -351,13 +362,13 @@ export const serviceCostRows = [
 ];
 
 export const shopCandidates = [
-  { name: "JB motors", area: "경기/수도권", note: "모델 Y 신차패키지 가격표 공개 사례" },
-  { name: "오리진마인드", area: "수도권", note: "모델 Y 주니퍼 95만 원 패키지 공개 사례" },
-  { name: "스타일매니아", area: "수도권", note: "모델 Y 주니퍼 썬팅/PPF 시공 사례 확인" },
-  { name: "모터스킨", area: "서울 강서", note: "전체 PPF+썬팅 가격 사례 확인" },
-  { name: "카독스", area: "경기 광주", note: "틴팅, 블랙박스, PPF 시공 사례 확인" },
-  { name: "비앤엠코리아", area: "부산", note: "부산 테슬라 신차패키지 후보" },
-  { name: "오늘의카", area: "비교 플랫폼", note: "하남·강동·송파 등 비교견적 탐색용" }
+  { name: "JB motors", area: "경기/수도권", note: "모델 Y 신차패키지 가격표 공개 사례", url: "https://jbmotors.co.kr/content/06tesla/03_01.php" },
+  { name: "오리진마인드", area: "수도권", note: "모델 Y 주니퍼 95만 원 패키지 공개 사례", url: "https://orgnmind.co.kr/90" },
+  { name: "스타일매니아", area: "수도권", note: "모델 Y 주니퍼 썬팅/PPF 시공 사례 확인", url: "https://www.stylemania.co.kr/?bmode=view&idx=165250901" },
+  { name: "모터스킨", area: "서울 강서", note: "전체 PPF+썬팅 가격 사례 확인", url: "https://m.oh-car.co.kr/goods/goods_view.php?goodsNo=1000066105" },
+  { name: "카독스", area: "경기 광주", note: "틴팅, 블랙박스, PPF 시공 사례 확인", url: "https://www.cardocs.co.kr/" },
+  { name: "비앤엠코리아", area: "부산", note: "부산 테슬라 신차패키지 후보", url: "https://bnmkorea.co.kr/%EB%B6%80%EC%82%B0-%ED%85%8C%EC%8A%AC%EB%9D%BC-%EC%8B%A0%EC%B0%A8%ED%8C%A8%ED%82%A4%EC%A7%80-%EB%AA%A8%EB%8D%B8y-%EC%A0%84%EB%AC%B8-%EC%8B%9C%EA%B3%B5%EC%9D%80-%EC%98%A4%EB%84%88%EC%9D%98-%EB%AF%B8/" },
+  { name: "오늘의카", area: "비교 플랫폼", note: "하남·강동·송파 등 비교견적 탐색용", url: "https://m.oh-car.co.kr/" }
 ];
 
 export const deliveryChecklist = [

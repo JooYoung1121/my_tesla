@@ -17,7 +17,6 @@ import {
   decisionItems,
   aliShoppingList,
   budgetBuckets,
-  deliveryChecklist,
   essentialSupplies,
   intelItems,
   modelYPremiumRwdSpecs,
@@ -31,29 +30,11 @@ import {
   statusMetrics,
   watchedCafes
 } from "@/data/home";
-import {
-  naverCafeFetchedAt,
-  naverCafeKeywords,
-  naverCafeResults
-} from "@/data/naver-cafe-results";
+import { CafeSearchPanel } from "./components/CafeSearchPanel";
+import { ChecklistManager } from "./components/ChecklistManager";
+import { PersonalNotes } from "./components/PersonalNotes";
 
 export default function Home() {
-  const cafeFetchedLabel = naverCafeFetchedAt
-    ? new Intl.DateTimeFormat("ko-KR", {
-        dateStyle: "medium",
-        timeStyle: "short",
-        timeZone: "Asia/Seoul"
-      }).format(new Date(naverCafeFetchedAt))
-    : "아직 수집 전";
-
-  const cafeResultPreview = naverCafeResults.slice(0, 18);
-  const cafeResultCounts = Array.from(
-    naverCafeResults.reduce((map, item) => {
-      map.set(item.category, (map.get(item.category) ?? 0) + 1);
-      return map;
-    }, new Map<string, number>())
-  );
-
   return (
     <main className="app-shell">
       <aside className="side-rail" aria-label="주요 메뉴">
@@ -86,16 +67,16 @@ export default function Home() {
             <h1>오늘 확인할 테슬라 정보</h1>
           </div>
           <div className="topbar-actions" aria-label="빠른 동작">
-            <button className="icon-button" title="검색">
+            <a className="icon-button" href="#intel-search" title="검색">
               <Search size={18} aria-hidden="true" />
-            </button>
-            <button className="icon-button" title="필터">
+            </a>
+            <a className="icon-button" href="#buying" title="구매 계획">
               <Filter size={18} aria-hidden="true" />
-            </button>
-            <button className="primary-button">
+            </a>
+            <a className="primary-button" href="#my-notes">
               <Plus size={18} aria-hidden="true" />
               정보 추가
-            </button>
+            </a>
           </div>
         </header>
 
@@ -151,21 +132,21 @@ export default function Home() {
               <p className="eyebrow">정보 보드</p>
               <h2>검색해서 볼 것과 저장해서 볼 것</h2>
             </div>
-            <button className="ghost-button">
+            <a className="ghost-button" href="#intel-search">
               전체 보기
               <ChevronRight size={18} aria-hidden="true" />
-            </button>
+            </a>
           </div>
 
           <div className="search-groups">
             {searchGroups.map((group) => {
               const Icon = group.icon;
               return (
-                <button className="search-chip" key={group.label}>
+                <a className="search-chip" href="#intel-search" key={group.label}>
                   <Icon size={16} aria-hidden="true" />
                   <span>{group.label}</span>
                   <strong>{group.count}</strong>
-                </button>
+                </a>
               );
             })}
           </div>
@@ -189,49 +170,7 @@ export default function Home() {
             ))}
           </div>
 
-          <div className="live-cafe-board">
-            <div className="live-cafe-head">
-              <div>
-                <p className="eyebrow">실제 공개글 수집 결과</p>
-                <h3>대상 카페 2곳에서 가져온 최신 검색 결과</h3>
-                <p>
-                  수동 실행 기준 {cafeFetchedLabel}, 총 {naverCafeResults.length}건.
-                  비공개/회원 전용 글은 포함하지 않는다.
-                </p>
-              </div>
-              <div className="live-cafe-counts" aria-label="카테고리별 수집 건수">
-                {cafeResultCounts.map(([category, count]) => (
-                  <span key={category}>
-                    {category}
-                    <strong>{count}</strong>
-                  </span>
-                ))}
-              </div>
-            </div>
-
-            <div className="keyword-strip" aria-label="검색한 키워드">
-              {naverCafeKeywords.map((keyword) => (
-                <span key={keyword}>{keyword}</span>
-              ))}
-            </div>
-
-            <div className="cafe-result-grid">
-              {cafeResultPreview.map((item) => (
-                <article className="cafe-result-card" key={item.link}>
-                  <div className="cafe-result-meta">
-                    <span className="pill">{item.category}</span>
-                    <small>{item.targetCafe?.name ?? item.cafename}</small>
-                  </div>
-                  <a href={item.link} target="_blank" rel="noreferrer">
-                    {item.title}
-                    <ExternalLink size={15} aria-hidden="true" />
-                  </a>
-                  <p>{item.description}</p>
-                  <em>{item.keyword}</em>
-                </article>
-              ))}
-            </div>
-          </div>
+          <CafeSearchPanel />
         </section>
 
         <section className="section-band" id="buying">
@@ -309,6 +248,10 @@ export default function Home() {
                     <div>
                       <em>{item.range}</em>
                       <small>{item.timing}</small>
+                      <a href={item.url} target="_blank" rel="noreferrer">
+                        상품 찾기
+                        <ExternalLink size={14} aria-hidden="true" />
+                      </a>
                     </div>
                   </div>
                 ))}
@@ -340,11 +283,15 @@ export default function Home() {
               </div>
               <div className="shop-grid">
                 {shopCandidates.map((shop) => (
-                  <div className="shop-chip" key={shop.name}>
+                  <a className="shop-chip" href={shop.url} key={shop.name} target="_blank" rel="noreferrer">
                     <strong>{shop.name}</strong>
                     <span>{shop.area}</span>
                     <small>{shop.note}</small>
-                  </div>
+                    <em>
+                      열기
+                      <ExternalLink size={13} aria-hidden="true" />
+                    </em>
+                  </a>
                 ))}
               </div>
             </article>
@@ -357,10 +304,6 @@ export default function Home() {
               <p className="eyebrow">인수 준비</p>
               <h2>계약 후부터 첫 달까지</h2>
             </div>
-            <button className="ghost-button">
-              체크 항목 추가
-              <Plus size={18} aria-hidden="true" />
-            </button>
           </div>
 
           <div className="prep-grid">
@@ -389,32 +332,10 @@ export default function Home() {
             })}
           </div>
 
-          <div className="checklist-board" aria-label="상세 인수 준비 체크리스트">
-            {deliveryChecklist.map((group) => {
-              const Icon = group.icon;
-              return (
-                <article className="checklist-card" key={group.phase}>
-                  <div className="checklist-card-head">
-                    <Icon size={21} aria-hidden="true" />
-                    <div>
-                      <strong>{group.phase}</strong>
-                      <p>{group.summary}</p>
-                    </div>
-                  </div>
-                  <ul className="checklist-items">
-                    {group.items.map((item) => (
-                      <li key={item.text}>
-                        <span className={`status-dot status-${item.status}`} aria-hidden="true" />
-                        <span>{item.text}</span>
-                        <em>{item.status}</em>
-                      </li>
-                    ))}
-                  </ul>
-                </article>
-              );
-            })}
-          </div>
+          <ChecklistManager />
         </section>
+
+        <PersonalNotes />
 
         <section className="section-band" id="cafes">
           <div className="section-heading">
@@ -422,10 +343,10 @@ export default function Home() {
               <p className="eyebrow">카페 수집 후보</p>
               <h2>공개글 검색으로 먼저 감시할 카페</h2>
             </div>
-            <button className="ghost-button">
-              API 연결 후 저장
+            <a className="ghost-button" href="#intel-search">
+              검색으로 이동
               <Database size={18} aria-hidden="true" />
-            </button>
+            </a>
           </div>
 
           <div className="cafe-grid">
@@ -453,9 +374,9 @@ export default function Home() {
                 <p className="eyebrow">결정 노트</p>
                 <h2>살 것, 보류할 것</h2>
               </div>
-              <button className="icon-button" title="북마크">
+              <a className="icon-button" href="#my-notes" title="메모로 이동">
                 <Bookmark size={18} aria-hidden="true" />
-              </button>
+              </a>
             </div>
 
             <div className="decision-list">
@@ -480,9 +401,9 @@ export default function Home() {
                 <p className="eyebrow">오너 로그</p>
                 <h2>인수 후 쌓을 데이터</h2>
               </div>
-              <button className="icon-button" title="연동 상태">
+              <a className="icon-button" href="/teslamate" title="TeslaMate 문서">
                 <Server size={18} aria-hidden="true" />
-              </button>
+              </a>
             </div>
 
             <div className="owner-log-grid">
