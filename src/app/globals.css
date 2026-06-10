@@ -436,6 +436,128 @@ h2 {
   line-height: 1.5;
 }
 
+.live-cafe-board {
+  margin-top: 18px;
+  padding: 18px;
+  background: #f9faf7;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
+.live-cafe-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(260px, 0.7fr);
+  gap: 16px;
+  align-items: start;
+  margin-bottom: 14px;
+}
+
+.live-cafe-head h3 {
+  margin: 0 0 9px;
+  font-size: 22px;
+  line-height: 1.22;
+}
+
+.live-cafe-head p {
+  margin-bottom: 0;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.live-cafe-counts,
+.keyword-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.live-cafe-counts {
+  justify-content: flex-end;
+}
+
+.live-cafe-counts span,
+.keyword-strip span {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 30px;
+  padding: 0 10px;
+  color: var(--muted);
+  background: #fff;
+  border: 1px solid #ebece7;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.live-cafe-counts strong {
+  color: var(--red);
+}
+
+.keyword-strip {
+  margin-bottom: 14px;
+}
+
+.cafe-result-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.cafe-result-card {
+  min-width: 0;
+  min-height: 210px;
+  padding: 14px;
+  background: #fff;
+  border: 1px solid #ebece7;
+  border-radius: 8px;
+}
+
+.cafe-result-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.cafe-result-meta small {
+  color: var(--muted);
+  font-weight: 800;
+  text-align: right;
+}
+
+.cafe-result-card a {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: 5px;
+  font-weight: 800;
+  line-height: 1.42;
+}
+
+.cafe-result-card a:hover {
+  color: var(--red);
+}
+
+.cafe-result-card p {
+  margin: 10px 0;
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.cafe-result-card em {
+  display: inline-flex;
+  align-items: center;
+  min-height: 26px;
+  padding: 0 9px;
+  color: var(--blue);
+  background: var(--blue-soft);
+  border-radius: 999px;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 800;
+}
+
 .pill,
 .priority {
   display: inline-flex;
@@ -1130,13 +1252,19 @@ h2 {
 
   .hero-grid,
   .hero-panel,
-  .split-section {
+  .split-section,
+  .live-cafe-head {
     grid-template-columns: 1fr;
+  }
+
+  .live-cafe-counts {
+    justify-content: flex-start;
   }
 
   .metric-grid,
   .signal-strip,
   .prep-grid,
+  .cafe-result-grid,
   .spec-grid,
   .budget-grid,
   .checklist-board,
@@ -1178,6 +1306,7 @@ h2 {
   .metric-grid,
   .signal-strip,
   .prep-grid,
+  .cafe-result-grid,
   .spec-grid,
   .budget-grid,
   .buying-columns,

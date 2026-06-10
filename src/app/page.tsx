@@ -31,8 +31,29 @@ import {
   statusMetrics,
   watchedCafes
 } from "@/data/home";
+import {
+  naverCafeFetchedAt,
+  naverCafeKeywords,
+  naverCafeResults
+} from "@/data/naver-cafe-results";
 
 export default function Home() {
+  const cafeFetchedLabel = naverCafeFetchedAt
+    ? new Intl.DateTimeFormat("ko-KR", {
+        dateStyle: "medium",
+        timeStyle: "short",
+        timeZone: "Asia/Seoul"
+      }).format(new Date(naverCafeFetchedAt))
+    : "아직 수집 전";
+
+  const cafeResultPreview = naverCafeResults.slice(0, 18);
+  const cafeResultCounts = Array.from(
+    naverCafeResults.reduce((map, item) => {
+      map.set(item.category, (map.get(item.category) ?? 0) + 1);
+      return map;
+    }, new Map<string, number>())
+  );
+
   return (
     <main className="app-shell">
       <aside className="side-rail" aria-label="주요 메뉴">
@@ -166,6 +187,50 @@ export default function Home() {
                 <p>{item.summary}</p>
               </article>
             ))}
+          </div>
+
+          <div className="live-cafe-board">
+            <div className="live-cafe-head">
+              <div>
+                <p className="eyebrow">실제 공개글 수집 결과</p>
+                <h3>대상 카페 2곳에서 가져온 최신 검색 결과</h3>
+                <p>
+                  수동 실행 기준 {cafeFetchedLabel}, 총 {naverCafeResults.length}건.
+                  비공개/회원 전용 글은 포함하지 않는다.
+                </p>
+              </div>
+              <div className="live-cafe-counts" aria-label="카테고리별 수집 건수">
+                {cafeResultCounts.map(([category, count]) => (
+                  <span key={category}>
+                    {category}
+                    <strong>{count}</strong>
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            <div className="keyword-strip" aria-label="검색한 키워드">
+              {naverCafeKeywords.map((keyword) => (
+                <span key={keyword}>{keyword}</span>
+              ))}
+            </div>
+
+            <div className="cafe-result-grid">
+              {cafeResultPreview.map((item) => (
+                <article className="cafe-result-card" key={item.link}>
+                  <div className="cafe-result-meta">
+                    <span className="pill">{item.category}</span>
+                    <small>{item.targetCafe?.name ?? item.cafename}</small>
+                  </div>
+                  <a href={item.link} target="_blank" rel="noreferrer">
+                    {item.title}
+                    <ExternalLink size={15} aria-hidden="true" />
+                  </a>
+                  <p>{item.description}</p>
+                  <em>{item.keyword}</em>
+                </article>
+              ))}
+            </div>
           </div>
         </section>
 
