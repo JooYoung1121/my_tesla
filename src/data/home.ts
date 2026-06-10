@@ -1,11 +1,13 @@
 import {
   BatteryCharging,
+  Boxes,
   CalendarCheck,
   CarFront,
   ChartNoAxesCombined,
   CircleDollarSign,
   ClipboardCheck,
   CreditCard,
+  Hammer,
   FileText,
   Gauge,
   KeyRound,
@@ -13,6 +15,7 @@ import {
   NotebookTabs,
   PlugZap,
   Radar,
+  ReceiptText,
   ShieldCheck,
   Sparkles,
   Tags,
@@ -22,6 +25,7 @@ import {
 export const navItems = [
   { label: "오늘", href: "#today" },
   { label: "정보 보드", href: "#intel" },
+  { label: "구매 계획", href: "#buying" },
   { label: "인수 준비", href: "#delivery" },
   { label: "카페 후보", href: "#cafes" },
   { label: "결정 노트", href: "#decisions" },
@@ -187,6 +191,173 @@ export const searchGroups = [
   { icon: CircleDollarSign, label: "보조금", count: 5 },
   { icon: Sparkles, label: "액세서리", count: 11 },
   { icon: FileText, label: "보험", count: 3 }
+];
+
+export const modelYPremiumRwdSpecs = [
+  { label: "차량가", value: "4,999만 원", note: "Tesla Korea 디자인 페이지 기준" },
+  { label: "구동", value: "RWD", note: "후륜구동" },
+  { label: "배터리", value: "Standard Range", note: "공식 제원 표기" },
+  { label: "주행 가능 거리", value: "400km", note: "실주행은 계절·속도 영향" },
+  { label: "0-100km/h", value: "5.9초", note: "일상 주행 충분" },
+  { label: "수퍼차저", value: "최대 175kW", note: "사용량 기반 과금" },
+  { label: "적재공간", value: "2,138L", note: "5인승 기준" },
+  { label: "보증", value: "4년/8만km", note: "배터리·구동장치 8년/16만km" }
+];
+
+export const budgetBuckets = [
+  {
+    icon: ReceiptText,
+    title: "차량·등록",
+    amount: "4,999만 원 + 등록비",
+    detail: "취득세는 전기차 감면 후 계산한다. 2026년 기준 전기차 취득세 감면 한도는 140만 원으로 확인된다."
+  },
+  {
+    icon: CircleDollarSign,
+    title: "보조금",
+    amount: "국비 170만 원 + 지역별 지방비",
+    detail: "Model Y Premium RWD 국비는 170만 원으로 확인된다. 지방비와 잔여 물량은 주소지 기준으로 매번 확인한다."
+  },
+  {
+    icon: ShieldCheck,
+    title: "보험",
+    amount: "연 120만~220만 원 가정",
+    detail: "연령, 운전자 범위, 자차, 자기부담금, 특약에 따라 크게 달라진다. 최소 3곳 비교가 필요하다."
+  },
+  {
+    icon: Hammer,
+    title: "시공",
+    amount: "85만~250만 원",
+    detail: "썬팅+생활보호 PPF 중심이면 85만~150만 원, 블랙박스·코팅·프론트 PPF를 더하면 150만~250만 원대로 올라간다."
+  },
+  {
+    icon: PlugZap,
+    title: "충전 준비",
+    amount: "0~40만 원",
+    detail: "충전카드는 무료 발급 중심. CCS 어댑터와 모바일 커넥터는 필요성이 확인되면 공식 제품 위주로 검토한다."
+  },
+  {
+    icon: Boxes,
+    title: "알리 필수템",
+    amount: "15만~45만 원",
+    detail: "보호필름, 매트, 선쉐이드, 머드플랩, 수납류처럼 실패해도 리스크가 낮은 품목부터 산다."
+  }
+];
+
+export const essentialSupplies = [
+  { item: "보험 견적", timing: "인수 2~3주 전", priority: "필수", memo: "운전자 범위, 자차, 자기부담금, 전기차 특약 확인" },
+  { item: "충전카드", timing: "지금", priority: "필수", memo: "환경부, 이브이인프라, 해피차저 등 생활권 기준 발급" },
+  { item: "하이패스", timing: "인수 전", priority: "필수", memo: "기존 단말 재사용 또는 새 단말 등록 방식 결정" },
+  { item: "썬팅", timing: "인수 직후", priority: "필수", memo: "야간 시야와 전파 수신, 보증 조건을 가격보다 먼저 확인" },
+  { item: "생활보호 PPF", timing: "인수 직후", priority: "권장", memo: "도어컵, 도어엣지, 충전구, 트렁크 리어 범퍼 중심" },
+  { item: "블랙박스", timing: "보류", priority: "선택", memo: "센트리 모드로 충분한지, 주차 녹화/보험 특약 필요성이 있는지 판단" },
+  { item: "CCS 어댑터", timing: "인수 후", priority: "상황별", memo: "장거리·지방 이동이 많으면 공식 제품 위주로 검토" },
+  { item: "모바일 커넥터", timing: "집밥 검토 후", priority: "상황별", memo: "단독주택·비상 충전 환경이 있으면 유용" }
+];
+
+export const aliShoppingList = [
+  {
+    item: "센터/후석 디스플레이 강화유리",
+    range: "1만~3만 원",
+    timing: "먼저 구매",
+    memo: "저렴하고 실패 리스크가 낮다. 2025~2026 Juniper/Highland 호환 표기를 확인한다."
+  },
+  {
+    item: "TPE 바닥·트렁크 매트",
+    range: "4만~12만 원",
+    timing: "먼저 구매",
+    memo: "국내 브랜드 대비 저렴하지만 냄새, 들뜸, 고정 핀 위치 후기를 확인한다."
+  },
+  {
+    item: "루프 선쉐이드",
+    range: "3만~11만 원",
+    timing: "여름 전",
+    memo: "모델 Y 글라스 루프 체감 온도 때문에 여름 인수라면 우선순위가 높다."
+  },
+  {
+    item: "짧은 머드플랩",
+    range: "1만~3만 원",
+    timing: "인수 전",
+    memo: "돌빵과 하단 오염 방지용. 너무 긴 제품은 간섭 후기를 확인한다."
+  },
+  {
+    item: "트렁크 문턱 보호대",
+    range: "1만~3만 원",
+    timing: "인수 후",
+    memo: "캐리어와 짐을 자주 싣는다면 체감된다. 접착식은 탈거 흔적을 고려한다."
+  },
+  {
+    item: "시트 하단 에어벤트 커버",
+    range: "5천~1.5만 원",
+    timing: "나중",
+    memo: "작은 물건이 뒷좌석 송풍구로 들어가는 것을 막는 용도다."
+  },
+  {
+    item: "센터 콘솔/스크린 하단 수납함",
+    range: "1만~4만 원",
+    timing: "나중",
+    memo: "수납 습관이 생긴 뒤 필요한 위치만 산다."
+  },
+  {
+    item: "휠 커버",
+    range: "6만~20만 원",
+    timing: "보류",
+    memo: "외관 만족도는 높지만 고속 주행 소음, 체결력, 순정 휠 흠집 후기를 확인한다."
+  },
+  {
+    item: "Qi2 맥세이프 거치대",
+    range: "3만~7만 원",
+    timing: "보류",
+    memo: "차량 기본 무선 충전이 불편할 때만 산다. Qi2 인증 여부를 확인한다."
+  },
+  {
+    item: "전면 흡기구/카메라 커버류",
+    range: "5천~2만 원",
+    timing: "검증 후",
+    memo: "센서, 냉각, 배수에 영향을 줄 수 있는 제품은 후기 확인 전 구매하지 않는다."
+  }
+];
+
+export const serviceCostRows = [
+  {
+    work: "썬팅 단품",
+    range: "55만~150만 원",
+    memo: "필름 등급과 루프/후면 통시공 여부에 따라 차이가 크다."
+  },
+  {
+    work: "썬팅 + 생활보호 PPF 패키지",
+    range: "85만~150만 원",
+    memo: "JB motors 85만 원대, 오리진마인드 95만 원 패키지 등 공개 사례가 있다."
+  },
+  {
+    work: "블랙박스 추가",
+    range: "30만~80만 원",
+    memo: "센트리 모드와 별도 블랙박스의 필요성을 먼저 결정한다."
+  },
+  {
+    work: "프론트 PPF",
+    range: "80만~180만 원",
+    memo: "범퍼, 보닛, 헤드라이트 등 시공 범위에 따라 달라진다."
+  },
+  {
+    work: "전체 PPF",
+    range: "250만~400만 원 이상",
+    memo: "무광/유광, 필름 브랜드, 재단 방식에 따라 큰 차이가 난다."
+  },
+  {
+    work: "유리막·가죽코팅·발수",
+    range: "10만~100만 원",
+    memo: "필수보다는 관리 성향에 가까워서 예산이 남을 때 검토한다."
+  }
+];
+
+export const shopCandidates = [
+  { name: "JB motors", area: "경기/수도권", note: "모델 Y 신차패키지 가격표 공개 사례" },
+  { name: "오리진마인드", area: "수도권", note: "모델 Y 주니퍼 95만 원 패키지 공개 사례" },
+  { name: "스타일매니아", area: "수도권", note: "모델 Y 주니퍼 썬팅/PPF 시공 사례 확인" },
+  { name: "모터스킨", area: "서울 강서", note: "전체 PPF+썬팅 가격 사례 확인" },
+  { name: "카독스", area: "경기 광주", note: "틴팅, 블랙박스, PPF 시공 사례 확인" },
+  { name: "비앤엠코리아", area: "부산", note: "부산 테슬라 신차패키지 후보" },
+  { name: "오늘의카", area: "비교 플랫폼", note: "하남·강동·송파 등 비교견적 탐색용" }
 ];
 
 export const deliveryChecklist = [

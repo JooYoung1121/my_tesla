@@ -15,12 +15,18 @@ import {
 } from "lucide-react";
 import {
   decisionItems,
+  aliShoppingList,
+  budgetBuckets,
   deliveryChecklist,
+  essentialSupplies,
   intelItems,
+  modelYPremiumRwdSpecs,
   navItems,
   ownerLogItems,
   prepGroups,
   searchGroups,
+  serviceCostRows,
+  shopCandidates,
   signalCards,
   statusMetrics,
   watchedCafes
@@ -160,6 +166,123 @@ export default function Home() {
                 <p>{item.summary}</p>
               </article>
             ))}
+          </div>
+        </section>
+
+        <section className="section-band" id="buying">
+          <div className="section-heading">
+            <div>
+              <p className="eyebrow">구매 계획</p>
+              <h2>모델 Y 프리미엄 RWD 기준 예산과 준비물</h2>
+            </div>
+            <a className="ghost-button" href="https://www.tesla.com/ko_kr/modely" target="_blank" rel="noreferrer">
+              공식 제원
+              <ExternalLink size={18} aria-hidden="true" />
+            </a>
+          </div>
+
+          <div className="spec-grid" aria-label="모델 Y 프리미엄 RWD 핵심 제원">
+            {modelYPremiumRwdSpecs.map((spec) => (
+              <article className="spec-card" key={spec.label}>
+                <span>{spec.label}</span>
+                <strong>{spec.value}</strong>
+                <small>{spec.note}</small>
+              </article>
+            ))}
+          </div>
+
+          <div className="budget-grid">
+            {budgetBuckets.map((bucket) => {
+              const Icon = bucket.icon;
+              return (
+                <article className="budget-card" key={bucket.title}>
+                  <Icon size={22} aria-hidden="true" />
+                  <div>
+                    <span>{bucket.title}</span>
+                    <strong>{bucket.amount}</strong>
+                    <p>{bucket.detail}</p>
+                  </div>
+                </article>
+              );
+            })}
+          </div>
+
+          <div className="buying-columns">
+            <article className="buying-panel">
+              <div className="mini-heading">
+                <p className="eyebrow">필수 준비물</p>
+                <h3>인수 전에 결정할 것</h3>
+              </div>
+              <div className="supply-list">
+                {essentialSupplies.map((supply) => (
+                  <div className="supply-item" key={supply.item}>
+                    <div>
+                      <strong>{supply.item}</strong>
+                      <span>{supply.memo}</span>
+                    </div>
+                    <div>
+                      <em>{supply.priority}</em>
+                      <small>{supply.timing}</small>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </article>
+
+            <article className="buying-panel">
+              <div className="mini-heading">
+                <p className="eyebrow">알리 구매 후보</p>
+                <h3>싸게 사도 괜찮은 것부터</h3>
+              </div>
+              <div className="ali-list">
+                {aliShoppingList.map((item) => (
+                  <div className="ali-item" key={item.item}>
+                    <div>
+                      <strong>{item.item}</strong>
+                      <span>{item.memo}</span>
+                    </div>
+                    <div>
+                      <em>{item.range}</em>
+                      <small>{item.timing}</small>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </article>
+          </div>
+
+          <div className="service-board">
+            <article className="service-panel">
+              <div className="mini-heading">
+                <p className="eyebrow">시공 비용</p>
+                <h3>견적 받을 때의 기준선</h3>
+              </div>
+              <div className="service-table">
+                {serviceCostRows.map((row) => (
+                  <div className="service-row" key={row.work}>
+                    <strong>{row.work}</strong>
+                    <em>{row.range}</em>
+                    <span>{row.memo}</span>
+                  </div>
+                ))}
+              </div>
+            </article>
+
+            <article className="service-panel">
+              <div className="mini-heading">
+                <p className="eyebrow">업체 후보</p>
+                <h3>추천이 아니라 견적 비교 목록</h3>
+              </div>
+              <div className="shop-grid">
+                {shopCandidates.map((shop) => (
+                  <div className="shop-chip" key={shop.name}>
+                    <strong>{shop.name}</strong>
+                    <span>{shop.area}</span>
+                    <small>{shop.note}</small>
+                  </div>
+                ))}
+              </div>
+            </article>
           </div>
         </section>
 
