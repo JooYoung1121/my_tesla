@@ -15,13 +15,15 @@ import {
 } from "lucide-react";
 import {
   decisionItems,
+  deliveryChecklist,
   intelItems,
   navItems,
   ownerLogItems,
   prepGroups,
   searchGroups,
   signalCards,
-  statusMetrics
+  statusMetrics,
+  watchedCafes
 } from "@/data/home";
 
 export default function Home() {
@@ -197,6 +199,62 @@ export default function Home() {
                 </article>
               );
             })}
+          </div>
+
+          <div className="checklist-board" aria-label="상세 인수 준비 체크리스트">
+            {deliveryChecklist.map((group) => {
+              const Icon = group.icon;
+              return (
+                <article className="checklist-card" key={group.phase}>
+                  <div className="checklist-card-head">
+                    <Icon size={21} aria-hidden="true" />
+                    <div>
+                      <strong>{group.phase}</strong>
+                      <p>{group.summary}</p>
+                    </div>
+                  </div>
+                  <ul className="checklist-items">
+                    {group.items.map((item) => (
+                      <li key={item.text}>
+                        <span className={`status-dot status-${item.status}`} aria-hidden="true" />
+                        <span>{item.text}</span>
+                        <em>{item.status}</em>
+                      </li>
+                    ))}
+                  </ul>
+                </article>
+              );
+            })}
+          </div>
+        </section>
+
+        <section className="section-band" id="cafes">
+          <div className="section-heading">
+            <div>
+              <p className="eyebrow">카페 수집 후보</p>
+              <h2>공개글 검색으로 먼저 감시할 카페</h2>
+            </div>
+            <button className="ghost-button">
+              API 연결 후 저장
+              <Database size={18} aria-hidden="true" />
+            </button>
+          </div>
+
+          <div className="cafe-grid">
+            {watchedCafes.map((cafe) => (
+              <article className="cafe-card" key={cafe.slug}>
+                <span>{cafe.slug}</span>
+                <strong>{cafe.name}</strong>
+                <p>{cafe.note}</p>
+                <div>
+                  <small>clubId {cafe.clubId}</small>
+                  <a href={cafe.url} target="_blank" rel="noreferrer">
+                    열기
+                    <ExternalLink size={15} aria-hidden="true" />
+                  </a>
+                </div>
+              </article>
+            ))}
           </div>
         </section>
 

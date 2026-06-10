@@ -527,6 +527,140 @@ h2 {
   color: var(--green);
 }
 
+.checklist-board {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.checklist-card {
+  min-width: 0;
+  padding: 16px;
+  background: #f9faf7;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
+.checklist-card-head {
+  display: grid;
+  grid-template-columns: 30px minmax(0, 1fr);
+  gap: 10px;
+  min-height: 58px;
+  margin-bottom: 12px;
+}
+
+.checklist-card-head svg {
+  margin-top: 2px;
+  color: var(--red);
+}
+
+.checklist-card-head strong,
+.checklist-card-head p {
+  display: block;
+}
+
+.checklist-card-head p {
+  margin: 5px 0 0;
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+.checklist-items {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.checklist-items li {
+  display: grid;
+  grid-template-columns: 10px minmax(0, 1fr) 42px;
+  gap: 9px;
+  align-items: center;
+  min-height: 32px;
+  padding: 8px 10px;
+  background: #fff;
+  border: 1px solid #ebece7;
+  border-radius: 8px;
+  line-height: 1.45;
+}
+
+.checklist-items em {
+  color: var(--muted);
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 800;
+  text-align: right;
+}
+
+.status-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 999px;
+  background: #c9cbc5;
+}
+
+.status-완료 {
+  background: var(--green);
+}
+
+.status-진행 {
+  background: var(--amber);
+}
+
+.status-대기 {
+  background: #b9bdb8;
+}
+
+.cafe-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.cafe-card {
+  min-height: 176px;
+  padding: 18px;
+  background: #f9faf7;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
+.cafe-card > span,
+.cafe-card small {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.cafe-card strong {
+  display: block;
+  margin: 7px 0 10px;
+  font-size: 20px;
+}
+
+.cafe-card p {
+  margin-bottom: 18px;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.cafe-card div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.cafe-card a {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--red);
+  font-weight: 800;
+}
+
 .split-section {
   display: grid;
   grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
@@ -797,6 +931,8 @@ h2 {
   .metric-grid,
   .signal-strip,
   .prep-grid,
+  .checklist-board,
+  .cafe-grid,
   .system-strip,
   .doc-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -834,6 +970,8 @@ h2 {
   .metric-grid,
   .signal-strip,
   .prep-grid,
+  .checklist-board,
+  .cafe-grid,
   .owner-log-grid,
   .system-strip,
   .doc-grid,
