@@ -1,12 +1,15 @@
 import {
   BatteryCharging,
   Boxes,
+  BrainCircuit,
   CalendarCheck,
   CarFront,
   ChartNoAxesCombined,
   CircleDollarSign,
   ClipboardCheck,
   CreditCard,
+  Cpu,
+  Factory,
   Hammer,
   FileText,
   Gauge,
@@ -16,9 +19,13 @@ import {
   PlugZap,
   Radar,
   ReceiptText,
+  RefreshCw,
+  Route,
   ShieldCheck,
+  ShieldAlert,
   Sparkles,
   Tags,
+  Wifi,
   Wrench
 } from "lucide-react";
 
@@ -192,6 +199,75 @@ export const searchGroups = [
   { icon: CircleDollarSign, label: "보조금", count: 8 },
   { icon: Sparkles, label: "공용 액세서리", count: 15 },
   { icon: FileText, label: "보험·인수", count: 11 }
+];
+
+export const teslaBasics = [
+  {
+    icon: Factory,
+    title: "한국 Model Y 원산지",
+    verdict: "주문서와 VIN으로 최종 확인",
+    detail: "한국 RWD Model Y는 2023년부터 기가 상하이 생산분 수입 사례가 확인된다. 다만 차량별 원산지는 주문 상세, 등록 서류, VIN으로 최종 확인한다.",
+    tags: ["기가 상하이", "VIN", "등록 서류"]
+  },
+  {
+    icon: BrainCircuit,
+    title: "FSD가 안 된다는 말",
+    verdict: "공장보다 지역·하드웨어·계정 권한 문제",
+    detail: "중국 공장에서 만들었다는 사실만으로 FSD 가능 여부가 갈리지는 않는다. 실제 기준은 판매 지역, 차량 구성, 구매 옵션, 어시스티드 드라이빙 하드웨어와 소프트웨어 버전이다.",
+    tags: ["지역", "옵션", "하드웨어"]
+  },
+  {
+    icon: RefreshCw,
+    title: "소프트웨어 업그레이드",
+    verdict: "가능하면 앱이나 차량 화면에 표시",
+    detail: "지원 대상이면 Tesla 앱의 업그레이드 메뉴나 차량 터치스크린의 업그레이드 메뉴에서 FSD 관련 옵션을 볼 수 있다. 활성화 전 OTA 업데이트가 필요할 수 있다.",
+    tags: ["Tesla 앱", "OTA", "업그레이드"]
+  },
+  {
+    icon: ShieldAlert,
+    title: "완전 자율주행 아님",
+    verdict: "감독형 운전자 보조",
+    detail: "FSD(감독형)는 이름과 달리 운전자의 적극적인 감독이 필요하다. 운전자는 항상 도로를 보고 즉시 직접 조작할 준비를 해야 한다.",
+    tags: ["감독형", "운전자 책임", "레벨2"]
+  }
+];
+
+export const autopilotLevels = [
+  {
+    label: "기본 안전 기능",
+    summary: "자동 긴급 제동, 충돌 경고 같은 기본 안전 보조 기능",
+    check: "차량 기본 제공 기능과 옵션 기능을 분리해서 본다."
+  },
+  {
+    label: "오토파일럿",
+    summary: "교통 인식 크루즈 컨트롤과 오토스티어 중심의 주행 보조",
+    check: "차선, 속도, 앞차 추종이 핵심이며 운전자가 계속 감독한다."
+  },
+  {
+    label: "향상된 오토파일럿",
+    summary: "일부 시장에서 제공되는 자동 차선 변경, 자동 주차 등 확장 패키지",
+    check: "한국 판매 구성과 구매 가능 여부는 주문/앱에서 확인한다."
+  },
+  {
+    label: "FSD(감독형)",
+    summary: "목적지 주행, 교차로 판단, 회전, 고속도로 진출입 등을 시도하는 고급 보조",
+    check: "차량 구성, 지역 지원, 하드웨어, 소프트웨어 버전이 모두 맞아야 한다."
+  }
+];
+
+export const teslaBasicsChecklist = [
+  "인수 전 주문 상세에서 FSD 또는 오토파일럿 관련 옵션 표기 확인",
+  "인수 후 차량 화면에서 컨트롤 > 소프트웨어의 어시스티드 드라이빙 컴퓨터 확인",
+  "Tesla 앱 > 업그레이드 > 소프트웨어 업그레이드에 FSD 옵션이 뜨는지 확인",
+  "카메라 보정, 지도 업데이트, 소프트웨어 업데이트 상태 확인",
+  "FSD 후기 글은 차량 연식, 생산지, 하드웨어 세대, 배포 국가를 같이 기록"
+];
+
+export const teslaBasicsSources = [
+  { label: "Tesla Model Y 공식 제원", url: "https://www.tesla.com/ko_kr/modely" },
+  { label: "Tesla FSD(감독형) 매뉴얼", url: "https://www.tesla.com/ownersmanual/modely/ko_us/GUID-2CB60804-9CEA-4F4B-8B04-09B991368DC5.html" },
+  { label: "Tesla FSD 지원 문서", url: "https://www.tesla.com/support/fsd" },
+  { label: "중국산 Model Y 한국 수출 보도", url: "https://kr.news.cn/20230721/3b385507cdb94901ab898e6c220bf5ae/c.html" }
 ];
 
 export const modelYPremiumRwdSpecs = [

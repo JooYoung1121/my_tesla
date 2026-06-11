@@ -5,6 +5,7 @@ import { useState } from "react";
 import {
   ArrowUpRight,
   Bookmark,
+  BrainCircuit,
   Check,
   Database,
   ExternalLink,
@@ -18,6 +19,7 @@ import {
   type LucideIcon
 } from "lucide-react";
 import {
+  autopilotLevels,
   decisionItems,
   aliShoppingList,
   budgetBuckets,
@@ -31,13 +33,16 @@ import {
   shopCandidates,
   signalCards,
   statusMetrics,
+  teslaBasics,
+  teslaBasicsChecklist,
+  teslaBasicsSources,
   watchedCafes
 } from "@/data/home";
 import { CafeSearchPanel } from "./CafeSearchPanel";
 import { ChecklistManager } from "./ChecklistManager";
 import { PersonalNotes } from "./PersonalNotes";
 
-type ViewId = "overview" | "intel" | "buying" | "delivery" | "notes" | "owner";
+type ViewId = "overview" | "intel" | "basics" | "buying" | "delivery" | "notes" | "owner";
 type TopbarAction = {
   label: string;
   icon: LucideIcon;
@@ -67,6 +72,13 @@ const views: Array<{
     title: "카페 글과 참고 정보를 주제별로 본다",
     eyebrow: "정보 보드",
     description: "모델 Y 전용 글과 테슬라 공용 글을 함께 보고, 주제가 같은 정보끼리 묶어 확인한다."
+  },
+  {
+    id: "basics",
+    label: "테슬라 기초",
+    title: "FSD와 생산지처럼 헷갈리는 기본기를 정리한다",
+    eyebrow: "기초 지식",
+    description: "중국 생산, 오토파일럿, FSD, 소프트웨어 업그레이드처럼 구매 전 자주 헷갈리는 내용을 따로 본다."
   },
   {
     id: "buying",
@@ -128,7 +140,13 @@ const topbarActionsByView: Record<ViewId, TopbarAction[]> = {
     { label: "정보 추가", icon: Plus, view: "notes", primary: true }
   ],
   intel: [
+    { label: "테슬라 기초", icon: BrainCircuit, view: "basics" },
     { label: "구매·시공", icon: Filter, view: "buying" },
+    { label: "메모 추가", icon: Plus, view: "notes", primary: true }
+  ],
+  basics: [
+    { label: "정보 검색", icon: Search, view: "intel" },
+    { label: "공식 제원", icon: ExternalLink, href: "https://www.tesla.com/ko_kr/modely", external: true },
     { label: "메모 추가", icon: Plus, view: "notes", primary: true }
   ],
   buying: [
@@ -266,6 +284,7 @@ export function TeslaCommandCenter() {
         <section className="tab-panel" aria-live="polite">
           {activeView === "overview" ? <OverviewView setActiveView={setActiveView} /> : null}
           {activeView === "intel" ? <IntelView setActiveView={setActiveView} /> : null}
+          {activeView === "basics" ? <BasicsView /> : null}
           {activeView === "buying" ? <BuyingView /> : null}
           {activeView === "delivery" ? <DeliveryView /> : null}
           {activeView === "notes" ? <NotesView /> : null}
@@ -352,6 +371,11 @@ function OverviewView({ setActiveView }: { setActiveView: (view: ViewId) => void
             <Search size={20} aria-hidden="true" />
             <strong>카페 글 찾기</strong>
             <span>썬팅, 보험, 충전카드 같은 검색 주제부터 본다.</span>
+          </button>
+          <button onClick={() => setActiveView("basics")} type="button">
+            <BrainCircuit size={20} aria-hidden="true" />
+            <strong>테슬라 기초</strong>
+            <span>FSD, 오토파일럿, 생산지, OTA처럼 헷갈리는 말을 정리한다.</span>
           </button>
           <button onClick={() => setActiveView("buying")} type="button">
             <Filter size={20} aria-hidden="true" />
@@ -453,6 +477,81 @@ function IntelView({ setActiveView }: { setActiveView: (view: ViewId) => void })
             </article>
           ))}
         </div>
+      </section>
+    </>
+  );
+}
+
+function BasicsView() {
+  return (
+    <>
+      <section className="section-band">
+        <SectionHeader eyebrow="핵심 정리" title="공장보다 중요한 것은 지역, 옵션, 하드웨어다" />
+        <div className="basic-card-grid">
+          {teslaBasics.map((item) => {
+            const Icon = item.icon;
+            return (
+              <article className="basic-card" key={item.title}>
+                <div className="basic-card-head">
+                  <Icon size={22} aria-hidden="true" />
+                  <span>{item.verdict}</span>
+                </div>
+                <strong>{item.title}</strong>
+                <p>{item.detail}</p>
+                <div>
+                  {item.tags.map((tag) => (
+                    <em key={tag}>{tag}</em>
+                  ))}
+                </div>
+              </article>
+            );
+          })}
+        </div>
+      </section>
+
+      <section className="section-band">
+        <SectionHeader eyebrow="용어 구분" title="오토파일럿과 FSD를 같은 말로 보지 않는다" />
+        <div className="autopilot-list">
+          {autopilotLevels.map((item) => (
+            <article className="autopilot-row" key={item.label}>
+              <strong>{item.label}</strong>
+              <p>{item.summary}</p>
+              <span>{item.check}</span>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="basics-columns">
+        <article className="basics-panel">
+          <div className="mini-heading">
+            <p className="eyebrow">인수 후 확인</p>
+            <h3>내 차 기준으로 판정할 것</h3>
+          </div>
+          <ul className="basics-checklist">
+            {teslaBasicsChecklist.map((item) => (
+              <li key={item}>
+                <Check size={16} aria-hidden="true" />
+                <span>{item}</span>
+              </li>
+            ))}
+          </ul>
+        </article>
+
+        <article className="basics-panel">
+          <div className="mini-heading">
+            <p className="eyebrow">공식·참고 링크</p>
+            <h3>나중에 다시 확인할 출처</h3>
+          </div>
+          <div className="basic-source-list">
+            {teslaBasicsSources.map((source) => (
+              <a href={source.url} key={source.url} target="_blank" rel="noreferrer">
+                <span>{source.label}</span>
+                <ExternalLink size={15} aria-hidden="true" />
+              </a>
+            ))}
+          </div>
+        </article>
       </section>
     </>
   );

@@ -349,6 +349,159 @@ h2 {
   font-weight: 800;
 }
 
+.basic-card-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.basic-card,
+.basics-panel,
+.autopilot-row {
+  min-width: 0;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
+.basic-card {
+  display: grid;
+  align-content: start;
+  min-height: 230px;
+  padding: 16px;
+}
+
+.basic-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.basic-card-head svg {
+  color: var(--red);
+}
+
+.basic-card-head span {
+  color: var(--blue);
+  font-size: 12px;
+  font-weight: 800;
+  text-align: right;
+}
+
+.basic-card strong {
+  margin-bottom: 9px;
+  font-size: 17px;
+}
+
+.basic-card p {
+  margin-bottom: 14px;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.basic-card div:last-child {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-self: end;
+}
+
+.basic-card em {
+  display: inline-flex;
+  align-items: center;
+  min-height: 26px;
+  padding: 0 9px;
+  color: var(--green);
+  background: var(--green-soft);
+  border-radius: 999px;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 800;
+}
+
+.autopilot-list {
+  display: grid;
+  gap: 9px;
+}
+
+.autopilot-row {
+  display: grid;
+  grid-template-columns: 150px minmax(220px, 1fr) minmax(260px, 1.25fr);
+  gap: 14px;
+  align-items: center;
+  min-height: 72px;
+  padding: 14px 16px;
+}
+
+.autopilot-row strong {
+  color: var(--red);
+}
+
+.autopilot-row p,
+.autopilot-row span {
+  margin-bottom: 0;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.basics-columns {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(280px, 0.9fr);
+  gap: 16px;
+}
+
+.basics-panel {
+  padding: 18px;
+}
+
+.basics-checklist {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.basics-checklist li {
+  display: grid;
+  grid-template-columns: 22px minmax(0, 1fr);
+  gap: 9px;
+  align-items: start;
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.basics-checklist svg {
+  color: var(--green);
+  margin-top: 2px;
+}
+
+.basic-source-list {
+  display: grid;
+  gap: 8px;
+}
+
+.basic-source-list a {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-height: 44px;
+  padding: 0 12px;
+  color: var(--ink);
+  background: #f9faf7;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  font-weight: 800;
+}
+
+.basic-source-list a:hover {
+  color: var(--red);
+  background: #fff;
+}
+
 .scroll-panel {
   max-height: min(620px, calc(100vh - 220px));
   overflow: auto;
@@ -1709,10 +1862,12 @@ h2 {
   .quick-focus-grid,
   .topic-grid,
   .prep-grid,
+  .basic-card-grid,
   .cafe-result-grid,
   .note-grid,
   .spec-grid,
   .budget-grid,
+  .basics-columns,
   .checklist-board,
   .cafe-grid,
   .system-strip,
@@ -1784,10 +1939,12 @@ h2 {
   .quick-focus-grid,
   .topic-grid,
   .prep-grid,
+  .basic-card-grid,
   .cafe-result-grid,
   .note-grid,
   .spec-grid,
   .budget-grid,
+  .basics-columns,
   .buying-columns,
   .service-board,
   .checklist-board,
@@ -1826,6 +1983,11 @@ h2 {
     gap: 8px;
     border: 1px solid var(--line);
     border-radius: 8px;
+  }
+
+  .autopilot-row {
+    grid-template-columns: 1fr;
+    gap: 8px;
   }
 
   .decision-item {

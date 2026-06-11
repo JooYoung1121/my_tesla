@@ -10,5 +10,6 @@ TeslaMate 연동 가능성을 한 곳에 모으는 개인용 웹앱을 목표로
 
 - [전략 문서](docs/strategy.md)
 - [TeslaMate 설명](docs/teslamate.md)
+- [테슬라 기초 지식](docs/tesla-basics.md)
 - [네이버 카페 수집 메모](docs/naver-cafe.md)
 - [모델 Y 프리미엄 RWD 구매 조사](docs/model-y-premium-rwd.md)
