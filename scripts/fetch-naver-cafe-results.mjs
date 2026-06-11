@@ -21,22 +21,34 @@ const TARGET_CAFES = [
 ];
 
 const KEYWORDS = [
+  "모델Y 프리미엄 RWD",
+  "모델Y 주니퍼 인수",
+  "모델Y 인수 체크",
   "모델Y 주니퍼 썬팅",
   "모델Y 썬팅",
+  "테슬라 썬팅",
+  "테슬라 틴팅",
   "모델Y PPF",
+  "테슬라 생활보호 PPF",
   "모델Y 블랙박스",
+  "테슬라 블랙박스",
   "모델Y 보험",
+  "테슬라 보험",
   "모델Y 보조금",
-  "모델Y 인수 체크",
   "테슬라 충전카드",
+  "테슬라 집밥 충전",
   "모델Y 하이패스",
+  "테슬라 하이패스",
   "모델Y 알리 액세서리",
+  "테슬라 알리 액세서리",
   "모델Y 선쉐이드",
-  "모델Y 매트"
+  "테슬라 선쉐이드",
+  "모델Y 매트",
+  "테슬라 매트"
 ];
 
 const MAX_RESULTS_PER_KEYWORD = 6;
-const MAX_TOTAL_RESULTS = 80;
+const MAX_TOTAL_RESULTS = 120;
 
 function loadEnv(text) {
   for (const line of text.split(/\r?\n/)) {
@@ -72,18 +84,48 @@ function findTargetCafe(cafeurl) {
   );
 }
 
-function categorize(keyword, title, description) {
-  const text = `${keyword} ${title} ${description}`;
-  if (/썬팅|틴팅|농도|필름/.test(text)) return "썬팅";
-  if (/PPF|생활보호|도어컵|도어엣지|필름/.test(text)) return "PPF";
-  if (/블랙박스|주차녹화|상시전원/.test(text)) return "블랙박스";
+function categorizeText(text) {
+  if (/PPF|생활보호|도어컵|도어엣지|트렁크리드|필러|스톤칩/i.test(text)) return "PPF";
+  if (/썬팅|틴팅|농도|필름|버텍스|레이노|브이쿨|루마|후퍼옵틱/i.test(text)) return "썬팅";
+  if (/블랙박스|주차녹화|상시전원|보조배터리|센트리/i.test(text)) return "블랙박스";
   if (/보험|특약|자차|자기부담/.test(text)) return "보험";
   if (/보조금|국비|지방비|지원금/.test(text)) return "보조금";
-  if (/충전|충전카드|슈퍼차저|집밥|회사밥/.test(text)) return "충전";
-  if (/하이패스/.test(text)) return "하이패스";
-  if (/알리|악세사리|액세서리|선쉐이드|매트|수납/.test(text)) return "액세서리";
+  if (/충전|충전카드|슈퍼차저|집밥|회사밥|어댑터|커넥터/.test(text)) return "충전";
+  if (/알리|악세사리|액세서리|선쉐이드|매트|수납|하이패스|거치대|보호필름|머드플랩/.test(text)) return "액세서리";
   if (/인수|출고|검수|체크/.test(text)) return "인수";
-  return "일반";
+  return "기타";
+}
+
+function categorize(keyword, title, description) {
+  const contentCategory = categorizeText(`${title} ${description}`);
+  return contentCategory === "기타" ? categorizeText(keyword) : contentCategory;
+}
+
+function isLikelyNoise(title, description) {
+  const text = `${title} ${description}`;
+  return /가입인사|신규 가입|판매\s*합니다|팝니다|삽니다|양도|승계|장기렌트|리스\s*승계|커멘더\s*판매|S3XY\s*노브|모델\s*Y\s*L|모델YL|(^|[^A-Za-z0-9])YL([^A-Za-z0-9]|$)/i.test(text);
+}
+
+function keywordFocusPattern(keyword) {
+  if (/하이패스/.test(keyword)) return /하이패스/i;
+  if (/충전카드/.test(keyword)) return /충전\s*카드|충전카드/i;
+  if (/집밥/.test(keyword)) return /집밥|회사밥|아파트\s*충전|완속\s*충전|충전기/i;
+  if (/썬팅|틴팅/.test(keyword)) return /썬팅|틴팅|필름|농도|버텍스|레이노|브이쿨|루마|후퍼옵틱/i;
+  if (/PPF|생활보호/.test(keyword)) return /PPF|생활보호|도어컵|도어엣지|트렁크리드|필러|스톤칩/i;
+  if (/블랙박스/.test(keyword)) return /블랙박스|주차녹화|상시전원|보조배터리|센트리/i;
+  if (/보험/.test(keyword)) return /보험|특약|자차|자기부담/i;
+  if (/보조금/.test(keyword)) return /보조금|국비|지방비|지원금/i;
+  if (/인수|체크/.test(keyword)) return /인수|인도|출고|검수|체크/i;
+  if (/알리|액세서리/.test(keyword)) return /알리|악세사리|액세서리|수납|거치대|보호필름|머드플랩/i;
+  if (/선쉐이드/.test(keyword)) return /선쉐이드|선세이드|차양|햇빛|루프\s*커버/i;
+  if (/매트/.test(keyword)) return /매트|트렁크\s*매트|바닥\s*매트|TPE/i;
+  if (/프리미엄|RWD/.test(keyword)) return /프리미엄|RWD|후륜|Standard Range|스탠다드/i;
+  return null;
+}
+
+function matchesKeywordFocus(keyword, title, description) {
+  const pattern = keywordFocusPattern(keyword);
+  return !pattern || pattern.test(`${title} ${description}`);
 }
 
 async function searchCafeArticles(keyword) {
@@ -157,6 +199,8 @@ try {
     const results = await searchCafeArticles(keyword);
     const targetResults = results
       .filter((item) => item.targetCafe)
+      .filter((item) => !isLikelyNoise(item.title, item.description))
+      .filter((item) => matchesKeywordFocus(keyword, item.title, item.description))
       .slice(0, MAX_RESULTS_PER_KEYWORD);
     batches.push(...targetResults);
     console.log(`${keyword}: 대상 카페 ${targetResults.length}건`);

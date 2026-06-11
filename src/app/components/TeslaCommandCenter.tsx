@@ -1,7 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import {
   ArrowUpRight,
   Bookmark,
@@ -14,7 +14,8 @@ import {
   Search,
   Server,
   Star,
-  TimerReset
+  TimerReset,
+  type LucideIcon
 } from "lucide-react";
 import {
   decisionItems,
@@ -37,6 +38,14 @@ import { ChecklistManager } from "./ChecklistManager";
 import { PersonalNotes } from "./PersonalNotes";
 
 type ViewId = "overview" | "intel" | "buying" | "delivery" | "notes" | "owner";
+type TopbarAction = {
+  label: string;
+  icon: LucideIcon;
+  view?: ViewId;
+  href?: string;
+  external?: boolean;
+  primary?: boolean;
+};
 
 const views: Array<{
   id: ViewId;
@@ -57,7 +66,7 @@ const views: Array<{
     label: "정보 검색",
     title: "카페 글과 참고 정보를 주제별로 본다",
     eyebrow: "정보 보드",
-    description: "썬팅, 보험, 충전, 액세서리처럼 판단 주제가 같은 글끼리 묶어 확인한다."
+    description: "모델 Y 전용 글과 테슬라 공용 글을 함께 보고, 주제가 같은 정보끼리 묶어 확인한다."
   },
   {
     id: "buying",
@@ -107,10 +116,39 @@ const infoTopicGroups = [
   },
   {
     title: "나중에 살 것",
-    tags: ["액세서리", "알리", "수납"],
-    text: "실사용 후 불편이 생겼을 때 사도 되는 품목으로 분리한다."
+    tags: ["액세서리", "알리", "공용 테슬라"],
+    text: "모델 Y 전용 부품과 전 차종 공용 액세서리를 나눠서 본다."
   }
 ];
+
+const topbarActionsByView: Record<ViewId, TopbarAction[]> = {
+  overview: [
+    { label: "정보 검색", icon: Search, view: "intel" },
+    { label: "구매·시공", icon: Filter, view: "buying" },
+    { label: "정보 추가", icon: Plus, view: "notes", primary: true }
+  ],
+  intel: [
+    { label: "구매·시공", icon: Filter, view: "buying" },
+    { label: "메모 추가", icon: Plus, view: "notes", primary: true }
+  ],
+  buying: [
+    { label: "공식 제원", icon: ExternalLink, href: "https://www.tesla.com/ko_kr/modely", external: true },
+    { label: "인수 준비", icon: Check, view: "delivery" },
+    { label: "메모 추가", icon: Plus, view: "notes", primary: true }
+  ],
+  delivery: [
+    { label: "구매·시공", icon: Filter, view: "buying" },
+    { label: "메모 추가", icon: Plus, view: "notes", primary: true }
+  ],
+  notes: [
+    { label: "정보 검색", icon: Search, view: "intel" },
+    { label: "구매·시공", icon: Filter, view: "buying" }
+  ],
+  owner: [
+    { label: "TeslaMate", icon: Server, href: "/teslamate" },
+    { label: "메모 추가", icon: Plus, view: "notes", primary: true }
+  ]
+};
 
 function SectionHeader({
   eyebrow,
@@ -135,15 +173,7 @@ function SectionHeader({
 export function TeslaCommandCenter() {
   const [activeView, setActiveView] = useState<ViewId>("overview");
   const currentView = views.find((view) => view.id === activeView) ?? views[0];
-
-  const quickActions = useMemo(
-    () => [
-      { label: "검색", icon: Search, view: "intel" as ViewId },
-      { label: "구매 계획", icon: Filter, view: "buying" as ViewId },
-      { label: "정보 추가", icon: Plus, view: "notes" as ViewId }
-    ],
-    []
-  );
+  const topbarActions = topbarActionsByView[activeView];
 
   return (
     <main className="app-shell">
@@ -188,18 +218,32 @@ export function TeslaCommandCenter() {
             <p className="view-description">{currentView.description}</p>
           </div>
           <div className="topbar-actions" aria-label="빠른 동작">
-            {quickActions.map((action) => {
+            {topbarActions.map((action) => {
               const Icon = action.icon;
-              return (
-                <button
-                  className={action.label === "정보 추가" ? "primary-button" : "icon-button"}
+              const className = action.primary ? "primary-button" : "ghost-button";
+
+              return action.href ? (
+                <a
+                  className={className}
+                  href={action.href}
                   key={action.label}
-                  onClick={() => setActiveView(action.view)}
+                  rel={action.external ? "noreferrer" : undefined}
+                  target={action.external ? "_blank" : undefined}
+                  title={action.label}
+                >
+                  <Icon size={18} aria-hidden="true" />
+                  {action.label}
+                </a>
+              ) : (
+                <button
+                  className={className}
+                  key={action.label}
+                  onClick={() => action.view && setActiveView(action.view)}
                   title={action.label}
                   type="button"
                 >
                   <Icon size={18} aria-hidden="true" />
-                  {action.label === "정보 추가" ? action.label : null}
+                  {action.label}
                 </button>
               );
             })}

@@ -42,8 +42,8 @@ export const statusMetrics = [
   },
   {
     label: "확인할 글",
-    value: "27",
-    detail: "썬팅·보험·충전카드 중심",
+    value: "96건",
+    detail: "모델 Y 전용 + 테슬라 공용 최초 수집",
     tone: "blue"
   },
   {
@@ -188,20 +188,24 @@ export const ownerLogItems = [
 ];
 
 export const searchGroups = [
-  { icon: Tags, label: "썬팅", count: 8 },
-  { icon: CircleDollarSign, label: "보조금", count: 5 },
-  { icon: Sparkles, label: "액세서리", count: 11 },
-  { icon: FileText, label: "보험", count: 3 }
+  { icon: Tags, label: "썬팅·틴팅", count: 21 },
+  { icon: CircleDollarSign, label: "보조금", count: 8 },
+  { icon: Sparkles, label: "공용 액세서리", count: 15 },
+  { icon: FileText, label: "보험·인수", count: 11 }
 ];
 
 export const modelYPremiumRwdSpecs = [
-  { label: "차량가", value: "4,999만 원", note: "Tesla Korea 디자인 페이지 기준" },
+  { label: "차량가", value: "4,999만 원", note: "2026-06-11 확인 기준" },
   { label: "구동", value: "RWD", note: "후륜구동" },
   { label: "배터리", value: "Standard Range", note: "공식 제원 표기" },
   { label: "주행 가능 거리", value: "400km", note: "실주행은 계절·속도 영향" },
   { label: "0-100km/h", value: "5.9초", note: "일상 주행 충분" },
+  { label: "중량", value: "1,920kg", note: "Premium RWD 기준" },
   { label: "수퍼차저", value: "최대 175kW", note: "사용량 기반 과금" },
   { label: "적재공간", value: "2,138L", note: "5인승 기준" },
+  { label: "디스플레이", value: "16인치+8인치", note: "중앙·후석 터치스크린" },
+  { label: "전장/전고", value: "4,790/1,625mm", note: "공식 치수" },
+  { label: "전폭", value: "1,980/2,130mm", note: "접이식/확장 미러 기준" },
   { label: "보증", value: "4년/8만km", note: "배터리·구동장치 8년/16만km" }
 ];
 
@@ -216,7 +220,7 @@ export const budgetBuckets = [
     icon: CircleDollarSign,
     title: "보조금",
     amount: "국비 170만 원 + 지역별 지방비",
-    detail: "Model Y Premium RWD 국비는 170만 원으로 확인된다. 지방비와 잔여 물량은 주소지 기준으로 매번 확인한다."
+    detail: "Model Y Premium RWD 국비는 170만 원으로 확인된다. 지방비, 잔여 물량, 테슬라 자체 지원 여부는 주소지 기준으로 매번 확인한다."
   },
   {
     icon: ShieldCheck,
@@ -240,7 +244,7 @@ export const budgetBuckets = [
     icon: Boxes,
     title: "알리 필수템",
     amount: "15만~45만 원",
-    detail: "보호필름, 매트, 선쉐이드, 머드플랩, 수납류처럼 실패해도 리스크가 낮은 품목부터 산다."
+    detail: "보호필름, 매트, 선쉐이드, 머드플랩, 수납류처럼 테슬라 공용 후기가 많고 실패 리스크가 낮은 품목부터 산다."
   }
 ];
 
@@ -362,11 +366,11 @@ export const serviceCostRows = [
 ];
 
 export const shopCandidates = [
-  { name: "JB motors", area: "경기/수도권", note: "모델 Y 신차패키지 가격표 공개 사례", url: "https://jbmotors.co.kr/content/06tesla/03_01.php" },
+  { name: "JB motors", area: "경기/수도권", note: "모델 Y 신차패키지 가격표 공개 사례. HTTPS 인증서 이슈가 있어 HTTP로 연결", url: "http://jbmotors.co.kr/content/06tesla/03_01.php" },
   { name: "오리진마인드", area: "수도권", note: "모델 Y 주니퍼 95만 원 패키지 공개 사례", url: "https://orgnmind.co.kr/90" },
   { name: "스타일매니아", area: "수도권", note: "모델 Y 주니퍼 썬팅/PPF 시공 사례 확인", url: "https://www.stylemania.co.kr/?bmode=view&idx=165250901" },
   { name: "모터스킨", area: "서울 강서", note: "전체 PPF+썬팅 가격 사례 확인", url: "https://m.oh-car.co.kr/goods/goods_view.php?goodsNo=1000066105" },
-  { name: "카독스", area: "경기 광주", note: "틴팅, 블랙박스, PPF 시공 사례 확인", url: "https://www.cardocs.co.kr/" },
+  { name: "카닥", area: "비교 플랫폼", note: "외장수리·정비 견적 비교용. 틴팅/PPF 전용 업체는 별도 비교", url: "https://cardoc.co.kr/" },
   { name: "비앤엠코리아", area: "부산", note: "부산 테슬라 신차패키지 후보", url: "https://bnmkorea.co.kr/%EB%B6%80%EC%82%B0-%ED%85%8C%EC%8A%AC%EB%9D%BC-%EC%8B%A0%EC%B0%A8%ED%8C%A8%ED%82%A4%EC%A7%80-%EB%AA%A8%EB%8D%B8y-%EC%A0%84%EB%AC%B8-%EC%8B%9C%EA%B3%B5%EC%9D%80-%EC%98%A4%EB%84%88%EC%9D%98-%EB%AF%B8/" },
   { name: "오늘의카", area: "비교 플랫폼", note: "하남·강동·송파 등 비교견적 탐색용", url: "https://m.oh-car.co.kr/" }
 ];

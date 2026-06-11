@@ -43,6 +43,50 @@ function findTargetCafe(cafeurl: string) {
   );
 }
 
+function categorizeText(text: string) {
+  if (/PPF|생활보호|도어컵|도어엣지|트렁크리드|필러|스톤칩/i.test(text)) return "PPF";
+  if (/썬팅|틴팅|농도|필름|버텍스|레이노|브이쿨|루마|후퍼옵틱/i.test(text)) return "썬팅";
+  if (/블랙박스|주차녹화|상시전원|보조배터리|센트리/i.test(text)) return "블랙박스";
+  if (/보험|특약|자차|자기부담/.test(text)) return "보험";
+  if (/보조금|국비|지방비|지원금/.test(text)) return "보조금";
+  if (/충전|충전카드|슈퍼차저|집밥|회사밥|어댑터|커넥터/.test(text)) return "충전";
+  if (/알리|악세사리|액세서리|선쉐이드|매트|수납|하이패스|거치대|보호필름|머드플랩/.test(text)) return "액세서리";
+  if (/인수|출고|검수|체크/.test(text)) return "인수";
+  return "기타";
+}
+
+function categorize(keyword: string, title: string, description: string) {
+  const contentCategory = categorizeText(`${title} ${description}`);
+  return contentCategory === "기타" ? categorizeText(keyword) : contentCategory;
+}
+
+function isLikelyNoise(title: string, description: string) {
+  const text = `${title} ${description}`;
+  return /가입인사|신규 가입|판매\s*합니다|팝니다|삽니다|양도|승계|장기렌트|리스\s*승계|커멘더\s*판매|S3XY\s*노브|모델\s*Y\s*L|모델YL|(^|[^A-Za-z0-9])YL([^A-Za-z0-9]|$)/i.test(text);
+}
+
+function keywordFocusPattern(keyword: string) {
+  if (/하이패스/.test(keyword)) return /하이패스/i;
+  if (/충전카드/.test(keyword)) return /충전\s*카드|충전카드/i;
+  if (/집밥/.test(keyword)) return /집밥|회사밥|아파트\s*충전|완속\s*충전|충전기/i;
+  if (/썬팅|틴팅/.test(keyword)) return /썬팅|틴팅|필름|농도|버텍스|레이노|브이쿨|루마|후퍼옵틱/i;
+  if (/PPF|생활보호/.test(keyword)) return /PPF|생활보호|도어컵|도어엣지|트렁크리드|필러|스톤칩/i;
+  if (/블랙박스/.test(keyword)) return /블랙박스|주차녹화|상시전원|보조배터리|센트리/i;
+  if (/보험/.test(keyword)) return /보험|특약|자차|자기부담/i;
+  if (/보조금/.test(keyword)) return /보조금|국비|지방비|지원금/i;
+  if (/인수|체크/.test(keyword)) return /인수|인도|출고|검수|체크/i;
+  if (/알리|액세서리/.test(keyword)) return /알리|악세사리|액세서리|수납|거치대|보호필름|머드플랩/i;
+  if (/선쉐이드/.test(keyword)) return /선쉐이드|선세이드|차양|햇빛|루프\s*커버/i;
+  if (/매트/.test(keyword)) return /매트|트렁크\s*매트|바닥\s*매트|TPE/i;
+  if (/프리미엄|RWD/.test(keyword)) return /프리미엄|RWD|후륜|Standard Range|스탠다드/i;
+  return null;
+}
+
+function matchesKeywordFocus(keyword: string, title: string, description: string) {
+  const pattern = keywordFocusPattern(keyword);
+  return !pattern || pattern.test(`${title} ${description}`);
+}
+
 function toSafeDisplay(value: string, fallback: number, max: number) {
   const parsed = Number(value);
   if (!Number.isFinite(parsed)) return fallback;
@@ -98,11 +142,14 @@ export async function GET(request: Request) {
   }
 
   const items = ((payload.items ?? []) as NaverCafeArticle[]).map((item) => {
+    const title = decodeHtml(item.title);
+    const description = decodeHtml(item.description);
     const targetCafe = findTargetCafe(item.cafeurl);
     return {
-      title: decodeHtml(item.title),
+      category: categorize(query, title, description),
+      title,
       link: item.link,
-      description: decodeHtml(item.description),
+      description,
       cafename: decodeHtml(item.cafename),
       cafeurl: normalizeCafeUrl(item.cafeurl),
       targetCafe: targetCafe
@@ -111,9 +158,11 @@ export async function GET(request: Request) {
     };
   });
 
-  const filteredItems = targetOnly
+  const filteredItems = (targetOnly
     ? items.filter((item) => item.targetCafe)
-    : items;
+    : items)
+    .filter((item) => !isLikelyNoise(item.title, item.description))
+    .filter((item) => matchesKeywordFocus(query, item.title, item.description));
 
   return NextResponse.json({
     query,

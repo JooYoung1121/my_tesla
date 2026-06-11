@@ -1,10 +1,10 @@
 # 모델 Y 프리미엄 RWD 구매 조사
 
-최종 업데이트: 2026-06-10
+최종 업데이트: 2026-06-11
 
 ## 기준
 
-대상 차량은 한국 판매 기준 Tesla Model Y Premium RWD다. 가격, 보조금, 시공비, 알리익스프레스 상품가는 수시로 바뀌므로 이 문서는 인수 준비용 기준선으로만 사용한다.
+대상 차량은 한국 판매 기준 Tesla Model Y Premium RWD다. 2026년형 신형 모델 기준으로 보되, 가격, 보조금, 시공비, 알리익스프레스 상품가는 수시로 바뀌므로 이 문서는 인수 준비용 기준선으로만 사용한다.
 
 ## 차량 요약
 
@@ -30,7 +30,6 @@ Tesla Korea 공식 제원 기준:
 
 출처:
 
-- https://www.tesla.com/ko_KR/modely/design
 - https://www.tesla.com/ko_kr/modely
 
 ## 보조금과 세금
@@ -46,6 +45,7 @@ Tesla Korea 공식 제원 기준:
 
 - 실제 실구매가는 인수 시점, 등록 주소지, 보조금 잔여 물량, Tesla 자체 지원금 여부에 따라 달라진다.
 - 인수 직전 무공해차 통합누리집과 Tesla 견적서를 다시 확인해야 한다.
+- 테슬라 공식 페이지에는 Model Y L 제원도 함께 표시되므로, 이 문서는 5인승 Premium RWD 블록만 기준으로 삼는다.
 
 출처:
 
@@ -148,11 +148,16 @@ Tesla Korea 공식 제원 기준:
 
 참고:
 
-- https://jbmotors.co.kr/content/06tesla/03_01.php
+- http://jbmotors.co.kr/content/06tesla/03_01.php
 - https://orgnmind.co.kr/90
 - https://www.stylemania.co.kr/?bmode=view&idx=165250901
 - https://m.oh-car.co.kr/goods/goods_view.php?goodsNo=1000066105
 - https://bnmkorea.co.kr/%EB%B6%80%EC%82%B0-%ED%85%8C%EC%8A%AC%EB%9D%BC-%EC%8B%A0%EC%B0%A8%ED%8C%A8%ED%82%A4%EC%A7%80-%EB%AA%A8%EB%8D%B8y-%EC%A0%84%EB%AC%B8-%EC%8B%9C%EA%B3%B5%EC%9D%80-%EC%98%A4%EB%84%88%EC%9D%98-%EB%AF%B8/
+
+링크 확인:
+
+- JB motors는 HTTPS 인증서 문제로 자동 검증이 실패하며 HTTP 주소는 200 OK로 확인된다.
+- 카닥 공식 도메인은 `cardoc.co.kr`이며, `cardocs.co.kr`는 사용하지 않는다.
 
 ## 업체 후보
 
@@ -162,9 +167,11 @@ Tesla Korea 공식 제원 기준:
 - 오리진마인드
 - 스타일매니아
 - 모터스킨
-- 카독스
+- 카닥
 - 비앤엠코리아
 - 오늘의카 비교견적
+
+카닥은 외장수리·정비 견적 비교 플랫폼으로 보고, 틴팅/PPF 전용 시공 후보와는 별도 성격으로 분리한다.
 
 견적 문의 시 확인할 것:
 
@@ -190,3 +197,9 @@ Tesla Korea 공식 제원 기준:
 5. 알리 보호필름/매트/선쉐이드/머드플랩 구매
 6. 블랙박스는 센트리 모드 사용성을 보고 결정
 7. 전체 PPF와 고가 코팅은 보류
+
+카페 검색 기준:
+
+- Model Y 전용 키워드: 프리미엄 RWD, 주니퍼, 인수, 썬팅, PPF, 블랙박스, 보험, 보조금
+- 테슬라 공용 키워드: 틴팅, 생활보호 PPF, 충전카드, 집밥 충전, 하이패스, 알리 액세서리, 선쉐이드, 매트
+- 썬팅/PPF/충전/하이패스/알리템은 차종 공용 후기가 의미 있는 경우가 많으므로 모델 Y 글만 보지 않는다.

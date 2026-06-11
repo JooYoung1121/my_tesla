@@ -715,6 +715,39 @@ h2 {
   font-weight: 800;
 }
 
+.category-filter-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin: 0 0 14px;
+}
+
+.category-filter-tabs button {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 32px;
+  padding: 0 10px;
+  color: var(--muted);
+  background: #fff;
+  border: 1px solid #ebece7;
+  border-radius: 999px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.category-filter-tabs button:hover,
+.category-filter-tabs button.is-active {
+  color: #fff;
+  background: var(--ink);
+  border-color: var(--ink);
+}
+
+.category-filter-tabs strong {
+  font-size: 12px;
+}
+
 .cafe-result-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));

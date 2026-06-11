@@ -24,7 +24,7 @@ type CafeResult = {
 
 const SAVED_KEY = "my-tesla-saved-cafe-links";
 const HIDDEN_KEY = "my-tesla-hidden-cafe-links";
-const CATEGORY_ORDER = ["썬팅", "PPF", "블랙박스", "보험", "보조금", "충전", "액세서리", "기타"];
+const CATEGORY_ORDER = ["썬팅", "PPF", "블랙박스", "보험", "보조금", "충전", "액세서리", "인수", "기타"];
 
 function inferCategory(item: Partial<CafeResult>, fallbackKeyword: string) {
   const text = `${fallbackKeyword} ${item.title ?? ""} ${item.description ?? ""}`;
@@ -34,7 +34,8 @@ function inferCategory(item: Partial<CafeResult>, fallbackKeyword: string) {
   if (/보험|특약|자차|자기부담금/i.test(text)) return "보험";
   if (/보조금|취득세|등록비|지방비/i.test(text)) return "보조금";
   if (/충전|충전카드|슈퍼차저|집밥|어댑터|커넥터/i.test(text)) return "충전";
-  if (/알리|액세서리|매트|선쉐이드|하이패스|거치대|수납/i.test(text)) return "액세서리";
+  if (/알리|악세사리|액세서리|매트|선쉐이드|하이패스|거치대|수납|머드플랩/i.test(text)) return "액세서리";
+  if (/인수|출고|검수|체크/i.test(text)) return "인수";
   return "기타";
 }
 
@@ -64,6 +65,7 @@ export function CafeSearchPanel() {
   const [message, setMessage] = useState("");
   const [savedLinks, setSavedLinks] = useState<Set<string>>(new Set());
   const [hiddenLinks, setHiddenLinks] = useState<Set<string>>(new Set());
+  const [activeCategory, setActiveCategory] = useState("전체");
 
   useEffect(() => {
     setSavedLinks(readStoredSet(SAVED_KEY));
@@ -86,15 +88,19 @@ export function CafeSearchPanel() {
   }, [hiddenLinks, items]);
 
   const groupedItems = useMemo(() => {
+    const categoryItems = activeCategory === "전체"
+      ? visibleItems
+      : visibleItems.filter((item) => item.category === activeCategory);
+
     return Array.from(
-      visibleItems.reduce((map, item) => {
+      categoryItems.reduce((map, item) => {
         const group = map.get(item.category) ?? [];
         group.push(item);
         map.set(item.category, group);
         return map;
       }, new Map<string, CafeResult[]>())
     );
-  }, [visibleItems]);
+  }, [activeCategory, visibleItems]);
 
   const counts = useMemo(() => {
     return Array.from(
@@ -105,6 +111,12 @@ export function CafeSearchPanel() {
     );
   }, [visibleItems]);
 
+  const categoryTabs = useMemo(() => ["전체", ...counts.map(([category]) => category)], [counts]);
+
+  const activeCount = activeCategory === "전체"
+    ? visibleItems.length
+    : visibleItems.filter((item) => item.category === activeCategory).length;
+
   async function runSearch(nextQuery = query) {
     const cleanQuery = nextQuery.trim();
     if (!cleanQuery) return;
@@ -112,6 +124,7 @@ export function CafeSearchPanel() {
     setIsLoading(true);
     setMessage("");
     setQuery(cleanQuery);
+    setActiveCategory("전체");
 
     try {
       const response = await fetch(
@@ -218,10 +231,34 @@ export function CafeSearchPanel() {
       </div>
 
       <div className="result-toolbar">
-        <span>{message || `표시 중 ${visibleItems.length}건`}</span>
+        <span>
+          {message
+            ? `${message} · ${activeCategory} ${activeCount}건 표시`
+            : `${activeCategory} ${activeCount}건 표시`}
+        </span>
         <button className="ghost-button" onClick={resetHidden} type="button">
           숨김 초기화
         </button>
+      </div>
+
+      <div className="category-filter-tabs" aria-label="카페 검색 결과 필터">
+        {categoryTabs.map((category) => {
+          const count = category === "전체"
+            ? visibleItems.length
+            : counts.find(([name]) => name === category)?.[1] ?? 0;
+
+          return (
+            <button
+              className={activeCategory === category ? "is-active" : ""}
+              key={category}
+              onClick={() => setActiveCategory(category)}
+              type="button"
+            >
+              <span>{category}</span>
+              <strong>{count}</strong>
+            </button>
+          );
+        })}
       </div>
 
       <div className="cafe-category-sections">
