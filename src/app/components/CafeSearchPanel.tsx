@@ -24,6 +24,24 @@ type CafeResult = {
 
 const SAVED_KEY = "my-tesla-saved-cafe-links";
 const HIDDEN_KEY = "my-tesla-hidden-cafe-links";
+const CATEGORY_ORDER = ["썬팅", "PPF", "블랙박스", "보험", "보조금", "충전", "액세서리", "기타"];
+
+function inferCategory(item: Partial<CafeResult>, fallbackKeyword: string) {
+  const text = `${fallbackKeyword} ${item.title ?? ""} ${item.description ?? ""}`;
+  if (/ppf|생활보호|도어컵|도어엣지/i.test(text)) return "PPF";
+  if (/썬팅|틴팅|필름|버텍스|레이노|브이쿨|농도/i.test(text)) return "썬팅";
+  if (/블랙박스|보조배터리|센트리/i.test(text)) return "블랙박스";
+  if (/보험|특약|자차|자기부담금/i.test(text)) return "보험";
+  if (/보조금|취득세|등록비|지방비/i.test(text)) return "보조금";
+  if (/충전|충전카드|슈퍼차저|집밥|어댑터|커넥터/i.test(text)) return "충전";
+  if (/알리|액세서리|매트|선쉐이드|하이패스|거치대|수납/i.test(text)) return "액세서리";
+  return "기타";
+}
+
+function categoryRank(category: string) {
+  const index = CATEGORY_ORDER.indexOf(category);
+  return index === -1 ? CATEGORY_ORDER.length : index;
+}
 
 function readStoredSet(key: string) {
   if (typeof window === "undefined") return new Set<string>();
@@ -60,7 +78,23 @@ export function CafeSearchPanel() {
       }).format(new Date(naverCafeFetchedAt))
     : "아직 수집 전";
 
-  const visibleItems = items.filter((item) => !hiddenLinks.has(item.link));
+  const visibleItems = useMemo(() => {
+    return items
+      .filter((item) => !hiddenLinks.has(item.link))
+      .slice()
+      .sort((a, b) => categoryRank(a.category) - categoryRank(b.category));
+  }, [hiddenLinks, items]);
+
+  const groupedItems = useMemo(() => {
+    return Array.from(
+      visibleItems.reduce((map, item) => {
+        const group = map.get(item.category) ?? [];
+        group.push(item);
+        map.set(item.category, group);
+        return map;
+      }, new Map<string, CafeResult[]>())
+    );
+  }, [visibleItems]);
 
   const counts = useMemo(() => {
     return Array.from(
@@ -90,7 +124,13 @@ export function CafeSearchPanel() {
       }
 
       const nextItems = (payload.items ?? []) as CafeResult[];
-      setItems(nextItems.map((item) => ({ ...item, keyword: cleanQuery })));
+      setItems(
+        nextItems.map((item) => ({
+          ...item,
+          category: item.category ?? inferCategory(item, cleanQuery),
+          keyword: cleanQuery
+        }))
+      );
       setMessage(`${cleanQuery} 검색 결과 ${nextItems.length}건`);
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "검색에 실패했습니다.");
@@ -184,38 +224,48 @@ export function CafeSearchPanel() {
         </button>
       </div>
 
-      <div className="cafe-result-grid">
-        {visibleItems.slice(0, 24).map((item, index) => (
-          <article className="cafe-result-card" key={`${item.link}-${index}`}>
-            <div className="cafe-result-meta">
-              <span className="pill">{item.category}</span>
-              <small>{item.targetCafe?.name ?? item.cafename}</small>
+      <div className="cafe-category-sections">
+        {groupedItems.map(([category, categoryItems]) => (
+          <section className="cafe-category-group" key={category}>
+            <div className="cafe-category-title">
+              <strong>{category}</strong>
+              <span>{categoryItems.length}건</span>
             </div>
-            <a href={item.link} target="_blank" rel="noreferrer">
-              {item.title}
-              <ExternalLink size={15} aria-hidden="true" />
-            </a>
-            <p>{item.description}</p>
-            <div className="card-actions">
-              <em>{item.keyword ?? query}</em>
-              <button
-                className={savedLinks.has(item.link) ? "tiny-button is-active" : "tiny-button"}
-                onClick={() => toggleSaved(item.link)}
-                title="저장"
-                type="button"
-              >
-                <Star size={14} aria-hidden="true" />
-              </button>
-              <button
-                className="tiny-button"
-                onClick={() => hideResult(item.link)}
-                title="숨김"
-                type="button"
-              >
-                <X size={14} aria-hidden="true" />
-              </button>
+            <div className="cafe-result-grid">
+              {categoryItems.map((item, index) => (
+                <article className="cafe-result-card" key={`${item.link}-${index}`}>
+                  <div className="cafe-result-meta">
+                    <span className="pill">{item.category}</span>
+                    <small>{item.targetCafe?.name ?? item.cafename}</small>
+                  </div>
+                  <a href={item.link} target="_blank" rel="noreferrer">
+                    {item.title}
+                    <ExternalLink size={15} aria-hidden="true" />
+                  </a>
+                  <p>{item.description}</p>
+                  <div className="card-actions">
+                    <em>{item.keyword ?? query}</em>
+                    <button
+                      className={savedLinks.has(item.link) ? "tiny-button is-active" : "tiny-button"}
+                      onClick={() => toggleSaved(item.link)}
+                      title="저장"
+                      type="button"
+                    >
+                      <Star size={14} aria-hidden="true" />
+                    </button>
+                    <button
+                      className="tiny-button"
+                      onClick={() => hideResult(item.link)}
+                      title="숨김"
+                      type="button"
+                    >
+                      <X size={14} aria-hidden="true" />
+                    </button>
+                  </div>
+                </article>
+              ))}
             </div>
-          </article>
+          </section>
         ))}
       </div>
     </div>
