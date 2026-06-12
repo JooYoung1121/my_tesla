@@ -53,6 +53,9 @@ export function ChecklistManager() {
   const [store, setStore] = useState<ChecklistStore>({ states: {}, customItems: [] });
   const [newPhase, setNewPhase] = useState(deliveryChecklist[0]?.phase ?? "계약·일정");
   const [newText, setNewText] = useState("");
+  const [openPhases, setOpenPhases] = useState<Set<string>>(
+    () => new Set(deliveryChecklist[0]?.phase ? [deliveryChecklist[0].phase] : [])
+  );
 
   useEffect(() => {
     setStore(loadStore());
@@ -75,6 +78,48 @@ export function ChecklistManager() {
   function updateStore(next: ChecklistStore) {
     setStore(next);
     saveStore(next);
+  }
+
+  function getItemDone(phase: string, text: string, fallbackStatus: string) {
+    const id = itemId(phase, text);
+    const stored = store.states[id];
+    return stored?.done ?? defaultDone(fallbackStatus);
+  }
+
+  function getGroupStats(group: (typeof deliveryChecklist)[number]) {
+    const defaultDoneCount = group.items.filter((item) =>
+      getItemDone(group.phase, item.text, item.status)
+    ).length;
+    const customItems = store.customItems.filter((item) => item.phase === group.phase);
+    const customDoneCount = customItems.filter((item) => item.done).length;
+    const done = defaultDoneCount + customDoneCount;
+    const total = group.items.length + customItems.length;
+    return { done, total, percent: total ? Math.round((done / total) * 100) : 0 };
+  }
+
+  function togglePhase(phase: string) {
+    setOpenPhases((previous) => {
+      const next = new Set(previous);
+      if (next.has(phase)) {
+        next.delete(phase);
+      } else {
+        next.add(phase);
+      }
+      return next;
+    });
+  }
+
+  function focusPhase(phase: string) {
+    setOpenPhases(new Set([phase]));
+    setNewPhase(phase);
+  }
+
+  function expandAll() {
+    setOpenPhases(new Set(deliveryChecklist.map((group) => group.phase)));
+  }
+
+  function collapseAll() {
+    setOpenPhases(new Set());
   }
 
   function toggleItem(phase: string, text: string, fallbackStatus: string) {
@@ -164,9 +209,40 @@ export function ChecklistManager() {
             {totals.total}개 중 {totals.done}개 완료. 상태와 메모는 현재 브라우저에 저장된다.
           </p>
         </div>
-        <div className="progress-track" aria-hidden="true">
-          <span style={{ width: `${totals.percent}%` }} />
+        <div className="checklist-summary-side">
+          <div className="progress-track" aria-hidden="true">
+            <span style={{ width: `${totals.percent}%` }} />
+          </div>
+          <div className="checklist-summary-actions">
+            <button className="ghost-button" onClick={expandAll} type="button">
+              전체 펼치기
+            </button>
+            <button className="ghost-button" onClick={collapseAll} type="button">
+              접기
+            </button>
+          </div>
         </div>
+      </div>
+
+      <div className="checklist-roadmap" aria-label="인수 준비 단계">
+        {deliveryChecklist.map((group, index) => {
+          const stats = getGroupStats(group);
+          const isOpen = openPhases.has(group.phase);
+          return (
+            <button
+              className={isOpen ? "is-active" : ""}
+              key={group.phase}
+              onClick={() => focusPhase(group.phase)}
+              type="button"
+            >
+              <span>{index + 1}</span>
+              <strong>{group.phase}</strong>
+              <em>
+                {stats.done}/{stats.total}
+              </em>
+            </button>
+          );
+        })}
       </div>
 
       <form className="add-check-form" onSubmit={addCustomItem}>
@@ -192,70 +268,84 @@ export function ChecklistManager() {
         {deliveryChecklist.map((group) => {
           const Icon = group.icon;
           const customItems = store.customItems.filter((item) => item.phase === group.phase);
+          const stats = getGroupStats(group);
+          const isOpen = openPhases.has(group.phase);
           return (
-            <article className="checklist-card" key={group.phase}>
-              <div className="checklist-card-head">
-                <Icon size={21} aria-hidden="true" />
+            <article className={isOpen ? "checklist-card is-open" : "checklist-card"} key={group.phase}>
+              <button
+                className="checklist-card-trigger"
+                onClick={() => togglePhase(group.phase)}
+                type="button"
+                aria-expanded={isOpen}
+              >
+                <span className="checklist-card-icon">
+                  <Icon size={21} aria-hidden="true" />
+                </span>
                 <div>
                   <strong>{group.phase}</strong>
                   <p>{group.summary}</p>
                 </div>
-              </div>
-              <ul className="checklist-items">
-                {group.items.map((item) => {
-                  const id = itemId(group.phase, item.text);
-                  const stored = store.states[id];
-                  const done = stored?.done ?? defaultDone(item.status);
-                  return (
-                    <li className={done ? "is-done" : ""} key={item.text}>
+                <em>
+                  {stats.done}/{stats.total}
+                </em>
+              </button>
+              {isOpen ? (
+                <ul className="checklist-items">
+                  {group.items.map((item) => {
+                    const id = itemId(group.phase, item.text);
+                    const stored = store.states[id];
+                    const done = getItemDone(group.phase, item.text, item.status);
+                    return (
+                      <li className={done ? "is-done" : ""} key={item.text}>
+                        <button
+                          className="check-toggle"
+                          onClick={() => toggleItem(group.phase, item.text, item.status)}
+                          title="완료 상태 변경"
+                          type="button"
+                        >
+                          {done ? <Check size={14} aria-hidden="true" /> : null}
+                        </button>
+                        <span>{item.text}</span>
+                        <em>{done ? "완료" : item.status === "완료" ? "대기" : item.status}</em>
+                        <textarea
+                          value={stored?.memo ?? ""}
+                          onChange={(event) =>
+                            updateMemo(group.phase, item.text, item.status, event.target.value)
+                          }
+                          placeholder="메모"
+                        />
+                      </li>
+                    );
+                  })}
+                  {customItems.map((item) => (
+                    <li className={item.done ? "is-done" : ""} key={item.id}>
                       <button
                         className="check-toggle"
-                        onClick={() => toggleItem(group.phase, item.text, item.status)}
+                        onClick={() => toggleCustomItem(item.id)}
                         title="완료 상태 변경"
                         type="button"
                       >
-                        {done ? <Check size={14} aria-hidden="true" /> : null}
+                        {item.done ? <Check size={14} aria-hidden="true" /> : null}
                       </button>
                       <span>{item.text}</span>
-                      <em>{done ? "완료" : item.status === "완료" ? "대기" : item.status}</em>
+                      <em>{item.done ? "완료" : "추가"}</em>
                       <textarea
-                        value={stored?.memo ?? ""}
-                        onChange={(event) =>
-                          updateMemo(group.phase, item.text, item.status, event.target.value)
-                        }
+                        value={item.memo}
+                        onChange={(event) => updateCustomMemo(item.id, event.target.value)}
                         placeholder="메모"
                       />
+                      <button
+                        className="delete-check"
+                        onClick={() => removeCustomItem(item.id)}
+                        title="삭제"
+                        type="button"
+                      >
+                        <Trash2 size={14} aria-hidden="true" />
+                      </button>
                     </li>
-                  );
-                })}
-                {customItems.map((item) => (
-                  <li className={item.done ? "is-done" : ""} key={item.id}>
-                    <button
-                      className="check-toggle"
-                      onClick={() => toggleCustomItem(item.id)}
-                      title="완료 상태 변경"
-                      type="button"
-                    >
-                      {item.done ? <Check size={14} aria-hidden="true" /> : null}
-                    </button>
-                    <span>{item.text}</span>
-                    <em>{item.done ? "완료" : "추가"}</em>
-                    <textarea
-                      value={item.memo}
-                      onChange={(event) => updateCustomMemo(item.id, event.target.value)}
-                      placeholder="메모"
-                    />
-                    <button
-                      className="delete-check"
-                      onClick={() => removeCustomItem(item.id)}
-                      title="삭제"
-                      type="button"
-                    >
-                      <Trash2 size={14} aria-hidden="true" />
-                    </button>
-                  </li>
-                ))}
-              </ul>
+                  ))}
+                </ul>
+              ) : null}
             </article>
           );
         })}
