@@ -1,7 +1,7 @@
 "use client";
 
-import { ExternalLink, Search, Star, X } from "lucide-react";
-import { FormEvent, useEffect, useMemo, useState } from "react";
+import { ExternalLink, RotateCcw, Search, Star, X } from "lucide-react";
+import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import {
   naverCafeFetchedAt,
   naverCafeKeywords,
@@ -58,14 +58,20 @@ function writeStoredSet(key: string, value: Set<string>) {
   window.localStorage.setItem(key, JSON.stringify(Array.from(value)));
 }
 
+const initialItems = naverCafeResults as unknown as CafeResult[];
+
 export function CafeSearchPanel() {
   const [query, setQuery] = useState("모델Y 썬팅");
-  const [items, setItems] = useState<CafeResult[]>(naverCafeResults as unknown as CafeResult[]);
+  const [items, setItems] = useState<CafeResult[]>(initialItems);
   const [isLoading, setIsLoading] = useState(false);
+  const [isInitialData, setIsInitialData] = useState(true);
   const [message, setMessage] = useState("");
   const [savedLinks, setSavedLinks] = useState<Set<string>>(new Set());
   const [hiddenLinks, setHiddenLinks] = useState<Set<string>>(new Set());
   const [activeCategory, setActiveCategory] = useState("전체");
+  const resultCache = useRef(new Map<string, CafeResult[]>());
+  const abortRef = useRef<AbortController | null>(null);
+  const requestSeq = useRef(0);
 
   useEffect(() => {
     setSavedLinks(readStoredSet(SAVED_KEY));
@@ -121,35 +127,69 @@ export function CafeSearchPanel() {
     const cleanQuery = nextQuery.trim();
     if (!cleanQuery) return;
 
-    setIsLoading(true);
-    setMessage("");
     setQuery(cleanQuery);
     setActiveCategory("전체");
 
+    const cached = resultCache.current.get(cleanQuery);
+    if (cached) {
+      abortRef.current?.abort();
+      requestSeq.current += 1;
+      setIsLoading(false);
+      setItems(cached);
+      setIsInitialData(false);
+      setMessage(`${cleanQuery} 검색 결과 ${cached.length}건 (캐시)`);
+      return;
+    }
+
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
+    const seq = (requestSeq.current += 1);
+
+    setIsLoading(true);
+    setMessage("");
+
     try {
       const response = await fetch(
-        `/api/naver/cafe-search?query=${encodeURIComponent(cleanQuery)}&display=30`
+        `/api/naver/cafe-search?query=${encodeURIComponent(cleanQuery)}&display=30`,
+        { signal: controller.signal }
       );
       const payload = await response.json();
+
+      if (seq !== requestSeq.current) return;
 
       if (!response.ok) {
         throw new Error(payload.error ?? "검색에 실패했습니다.");
       }
 
-      const nextItems = (payload.items ?? []) as CafeResult[];
-      setItems(
-        nextItems.map((item) => ({
-          ...item,
-          category: item.category ?? inferCategory(item, cleanQuery),
-          keyword: cleanQuery
-        }))
-      );
+      const nextItems = ((payload.items ?? []) as CafeResult[]).map((item) => ({
+        ...item,
+        category: item.category ?? inferCategory(item, cleanQuery),
+        keyword: cleanQuery
+      }));
+      resultCache.current.set(cleanQuery, nextItems);
+      setItems(nextItems);
+      setIsInitialData(false);
       setMessage(`${cleanQuery} 검색 결과 ${nextItems.length}건`);
     } catch (error) {
+      if (error instanceof DOMException && error.name === "AbortError") return;
+      if (seq !== requestSeq.current) return;
       setMessage(error instanceof Error ? error.message : "검색에 실패했습니다.");
     } finally {
-      setIsLoading(false);
+      if (seq === requestSeq.current) {
+        setIsLoading(false);
+      }
     }
+  }
+
+  function restoreInitialData() {
+    abortRef.current?.abort();
+    requestSeq.current += 1;
+    setIsLoading(false);
+    setItems(initialItems);
+    setIsInitialData(true);
+    setActiveCategory("전체");
+    setMessage("");
   }
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -220,7 +260,7 @@ export function CafeSearchPanel() {
       <div className="keyword-strip" aria-label="검색 키워드">
         {naverCafeKeywords.map((keyword) => (
           <button
-            className="keyword-button"
+            className={!isInitialData && keyword === query ? "keyword-button is-active" : "keyword-button"}
             key={keyword}
             onClick={() => void runSearch(keyword)}
             type="button"
@@ -232,13 +272,23 @@ export function CafeSearchPanel() {
 
       <div className="result-toolbar">
         <span>
-          {message
-            ? `${message} · ${activeCategory} ${activeCount}건 표시`
-            : `${activeCategory} ${activeCount}건 표시`}
+          {isLoading
+            ? "검색 중…"
+            : message
+              ? `${message} · ${activeCategory} ${activeCount}건 표시`
+              : `${activeCategory} ${activeCount}건 표시`}
         </span>
-        <button className="ghost-button" onClick={resetHidden} type="button">
-          숨김 초기화
-        </button>
+        <div className="result-toolbar-actions">
+          {!isInitialData ? (
+            <button className="ghost-button" onClick={restoreInitialData} type="button">
+              <RotateCcw size={14} aria-hidden="true" />
+              수집 데이터로
+            </button>
+          ) : null}
+          <button className="ghost-button" onClick={resetHidden} type="button">
+            숨김 초기화
+          </button>
+        </div>
       </div>
 
       <div className="category-filter-tabs" aria-label="카페 검색 결과 필터">
@@ -261,7 +311,7 @@ export function CafeSearchPanel() {
         })}
       </div>
 
-      <div className="cafe-category-sections">
+      <div className={isLoading ? "cafe-category-sections is-loading" : "cafe-category-sections"}>
         {groupedItems.map(([category, categoryItems]) => (
           <section className="cafe-category-group" key={category}>
             <div className="cafe-category-title">

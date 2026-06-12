@@ -1,5 +1,8 @@
 import { NextResponse } from "next/server";
 
+// 네이버 오픈 API가 한국에 있어 Vercel 기본 리전(미국)에서는 왕복이 느리다.
+export const preferredRegion = "icn1";
+
 const TARGET_CAFES = [
   {
     slug: "noljatravel",
@@ -122,7 +125,7 @@ export async function GET(request: Request) {
   endpoint.searchParams.set("sort", sort);
 
   const response = await fetch(endpoint, {
-    cache: "no-store",
+    next: { revalidate: 600 },
     headers: {
       "X-Naver-Client-Id": process.env.NAVER_CLIENT_ID,
       "X-Naver-Client-Secret": process.env.NAVER_CLIENT_SECRET
@@ -164,14 +167,21 @@ export async function GET(request: Request) {
     .filter((item) => !isLikelyNoise(item.title, item.description))
     .filter((item) => matchesKeywordFocus(query, item.title, item.description));
 
-  return NextResponse.json({
-    query,
-    display,
-    start,
-    sort,
-    total: payload.total ?? 0,
-    returned: filteredItems.length,
-    targetOnly,
-    items: filteredItems
-  });
+  return NextResponse.json(
+    {
+      query,
+      display,
+      start,
+      sort,
+      total: payload.total ?? 0,
+      returned: filteredItems.length,
+      targetOnly,
+      items: filteredItems
+    },
+    {
+      headers: {
+        "Cache-Control": "public, s-maxage=600, stale-while-revalidate=86400"
+      }
+    }
+  );
 }
