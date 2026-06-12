@@ -40,6 +40,12 @@ export const navItems = [
   { label: "오너 로그", href: "#owner-log" }
 ];
 
+export const deliveryTarget = {
+  date: "2026-08-01",
+  label: "2026년 8월 인수 목표",
+  note: "예상 인도월 기준. 확정 일정이 나오면 날짜를 갱신한다."
+};
+
 export const statusMetrics = [
   {
     label: "인수 준비율",

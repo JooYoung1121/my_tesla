@@ -1,7 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   ArrowUpRight,
   Bookmark,
@@ -11,18 +11,19 @@ import {
   ExternalLink,
   Filter,
   LockKeyhole,
-  Plus,
   Search,
   Server,
   Star,
   TimerReset,
-  type LucideIcon
+  Zap
 } from "lucide-react";
 import {
   autopilotLevels,
   decisionItems,
   aliShoppingList,
   budgetBuckets,
+  deliveryChecklist,
+  deliveryTarget,
   essentialSupplies,
   intelItems,
   modelYPremiumRwdSpecs,
@@ -42,15 +43,10 @@ import { CafeSearchPanel } from "./CafeSearchPanel";
 import { ChecklistManager } from "./ChecklistManager";
 import { PersonalNotes } from "./PersonalNotes";
 
-type ViewId = "overview" | "intel" | "basics" | "buying" | "delivery" | "notes" | "owner";
-type TopbarAction = {
-  label: string;
-  icon: LucideIcon;
-  view?: ViewId;
-  href?: string;
-  external?: boolean;
-  primary?: boolean;
-};
+type ViewId = "today" | "intel" | "prep" | "owner";
+type IntelTab = "search" | "basics";
+type PrepTab = "buying" | "checklist";
+type OwnerTab = "notes" | "plan";
 
 const views: Array<{
   id: ViewId;
@@ -60,53 +56,32 @@ const views: Array<{
   description: string;
 }> = [
   {
-    id: "overview",
-    label: "개요",
+    id: "today",
+    label: "오늘",
     title: "오늘 확인할 테슬라 정보",
-    eyebrow: "2026년 8월 인수 준비",
-    description: "인수 전에는 결정할 것만 남기고, 차량 데이터는 인수 후 연결한다."
+    eyebrow: "Model Y Cockpit",
+    description: "인수까지 남은 시간과 준비 상태를 한 화면에서 본다."
   },
   {
     id: "intel",
-    label: "정보 검색",
-    title: "카페 글과 참고 정보를 주제별로 본다",
-    eyebrow: "정보 보드",
-    description: "모델 Y 전용 글과 테슬라 공용 글을 함께 보고, 주제가 같은 정보끼리 묶어 확인한다."
+    label: "정보",
+    title: "카페 글과 기본기를 한 곳에서 본다",
+    eyebrow: "Intel",
+    description: "주제별 카페 글 검색과 FSD·생산지 같은 헷갈리는 기본기를 같이 정리한다."
   },
   {
-    id: "basics",
-    label: "테슬라 기초",
-    title: "FSD와 생산지처럼 헷갈리는 기본기를 정리한다",
-    eyebrow: "기초 지식",
-    description: "중국 생산, 오토파일럿, FSD, 소프트웨어 업그레이드처럼 구매 전 자주 헷갈리는 내용을 따로 본다."
-  },
-  {
-    id: "buying",
-    label: "구매·시공",
-    title: "돈이 들어가는 선택을 한 화면에서 비교한다",
-    eyebrow: "구매 계획",
-    description: "차량 비용, 필수 준비물, 알리 후보, 시공 업체를 같은 흐름으로 본다."
-  },
-  {
-    id: "delivery",
-    label: "인수 준비",
-    title: "계약 후부터 첫 달까지 체크한다",
-    eyebrow: "체크리스트",
-    description: "일정, 결제, 보험, 충전, 시공, 인수 당일 확인을 단계별로 관리한다."
-  },
-  {
-    id: "notes",
-    label: "내 기록",
-    title: "직접 판단한 내용을 남긴다",
-    eyebrow: "개인 메모",
-    description: "검색 결과와 별개로 내가 결정한 것, 나중에 볼 링크, 견적 메모를 저장한다."
+    id: "prep",
+    label: "준비",
+    title: "돈 쓰는 결정과 실행 체크를 관리한다",
+    eyebrow: "Preparation",
+    description: "차량 비용, 시공 견적, 알리 후보를 비교하고 인수 체크리스트로 실행한다."
   },
   {
     id: "owner",
-    label: "오너 데이터",
-    title: "인수 후 쌓을 기록을 미리 정한다",
-    eyebrow: "TeslaMate 이후",
-    description: "충전, 효율, 정비 기록은 인수 후 실제 차량 데이터가 생기면 붙인다."
+    label: "오너",
+    title: "내 판단과 인수 후 데이터 계획",
+    eyebrow: "Owner",
+    description: "직접 결정한 메모를 남기고, 인수 후 쌓을 차량 데이터를 미리 설계한다."
   }
 ];
 
@@ -133,40 +108,53 @@ const infoTopicGroups = [
   }
 ];
 
-const topbarActionsByView: Record<ViewId, TopbarAction[]> = {
-  overview: [
-    { label: "정보 검색", icon: Search, view: "intel" },
-    { label: "구매·시공", icon: Filter, view: "buying" },
-    { label: "정보 추가", icon: Plus, view: "notes", primary: true }
-  ],
-  intel: [
-    { label: "테슬라 기초", icon: BrainCircuit, view: "basics" },
-    { label: "구매·시공", icon: Filter, view: "buying" },
-    { label: "메모 추가", icon: Plus, view: "notes", primary: true }
-  ],
-  basics: [
-    { label: "정보 검색", icon: Search, view: "intel" },
-    { label: "공식 제원", icon: ExternalLink, href: "https://www.tesla.com/ko_kr/modely", external: true },
-    { label: "메모 추가", icon: Plus, view: "notes", primary: true }
-  ],
-  buying: [
-    { label: "공식 제원", icon: ExternalLink, href: "https://www.tesla.com/ko_kr/modely", external: true },
-    { label: "인수 준비", icon: Check, view: "delivery" },
-    { label: "메모 추가", icon: Plus, view: "notes", primary: true }
-  ],
-  delivery: [
-    { label: "구매·시공", icon: Filter, view: "buying" },
-    { label: "메모 추가", icon: Plus, view: "notes", primary: true }
-  ],
-  notes: [
-    { label: "정보 검색", icon: Search, view: "intel" },
-    { label: "구매·시공", icon: Filter, view: "buying" }
-  ],
-  owner: [
-    { label: "TeslaMate", icon: Server, href: "/teslamate" },
-    { label: "메모 추가", icon: Plus, view: "notes", primary: true }
-  ]
-};
+const CHECKLIST_STORE_KEY = "my-tesla-checklist-v1";
+
+function useChecklistReadiness() {
+  const [readiness, setReadiness] = useState<{ done: number; total: number; percent: number } | null>(
+    null
+  );
+
+  useEffect(() => {
+    let states: Record<string, { done: boolean }> = {};
+    let customItems: Array<{ done: boolean }> = [];
+    try {
+      const parsed = JSON.parse(window.localStorage.getItem(CHECKLIST_STORE_KEY) ?? "{}");
+      states = parsed.states ?? {};
+      customItems = Array.isArray(parsed.customItems) ? parsed.customItems : [];
+    } catch {
+      // 저장된 상태가 없으면 기본 상태로 계산한다.
+    }
+
+    const defaults = deliveryChecklist.flatMap((group) =>
+      group.items.map((item) => {
+        const stored = states[`${group.phase}::${item.text}`];
+        return stored?.done ?? item.status === "완료";
+      })
+    );
+    const all = [...defaults, ...customItems.map((item) => item.done)];
+    const done = all.filter(Boolean).length;
+    setReadiness({
+      done,
+      total: all.length,
+      percent: all.length ? Math.round((done / all.length) * 100) : 0
+    });
+  }, []);
+
+  return readiness;
+}
+
+function useDday(targetDate: string) {
+  const [dday, setDday] = useState<number | null>(null);
+
+  useEffect(() => {
+    const target = new Date(`${targetDate}T00:00:00+09:00`).getTime();
+    const now = Date.now();
+    setDday(Math.max(0, Math.ceil((target - now) / 86_400_000)));
+  }, [targetDate]);
+
+  return dday;
+}
 
 function SectionHeader({
   eyebrow,
@@ -188,17 +176,53 @@ function SectionHeader({
   );
 }
 
+function Segmented<T extends string>({
+  options,
+  value,
+  onChange
+}: {
+  options: Array<{ value: T; label: string }>;
+  value: T;
+  onChange: (value: T) => void;
+}) {
+  return (
+    <div className="segmented" role="tablist">
+      {options.map((option) => (
+        <button
+          className={value === option.value ? "is-active" : ""}
+          key={option.value}
+          onClick={() => onChange(option.value)}
+          role="tab"
+          aria-selected={value === option.value}
+          type="button"
+        >
+          {option.label}
+        </button>
+      ))}
+    </div>
+  );
+}
+
 export function TeslaCommandCenter() {
-  const [activeView, setActiveView] = useState<ViewId>("overview");
+  const [activeView, setActiveView] = useState<ViewId>("today");
+  const [intelTab, setIntelTab] = useState<IntelTab>("search");
+  const [prepTab, setPrepTab] = useState<PrepTab>("buying");
+  const [ownerTab, setOwnerTab] = useState<OwnerTab>("notes");
   const currentView = views.find((view) => view.id === activeView) ?? views[0];
-  const topbarActions = topbarActionsByView[activeView];
+
+  function goTo(view: ViewId, segment?: IntelTab | PrepTab | OwnerTab) {
+    if (view === "intel" && segment) setIntelTab(segment as IntelTab);
+    if (view === "prep" && segment) setPrepTab(segment as PrepTab);
+    if (view === "owner" && segment) setOwnerTab(segment as OwnerTab);
+    setActiveView(view);
+  }
 
   return (
     <main className="app-shell">
       <aside className="side-rail" aria-label="주요 메뉴">
         <button
           className="brand"
-          onClick={() => setActiveView("overview")}
+          onClick={() => setActiveView("today")}
           type="button"
           aria-label="마이 테슬라 홈"
         >
@@ -223,8 +247,8 @@ export function TeslaCommandCenter() {
         </nav>
 
         <div className="rail-note">
-          <Database size={18} aria-hidden="true" />
-          <span>탭 전환형 개인 허브</span>
+          <Database size={16} aria-hidden="true" />
+          <span>개인용 정보 허브</span>
         </div>
       </aside>
 
@@ -236,35 +260,23 @@ export function TeslaCommandCenter() {
             <p className="view-description">{currentView.description}</p>
           </div>
           <div className="topbar-actions" aria-label="빠른 동작">
-            {topbarActions.map((action) => {
-              const Icon = action.icon;
-              const className = action.primary ? "primary-button" : "ghost-button";
-
-              return action.href ? (
-                <a
-                  className={className}
-                  href={action.href}
-                  key={action.label}
-                  rel={action.external ? "noreferrer" : undefined}
-                  target={action.external ? "_blank" : undefined}
-                  title={action.label}
-                >
-                  <Icon size={18} aria-hidden="true" />
-                  {action.label}
-                </a>
-              ) : (
-                <button
-                  className={className}
-                  key={action.label}
-                  onClick={() => action.view && setActiveView(action.view)}
-                  title={action.label}
-                  type="button"
-                >
-                  <Icon size={18} aria-hidden="true" />
-                  {action.label}
-                </button>
-              );
-            })}
+            <a
+              className="ghost-button"
+              href="https://www.tesla.com/ko_kr/modely"
+              target="_blank"
+              rel="noreferrer"
+            >
+              <ExternalLink size={16} aria-hidden="true" />
+              공식 제원
+            </a>
+            <button
+              className="primary-button"
+              onClick={() => goTo("owner", "notes")}
+              type="button"
+            >
+              <Bookmark size={16} aria-hidden="true" />
+              메모
+            </button>
           </div>
         </header>
 
@@ -282,13 +294,12 @@ export function TeslaCommandCenter() {
         </div>
 
         <section className="tab-panel" aria-live="polite">
-          {activeView === "overview" ? <OverviewView setActiveView={setActiveView} /> : null}
-          {activeView === "intel" ? <IntelView setActiveView={setActiveView} /> : null}
-          {activeView === "basics" ? <BasicsView /> : null}
-          {activeView === "buying" ? <BuyingView /> : null}
-          {activeView === "delivery" ? <DeliveryView /> : null}
-          {activeView === "notes" ? <NotesView /> : null}
-          {activeView === "owner" ? <OwnerView /> : null}
+          {activeView === "today" ? <TodayView goTo={goTo} /> : null}
+          {activeView === "intel" ? (
+            <IntelView tab={intelTab} setTab={setIntelTab} goTo={goTo} />
+          ) : null}
+          {activeView === "prep" ? <PrepView tab={prepTab} setTab={setPrepTab} /> : null}
+          {activeView === "owner" ? <OwnerView tab={ownerTab} setTab={setOwnerTab} /> : null}
         </section>
 
         <footer className="footer">
@@ -315,85 +326,134 @@ export function TeslaCommandCenter() {
   );
 }
 
-function OverviewView({ setActiveView }: { setActiveView: (view: ViewId) => void }) {
+function TodayView({ goTo }: { goTo: (view: ViewId, segment?: IntelTab | PrepTab | OwnerTab) => void }) {
+  const dday = useDday(deliveryTarget.date);
+  const readiness = useChecklistReadiness();
+  const intelMetric = statusMetrics[1];
+  const candidateMetric = statusMetrics[2];
+
   return (
-    <>
-      <section className="hero-grid">
-        <article className="hero-panel">
-          <div className="hero-copy">
-            <p className="eyebrow">개인 정보 허브</p>
-            <h2>흩어진 카페 글과 준비 항목을 결정 가능한 정보로 바꾼다.</h2>
-            <p>
-              필요한 정보는 검색 탭에서 찾고, 비용 결정은 구매·시공 탭에서 비교하고,
-              실행 항목은 인수 준비 탭에서 체크한다.
-            </p>
+    <section className="bento-grid" aria-label="오늘의 콕핏">
+      <article className="bento-hero">
+        <img src="/tesla-charging.jpg" alt="충전 중인 테슬라 실내 디스플레이" />
+        <div className="bento-hero-overlay" aria-hidden="true" />
+        <div className="bento-hero-content">
+          <p className="hero-kicker">Model Y · Premium RWD</p>
+          <h2>
+            인수까지 <span className="dday">{dday === null ? "D-?" : `D-${dday}`}</span>
+          </h2>
+          <p>{deliveryTarget.note}</p>
+          <div className="hero-chips">
+            <span>
+              <Zap size={13} aria-hidden="true" />
+              {deliveryTarget.label}
+            </span>
+            <span>기가 상하이 생산분</span>
+            <span>4,999만 원</span>
           </div>
-          <div className="hero-image-wrap">
-            <img
-              src="/tesla-charging.jpg"
-              alt="충전 중인 테슬라 실내 디스플레이"
-              className="hero-image"
-            />
+        </div>
+      </article>
+
+      <div className="bento-side">
+        <article className="bento-tile bento-ready">
+          <span>인수 준비율</span>
+          <strong>
+            {readiness ? readiness.percent : 0}
+            <em>%</em>
+          </strong>
+          <div className="progress-track" aria-hidden="true">
+            <span style={{ width: `${readiness?.percent ?? 0}%` }} />
           </div>
+          <small>
+            {readiness
+              ? `체크리스트 ${readiness.total}개 중 ${readiness.done}개 완료. 준비 탭에서 갱신된다.`
+              : "체크리스트 기준으로 계산한다."}
+          </small>
         </article>
 
-        <div className="metric-grid" aria-label="현재 상태">
-          {statusMetrics.map((metric) => (
-            <article className={`metric metric-${metric.tone}`} key={metric.label}>
-              <span>{metric.label}</span>
-              <strong>{metric.value}</strong>
-              <small>{metric.detail}</small>
-            </article>
-          ))}
+        <div className="bento-mini-grid">
+          <article className="bento-tile bento-mini">
+            <span>{intelMetric.label}</span>
+            <strong>{intelMetric.value}</strong>
+            <small>{intelMetric.detail}</small>
+          </article>
+          <article className="bento-tile bento-mini">
+            <span>{candidateMetric.label}</span>
+            <strong>{candidateMetric.value}</strong>
+            <small>{candidateMetric.detail}</small>
+          </article>
         </div>
-      </section>
+      </div>
 
-      <section className="signal-strip" aria-label="오늘의 신호">
-        {signalCards.map((card) => {
-          const Icon = card.icon;
-          return (
-            <article className="signal-card" key={card.title}>
-              <Icon size={22} aria-hidden="true" />
-              <div>
-                <span>{card.title}</span>
-                <strong>{card.value}</strong>
-                <p>{card.detail}</p>
-              </div>
-            </article>
-          );
-        })}
-      </section>
+      {signalCards.map((card) => {
+        const Icon = card.icon;
+        return (
+          <article className="bento-tile bento-signal" key={card.title}>
+            <Icon size={20} aria-hidden="true" />
+            <div>
+              <span>{card.title}</span>
+              <strong>{card.value}</strong>
+              <p>{card.detail}</p>
+            </div>
+          </article>
+        );
+      })}
 
-      <section className="section-band">
-        <SectionHeader eyebrow="빠른 작업" title="오늘은 여기서 시작한다" />
-        <div className="quick-focus-grid">
-          <button onClick={() => setActiveView("intel")} type="button">
-            <Search size={20} aria-hidden="true" />
-            <strong>카페 글 찾기</strong>
-            <span>썬팅, 보험, 충전카드 같은 검색 주제부터 본다.</span>
-          </button>
-          <button onClick={() => setActiveView("basics")} type="button">
-            <BrainCircuit size={20} aria-hidden="true" />
-            <strong>테슬라 기초</strong>
-            <span>FSD, 오토파일럿, 생산지, OTA처럼 헷갈리는 말을 정리한다.</span>
-          </button>
-          <button onClick={() => setActiveView("buying")} type="button">
-            <Filter size={20} aria-hidden="true" />
-            <strong>비용 비교</strong>
-            <span>차량 비용, 알리 후보, 업체 견적을 한 묶음으로 본다.</span>
-          </button>
-          <button onClick={() => setActiveView("delivery")} type="button">
-            <Check size={20} aria-hidden="true" />
-            <strong>인수 체크</strong>
-            <span>계약 후부터 첫 달까지 실행 항목을 터치로 관리한다.</span>
-          </button>
-        </div>
-      </section>
+      <div className="bento-tile bento-actions" aria-label="빠른 작업">
+        <button onClick={() => goTo("intel", "search")} type="button">
+          <Search size={19} aria-hidden="true" />
+          <strong>카페 글 찾기</strong>
+          <span>썬팅, 보험, 충전카드 같은 검색 주제부터 본다.</span>
+        </button>
+        <button onClick={() => goTo("intel", "basics")} type="button">
+          <BrainCircuit size={19} aria-hidden="true" />
+          <strong>테슬라 기초</strong>
+          <span>FSD, 오토파일럿, 생산지, OTA처럼 헷갈리는 말을 정리한다.</span>
+        </button>
+        <button onClick={() => goTo("prep", "buying")} type="button">
+          <Filter size={19} aria-hidden="true" />
+          <strong>비용 비교</strong>
+          <span>차량 비용, 알리 후보, 업체 견적을 한 묶음으로 본다.</span>
+        </button>
+        <button onClick={() => goTo("prep", "checklist")} type="button">
+          <Check size={19} aria-hidden="true" />
+          <strong>인수 체크</strong>
+          <span>계약 후부터 첫 달까지 실행 항목을 터치로 관리한다.</span>
+        </button>
+      </div>
+    </section>
+  );
+}
+
+function IntelView({
+  tab,
+  setTab,
+  goTo
+}: {
+  tab: IntelTab;
+  setTab: (tab: IntelTab) => void;
+  goTo: (view: ViewId, segment?: IntelTab | PrepTab | OwnerTab) => void;
+}) {
+  return (
+    <>
+      <Segmented
+        options={[
+          { value: "search", label: "카페·정보" },
+          { value: "basics", label: "테슬라 기초" }
+        ]}
+        value={tab}
+        onChange={setTab}
+      />
+      {tab === "search" ? <IntelSearchSection goTo={goTo} /> : <BasicsSection />}
     </>
   );
 }
 
-function IntelView({ setActiveView }: { setActiveView: (view: ViewId) => void }) {
+function IntelSearchSection({
+  goTo
+}: {
+  goTo: (view: ViewId, segment?: IntelTab | PrepTab | OwnerTab) => void;
+}) {
   return (
     <>
       <section className="section-band">
@@ -455,9 +515,9 @@ function IntelView({ setActiveView }: { setActiveView: (view: ViewId) => void })
           eyebrow="카페 후보"
           title="공개글 검색으로 감시할 카페"
           action={
-            <button className="ghost-button" onClick={() => setActiveView("notes")} type="button">
+            <button className="ghost-button" onClick={() => goTo("owner", "notes")} type="button">
               메모로 보내기
-              <Bookmark size={18} aria-hidden="true" />
+              <Bookmark size={16} aria-hidden="true" />
             </button>
           }
         />
@@ -482,7 +542,7 @@ function IntelView({ setActiveView }: { setActiveView: (view: ViewId) => void })
   );
 }
 
-function BasicsView() {
+function BasicsSection() {
   return (
     <>
       <section className="section-band">
@@ -557,7 +617,23 @@ function BasicsView() {
   );
 }
 
-function BuyingView() {
+function PrepView({ tab, setTab }: { tab: PrepTab; setTab: (tab: PrepTab) => void }) {
+  return (
+    <>
+      <Segmented
+        options={[
+          { value: "buying", label: "구매·시공" },
+          { value: "checklist", label: "인수 체크리스트" }
+        ]}
+        value={tab}
+        onChange={setTab}
+      />
+      {tab === "buying" ? <BuyingSection /> : <DeliverySection />}
+    </>
+  );
+}
+
+function BuyingSection() {
   return (
     <>
       <section className="section-band">
@@ -567,7 +643,7 @@ function BuyingView() {
           action={
             <a className="ghost-button" href="https://www.tesla.com/ko_kr/modely" target="_blank" rel="noreferrer">
               공식 제원
-              <ExternalLink size={18} aria-hidden="true" />
+              <ExternalLink size={16} aria-hidden="true" />
             </a>
           }
         />
@@ -708,7 +784,7 @@ function BuyingView() {
   );
 }
 
-function DeliveryView() {
+function DeliverySection() {
   return (
     <>
       <section className="section-band">
@@ -719,7 +795,7 @@ function DeliveryView() {
             return (
               <article className="prep-card" key={group.phase}>
                 <div className="prep-card-head">
-                  <Icon size={22} aria-hidden="true" />
+                  <Icon size={20} aria-hidden="true" />
                   <strong>{group.phase}</strong>
                   <span>{group.progress}%</span>
                 </div>
@@ -745,11 +821,23 @@ function DeliveryView() {
   );
 }
 
-function NotesView() {
-  return <PersonalNotes />;
+function OwnerView({ tab, setTab }: { tab: OwnerTab; setTab: (tab: OwnerTab) => void }) {
+  return (
+    <>
+      <Segmented
+        options={[
+          { value: "notes", label: "내 기록" },
+          { value: "plan", label: "데이터 계획" }
+        ]}
+        value={tab}
+        onChange={setTab}
+      />
+      {tab === "notes" ? <PersonalNotes /> : <OwnerPlanSection />}
+    </>
+  );
 }
 
-function OwnerView() {
+function OwnerPlanSection() {
   return (
     <>
       <section className="section-band">
