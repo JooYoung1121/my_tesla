@@ -2,7 +2,7 @@
 
 import { CalendarClock, RotateCcw } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
-import { deliveryLeadStats } from "@/data/home";
+import { deliveryLeadStats, myOrder, pickLeadStat } from "@/data/home";
 
 export const DELIVERY_STORE_KEY = "my-tesla-delivery-v1";
 
@@ -12,15 +12,17 @@ type DeliveryInput = {
 };
 
 function loadInput(): DeliveryInput {
-  if (typeof window === "undefined") return { trim: "rwd", contractDate: "" };
+  if (typeof window === "undefined") return { trim: myOrder.trim, contractDate: myOrder.contractDate };
   try {
-    const parsed = JSON.parse(window.localStorage.getItem(DELIVERY_STORE_KEY) ?? "{}");
+    const raw = window.localStorage.getItem(DELIVERY_STORE_KEY);
+    if (!raw) return { trim: myOrder.trim, contractDate: myOrder.contractDate };
+    const parsed = JSON.parse(raw);
     return {
-      trim: parsed.trim ?? "rwd",
-      contractDate: parsed.contractDate ?? ""
+      trim: parsed.trim ?? myOrder.trim,
+      contractDate: parsed.contractDate ?? myOrder.contractDate
     };
   } catch {
-    return { trim: "rwd", contractDate: "" };
+    return { trim: myOrder.trim, contractDate: myOrder.contractDate };
   }
 }
 
@@ -39,7 +41,10 @@ function formatDate(date: Date) {
 }
 
 export function DeliveryEstimator() {
-  const [input, setInput] = useState<DeliveryInput>({ trim: "rwd", contractDate: "" });
+  const [input, setInput] = useState<DeliveryInput>({
+    trim: myOrder.trim,
+    contractDate: myOrder.contractDate
+  });
 
   useEffect(() => {
     setInput(loadInput());
@@ -51,18 +56,18 @@ export function DeliveryEstimator() {
     window.dispatchEvent(new Event("my-tesla-delivery-change"));
   }
 
-  const trim = deliveryLeadStats.trims.find((t) => t.id === input.trim) ?? deliveryLeadStats.trims[0];
+  const lead = useMemo(() => pickLeadStat(input.trim), [input.trim]);
 
   const result = useMemo(() => {
     if (!input.contractDate) return null;
     const base = new Date(`${input.contractDate}T00:00:00+09:00`);
     if (Number.isNaN(base.getTime())) return null;
-    const expected = addDays(base, trim.median);
-    const earliest = addDays(base, trim.p25);
-    const latest = addDays(base, trim.p75);
+    const expected = addDays(base, lead.median);
+    const earliest = addDays(base, lead.p25);
+    const latest = addDays(base, lead.p75);
     const dday = Math.ceil((expected.getTime() - Date.now()) / 86_400_000);
     return { expected, earliest, latest, dday };
-  }, [input.contractDate, trim]);
+  }, [input.contractDate, lead]);
 
   return (
     <div className="estimator">
@@ -125,9 +130,13 @@ export function DeliveryEstimator() {
       )}
 
       <p className="source-note">
-        {trim.label} 기준 {trim.count.toLocaleString()}건 실측 · 중앙값 {trim.median}일(빠르면 {trim.p25}
-        일, 늦으면 {trim.p75}일). {deliveryLeadStats.source}.
-        {trim.lowSample ? " 표본이 적어 참고용이다." : ""}
+        {lead.trimLabel} · {lead.cohortLabel} {lead.count.toLocaleString()}건 기준 · 중앙값{" "}
+        {lead.median}일(빠르면 {lead.p25}일, 늦으면 {lead.p75}일).{" "}
+        {lead.basis === "recent"
+          ? `최근 인도 추세를 반영했다(전체 중앙값은 ${lead.allTimeMedian}일). 다만 최근 계약은 느린 건이 아직 인도되지 않아 다소 짧게 보일 수 있다.`
+          : "최근 표본이 적어 2025년 이후 전체 통계를 쓴다."}{" "}
+        출처: {deliveryLeadStats.source}({deliveryLeadStats.collectedAt} 수집).
+        {lead.lowSample ? " 표본이 적어 참고용이다." : ""}
       </p>
     </div>
   );

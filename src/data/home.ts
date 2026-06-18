@@ -664,17 +664,56 @@ export const officialQuickLinks = [
   { label: "결제 안내", url: "https://linktr.ee/tesla_kr2" }
 ];
 
+// 내 주문 정보 (개인용 사이트라 직접 박아둔다).
+export const myOrder = {
+  contractDate: "2026-06-04",
+  surveyDate: "2026-06-12",
+  trim: "rwd"
+};
+
 // 계약→인도 리드타임(일) 실측 통계.
-// 출처: TKC 공동시트 '모델y(작성)' 탭(2026-06-18 수집), 2025년 이후 계약 후 인도완료 건.
+// 출처: TKC 공동시트 '모델y(작성)' 탭(2026-06-18 수집).
+// allTime = 2025년 이후 전체, recent = 2026년 2~4월 계약 코호트(최근 추세 반영).
 export const deliveryLeadStats = {
-  source: "TKC 공동시트 · 2025년 이후 인도완료 건",
+  source: "TKC 공동시트",
   collectedAt: "2026-06-18",
   trims: [
-    { id: "rwd", label: "프리미엄 RWD", count: 513, p25: 61, median: 81, p75: 99 },
-    { id: "awd", label: "프리미엄 AWD (롱레인지)", count: 214, p25: 90, median: 153, p75: 231 },
-    { id: "yl", label: "모델 Y L (롱바디)", count: 7, p25: 52, median: 63, p75: 68, lowSample: true }
+    {
+      id: "rwd",
+      label: "프리미엄 RWD",
+      allTime: { count: 513, p25: 61, median: 81, p75: 99 },
+      recent: { count: 48, p25: 53, median: 64, p75: 75, cohort: "2026년 2~4월 계약" }
+    },
+    {
+      id: "awd",
+      label: "프리미엄 AWD (롱레인지)",
+      allTime: { count: 214, p25: 90, median: 153, p75: 231 },
+      recent: null
+    },
+    {
+      id: "yl",
+      label: "모델 Y L (롱바디)",
+      allTime: { count: 7, p25: 52, median: 63, p75: 68 },
+      recent: null,
+      lowSample: true
+    }
   ]
-};
+} as const;
+
+// 표본이 충분하면(20건+) 최근 코호트를, 아니면 전체 통계를 쓴다.
+export function pickLeadStat(trimId: string) {
+  const trim = deliveryLeadStats.trims.find((t) => t.id === trimId) ?? deliveryLeadStats.trims[0];
+  const useRecent = trim.recent !== null && trim.recent.count >= 20;
+  const stat = useRecent ? trim.recent! : trim.allTime;
+  return {
+    trimLabel: trim.label,
+    basis: useRecent ? "recent" : ("allTime" as "recent" | "allTime"),
+    cohortLabel: useRecent ? trim.recent!.cohort : "2025년 이후 전체",
+    lowSample: "lowSample" in trim ? Boolean(trim.lowSample) : false,
+    allTimeMedian: trim.allTime.median,
+    ...stat
+  };
+}
 
 // 보조금·감면 계산 기준값. 출처: 환경부 2026 전기차 보조금 업무처리지침 + 테슬라 공지.
 export const subsidyConfig = {

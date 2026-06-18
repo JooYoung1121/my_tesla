@@ -23,15 +23,15 @@ import {
   aliShoppingList,
   budgetBuckets,
   deliveryChecklist,
-  deliveryLeadStats,
   deliveryProcessSteps,
-  deliveryTarget,
   deliveryTrackers,
   essentialSupplies,
   intelItems,
   modelYPremiumRwdSpecs,
+  myOrder,
   officialQuickLinks,
   officialResources,
+  pickLeadStat,
   ownerLogItems,
   prepGroups,
   searchGroups,
@@ -151,48 +151,46 @@ function useChecklistReadiness() {
   return readiness;
 }
 
-// 저장된 계약일이 있으면 트림 실측 중앙값으로 예상 인도일을 계산하고,
-// 없으면 기본 목표일(자리표시자)로 대체한다.
+// 저장된(또는 내 주문 기본값) 계약일과 트림으로 예상 인도일을 계산한다.
+// 트림별 최근 코호트 중앙값을 쓰며, 준비 탭에서 값을 바꾸면 즉시 반영된다.
 function useDeliveryEstimate() {
-  const [estimate, setEstimate] = useState<{
-    dday: number | null;
-    label: string;
-    basedOnContract: boolean;
-  }>({ dday: null, label: deliveryTarget.note, basedOnContract: false });
+  const [estimate, setEstimate] = useState<{ dday: number | null; label: string }>({
+    dday: null,
+    label: "계약일 기준 예상 인도일"
+  });
 
   useEffect(() => {
     function compute() {
-      let contractDate = "";
-      let trimId = "rwd";
+      let contractDate = myOrder.contractDate;
+      let trimId = myOrder.trim;
       try {
-        const parsed = JSON.parse(window.localStorage.getItem(DELIVERY_STORE_KEY) ?? "{}");
-        contractDate = parsed.contractDate ?? "";
-        trimId = parsed.trim ?? "rwd";
+        const raw = window.localStorage.getItem(DELIVERY_STORE_KEY);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          contractDate = parsed.contractDate ?? "";
+          trimId = parsed.trim ?? myOrder.trim;
+        }
       } catch {
-        // 저장값이 없으면 기본 목표일을 쓴다.
+        // 저장값이 깨졌으면 내 주문 기본값을 쓴다.
       }
 
       const now = Date.now();
-      if (contractDate) {
-        const trim = deliveryLeadStats.trims.find((t) => t.id === trimId) ?? deliveryLeadStats.trims[0];
-        const base = new Date(`${contractDate}T00:00:00+09:00`);
-        if (!Number.isNaN(base.getTime())) {
-          const expected = new Date(base);
-          expected.setDate(expected.getDate() + trim.median);
-          setEstimate({
-            dday: Math.max(0, Math.ceil((expected.getTime() - now) / 86_400_000)),
-            label: `내 계약일 + ${trim.label} 실측 중앙값 ${trim.median}일 기준`,
-            basedOnContract: true
-          });
-          return;
-        }
+      if (!contractDate) {
+        setEstimate({ dday: null, label: "준비 탭에서 계약일을 입력하면 D-day가 계산된다" });
+        return;
       }
 
-      const target = new Date(`${deliveryTarget.date}T00:00:00+09:00`).getTime();
+      const lead = pickLeadStat(trimId);
+      const base = new Date(`${contractDate}T00:00:00+09:00`);
+      if (Number.isNaN(base.getTime())) {
+        setEstimate({ dday: null, label: "계약일 형식을 확인해 주세요" });
+        return;
+      }
+      const expected = new Date(base);
+      expected.setDate(expected.getDate() + lead.median);
       setEstimate({
-        dday: Math.max(0, Math.ceil((target - now) / 86_400_000)),
-        label: "계약일 미입력 · 기본 목표일 기준 (준비 탭에서 설정)",
-        basedOnContract: false
+        dday: Math.max(0, Math.ceil((expected.getTime() - now) / 86_400_000)),
+        label: `${lead.trimLabel} · ${lead.cohortLabel} 중앙값 ${lead.median}일 기준`
       });
     }
 
@@ -395,7 +393,7 @@ function TodayView({ goTo }: { goTo: (view: ViewId, segment?: IntelTab | PrepTab
           <div className="hero-chips">
             <span>
               <Zap size={13} aria-hidden="true" />
-              {deliveryTarget.label}
+              계약 {myOrder.contractDate.replaceAll("-", ".")}
             </span>
             <span>기가 상하이 생산분</span>
             <span>4,999만 원</span>
