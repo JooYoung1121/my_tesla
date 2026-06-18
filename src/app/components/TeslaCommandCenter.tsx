@@ -23,10 +23,14 @@ import {
   aliShoppingList,
   budgetBuckets,
   deliveryChecklist,
+  deliveryProcessSteps,
   deliveryTarget,
+  deliveryTrackers,
   essentialSupplies,
   intelItems,
   modelYPremiumRwdSpecs,
+  officialQuickLinks,
+  officialResources,
   ownerLogItems,
   prepGroups,
   searchGroups,
@@ -45,7 +49,7 @@ import { PersonalNotes } from "./PersonalNotes";
 
 type ViewId = "today" | "intel" | "prep" | "owner";
 type IntelTab = "search" | "basics";
-type PrepTab = "buying" | "checklist";
+type PrepTab = "buying" | "official" | "checklist";
 type OwnerTab = "notes" | "plan";
 
 const views: Array<{
@@ -623,12 +627,143 @@ function PrepView({ tab, setTab }: { tab: PrepTab; setTab: (tab: PrepTab) => voi
       <Segmented
         options={[
           { value: "buying", label: "구매·시공" },
+          { value: "official", label: "공식 안내" },
           { value: "checklist", label: "인수 체크리스트" }
         ]}
         value={tab}
         onChange={setTab}
       />
-      {tab === "buying" ? <BuyingSection /> : <DeliverySection />}
+      {tab === "buying" ? <BuyingSection /> : null}
+      {tab === "official" ? <OfficialSection /> : null}
+      {tab === "checklist" ? <DeliverySection /> : null}
+    </>
+  );
+}
+
+function OfficialSection() {
+  return (
+    <>
+      <section className="section-band">
+        <SectionHeader
+          eyebrow="인도 프로세스"
+          title="계약부터 인수까지 흐름"
+          action={
+            <a
+              className="ghost-button"
+              href="https://linktr.ee/tesla_kr"
+              target="_blank"
+              rel="noreferrer"
+            >
+              공식 인도 가이드
+              <ExternalLink size={16} aria-hidden="true" />
+            </a>
+          }
+        />
+        <ol className="process-timeline">
+          {deliveryProcessSteps.map((step, index) => {
+            const Icon = step.icon;
+            return (
+              <li className="process-step" key={step.phase}>
+                <span className="process-rail" aria-hidden="true">
+                  <span className="process-dot">
+                    <Icon size={16} aria-hidden="true" />
+                  </span>
+                </span>
+                <div className="process-body">
+                  <div className="process-head">
+                    <strong>
+                      <em>{String(index + 1).padStart(2, "0")}</em>
+                      {step.phase}
+                    </strong>
+                    <span>{step.timing}</span>
+                  </div>
+                  <p>{step.detail}</p>
+                </div>
+              </li>
+            );
+          })}
+        </ol>
+        <p className="source-note">
+          소요 기간은 TKC 공동시트 인도완료 RWD 513건의 실측 중앙값(81일)과 테슬라 공식 안내를
+          참고한 추정치다. 트림·재고·시기에 따라 편차가 크다.
+        </p>
+      </section>
+
+      <section className="section-band">
+        <SectionHeader eyebrow="공식 자료" title="테슬라가 직접 제공하는 안내" />
+        <div className="resource-grid">
+          {officialResources.map((resource) => {
+            const Icon = resource.icon;
+            return (
+              <article className="resource-card" key={resource.title}>
+                <div className="resource-head">
+                  <span className="resource-icon">
+                    <Icon size={18} aria-hidden="true" />
+                  </span>
+                  <span className="resource-tag">{resource.category}</span>
+                </div>
+                <a className="resource-title" href={resource.url} target="_blank" rel="noreferrer">
+                  {resource.title}
+                  <ExternalLink size={15} aria-hidden="true" />
+                </a>
+                <p>{resource.detail}</p>
+                {resource.links.length > 0 ? (
+                  <div className="resource-links">
+                    {resource.links.map((link) => (
+                      <a href={link.url} key={link.url} target="_blank" rel="noreferrer">
+                        <ArrowUpRight size={14} aria-hidden="true" />
+                        {link.label}
+                      </a>
+                    ))}
+                  </div>
+                ) : null}
+              </article>
+            );
+          })}
+        </div>
+      </section>
+
+      <section className="prep-split">
+        <article className="section-band">
+          <div className="mini-heading">
+            <p className="eyebrow">입항·인도 추적</p>
+            <h3>선박과 보조금 잔여 확인</h3>
+          </div>
+          <div className="tracker-list">
+            {deliveryTrackers.map((tracker) => (
+              <a
+                className="tracker-row"
+                href={tracker.url}
+                key={tracker.url}
+                target="_blank"
+                rel="noreferrer"
+              >
+                <div>
+                  <strong>{tracker.name}</strong>
+                  <span>{tracker.detail}</span>
+                </div>
+                <ExternalLink size={15} aria-hidden="true" />
+              </a>
+            ))}
+          </div>
+          <p className="source-note">원천 데이터는 MarineTraffic AIS 선박 추적 기반.</p>
+        </article>
+
+        <article className="section-band">
+          <div className="mini-heading">
+            <p className="eyebrow">공식 바로가기</p>
+            <h3>자주 여는 페이지</h3>
+          </div>
+          <div className="quick-link-chips">
+            {officialQuickLinks.map((link) => (
+              <a href={link.url} key={link.url} target="_blank" rel="noreferrer">
+                {link.label}
+                <ArrowUpRight size={14} aria-hidden="true" />
+              </a>
+            ))}
+          </div>
+        </article>
+      </section>
     </>
   );
 }

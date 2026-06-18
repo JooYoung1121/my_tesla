@@ -14,13 +14,16 @@ import {
   FileText,
   Gauge,
   KeyRound,
+  Landmark,
   MapPinned,
   NotebookTabs,
   PlugZap,
   Radar,
   ReceiptText,
   RefreshCw,
+  Repeat2,
   Route,
+  Ship,
   ShieldCheck,
   ShieldAlert,
   Sparkles,
@@ -558,5 +561,129 @@ export const watchedCafes = [
     clubId: "10699343",
     url: "https://cafe.naver.com/shootgoal",
     note: "공개글은 검색 가능, 회원글 전체 수집은 별도 공식 읽기 API 없음"
+  }
+];
+
+// 한국 인도 흐름. 소요 기간은 TKC 공동시트 인도완료 RWD 513건의 실측 중앙값(81일)과
+// 테슬라 공식 안내를 참고한 추정치다. 트림·재고·시기에 따라 편차가 크다.
+export const deliveryProcessSteps = [
+  {
+    icon: FileText,
+    phase: "주문·계약",
+    detail: "Tesla App에 인수자 정보를 입력하고 주문번호와 예약금 결제 내역을 보관한다.",
+    timing: "계약 직후"
+  },
+  {
+    icon: Factory,
+    phase: "생산",
+    detail: "기가 상하이에서 생산. 트림·옵션 조합과 분기 물량에 따라 시작 시점이 달라진다.",
+    timing: "수 주"
+  },
+  {
+    icon: Ship,
+    phase: "선적·해상 운송",
+    detail: "RORO 운반선으로 한국까지 운송. 선박은 AIS 추적으로 위치를 가늠할 수 있다.",
+    timing: "약 1~2주"
+  },
+  {
+    icon: Boxes,
+    phase: "입항·통관",
+    detail: "평택·마산 등 국내 항 입항 후 통관. 입항 물량은 추적 서비스로 확인 가능.",
+    timing: "수 일~수 주"
+  },
+  {
+    icon: CreditCard,
+    phase: "인도센터 배정·결제",
+    detail: "VIN 배정 후 잔금 결제, 보험 가입, 번호판 등록을 마친다.",
+    timing: "배정 후 며칠"
+  },
+  {
+    icon: KeyRound,
+    phase: "인수",
+    detail: "인도센터 방문 또는 비대면 인수. 외관·실내·기능을 점검하고 서류를 보관한다.",
+    timing: "인도 당일"
+  }
+];
+
+// 출처: 테슬라 코리아 공식 링크트리(linktr.ee/tesla_kr)와 tesla.com 공식 지원 페이지.
+// 전문 전재 없이 링크와 요약만 적재한다.
+export const officialResources = [
+  {
+    icon: FileText,
+    category: "인도 가이드",
+    title: "Tesla 차량 인도 가이드",
+    detail: "공식 인도 가이드, 인도 수령 방법, 주문 후 앱 정보 입력 안내 모음.",
+    url: "https://linktr.ee/tesla_kr",
+    links: [
+      {
+        label: "5분만에 알아보는 인도 가이드",
+        url: "https://blog.naver.com/teslakr_official/224154611013"
+      },
+      {
+        label: "인도 수령 방법",
+        url: "https://blog.naver.com/teslakr_official/224181005657"
+      },
+      {
+        label: "신차 주문 후 앱 정보 입력",
+        url: "https://m.blog.naver.com/PostView.naver?blogId=teslakr_official&logNo=224102050550&navType=by"
+      }
+    ]
+  },
+  {
+    icon: Landmark,
+    category: "금융",
+    title: "리스·할부 상담",
+    detail: "Tesla 제휴 금융사를 통해 리스와 할부 상담을 진행한다.",
+    url: "https://www.tesla.com/ko_KR/support/tesla-financing",
+    links: []
+  },
+  {
+    icon: ShieldCheck,
+    category: "보험",
+    title: "InsureMyTesla",
+    detail: "Tesla 제휴 보험 프로그램 조건을 확인한다.",
+    url: "https://www.tesla.com/ko_KR/support/insuremytesla",
+    links: []
+  },
+  {
+    icon: Repeat2,
+    category: "보상 판매",
+    title: "Trade-in 견적",
+    detail: "현재 운용 중인 차량의 보상 판매 견적을 받아본다.",
+    url: "https://www.tesla.com/ko_KR/tradein",
+    links: []
+  }
+];
+
+// 인수 전후로 자주 여는 공식 바로가기.
+export const officialQuickLinks = [
+  { label: "즉시 인도 가능 차량", url: "https://www.tesla.com/ko_kr/inventory/new/my?redirect=no" },
+  { label: "Tesla 하이패스", url: "https://shop.tesla.com/ko_kr/product/hi-pass" },
+  { label: "CCS Combo1 어댑터", url: "https://shop.tesla.com/ko_kr/product/ccs-combo-1-adapter---south-korea" },
+  { label: "보조금 안내", url: "https://linktr.ee/tesla_kr3" },
+  { label: "결제 안내", url: "https://linktr.ee/tesla_kr2" }
+];
+
+// 입항·선박 추적 외부 서비스. 원천 데이터는 MarineTraffic AIS 기반.
+export const deliveryTrackers = [
+  {
+    name: "TKC 입항 물량",
+    detail: "모델별 입항 차량 수를 한눈에 본다.",
+    url: "https://tkc.kr/ship"
+  },
+  {
+    name: "지지직",
+    detail: "전체 입항 정보와 내 주문 입항 시점을 추정해 보여준다.",
+    url: "https://zizizik.app/contents/kr/vessel-arrival"
+  },
+  {
+    name: "EvTmate",
+    detail: "선박 입항일을 실시간으로 확인한다.",
+    url: "https://www.evtmate.com/"
+  },
+  {
+    name: "전국 보조금 잔여",
+    detail: "지자체별 보조금 잔여 물량을 확인한다.",
+    url: "https://longrange.gg/location/1100"
   }
 ];
