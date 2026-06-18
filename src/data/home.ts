@@ -664,6 +664,38 @@ export const officialQuickLinks = [
   { label: "결제 안내", url: "https://linktr.ee/tesla_kr2" }
 ];
 
+// 계약→인도 리드타임(일) 실측 통계.
+// 출처: TKC 공동시트 '모델y(작성)' 탭(2026-06-18 수집), 2025년 이후 계약 후 인도완료 건.
+export const deliveryLeadStats = {
+  source: "TKC 공동시트 · 2025년 이후 인도완료 건",
+  collectedAt: "2026-06-18",
+  trims: [
+    { id: "rwd", label: "프리미엄 RWD", count: 513, p25: 61, median: 81, p75: 99 },
+    { id: "awd", label: "프리미엄 AWD (롱레인지)", count: 214, p25: 90, median: 153, p75: 231 },
+    { id: "yl", label: "모델 Y L (롱바디)", count: 7, p25: 52, median: 63, p75: 68, lowSample: true }
+  ]
+};
+
+// 보조금·감면 계산 기준값. 출처: 환경부 2026 전기차 보조금 업무처리지침 + 테슬라 공지.
+export const subsidyConfig = {
+  basePrice: 4999, // 만원, Model Y Premium RWD
+  gukbi: 170, // 국비(만원), Model Y Premium RWD 기준
+  jibangbi: 0, // 지방비는 지역마다 달라 사용자가 입력
+  multiChild: [
+    { value: 0, label: "해당없음", amount: 0 },
+    { value: 2, label: "2자녀", amount: 100 },
+    { value: 3, label: "3자녀", amount: 200 },
+    { value: 4, label: "4자녀 이상", amount: 300 }
+  ],
+  options: [
+    { id: "youth", label: "청년 첫 차 (만 19~34세)", desc: "국비 보조금의 20% 추가", kind: "rate" },
+    { id: "conversion", label: "내연차 판매·폐차 전환", desc: "국비+지방비 ≥500만 → 100만 / 미만 → 합계의 20%", kind: "rate" },
+    { id: "veteran", label: "국가유공상이자", desc: "대상자 한정 · 100만 정액", kind: "flat", amount: 100 },
+    { id: "teslaSupport", label: "테슬라 자체 지원금", desc: "보조금 소진 지역 한정 · 170만", kind: "flat", amount: 170 },
+    { id: "referral", label: "추천 프로그램 할인", desc: "기존 오너 추천 링크 · 차량가 직접 33만 할인", kind: "discount", amount: 33 }
+  ]
+};
+
 // 입항·선박 추적 외부 서비스. 원천 데이터는 MarineTraffic AIS 기반.
 export const deliveryTrackers = [
   {

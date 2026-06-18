@@ -2072,6 +2072,346 @@ textarea {
 }
 
 /* ------------------------------------------------------------
+   예상 인도일 계산기
+   ------------------------------------------------------------ */
+
+.estimator {
+  display: grid;
+  gap: 16px;
+}
+
+.estimator-form {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: end;
+}
+
+.estimator-form label {
+  display: grid;
+  gap: 6px;
+}
+
+.estimator-form label span {
+  color: var(--faint);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.estimator-form select,
+.estimator-form input {
+  width: 100%;
+  min-height: 40px;
+  padding: 10px 12px;
+  color: var(--ink);
+  background: rgba(255, 255, 255, 0.045);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+
+.estimator-form select:focus,
+.estimator-form input:focus {
+  border-color: rgba(232, 33, 39, 0.6);
+}
+
+.estimator-form input[type="date"] {
+  color-scheme: dark;
+}
+
+.estimator-result {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+  gap: 12px;
+}
+
+.estimator-main {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 18px 20px;
+  background: var(--red-soft);
+  border: 1px solid rgba(232, 33, 39, 0.28);
+  border-radius: var(--radius-sm);
+}
+
+.estimator-main svg {
+  color: var(--red-bright);
+}
+
+.estimator-main span {
+  display: block;
+  color: var(--muted);
+  font-size: 12.5px;
+  font-weight: 600;
+}
+
+.estimator-main strong {
+  display: block;
+  margin-top: 4px;
+  font-size: 22px;
+  font-weight: 720;
+  letter-spacing: -0.02em;
+}
+
+.estimator-range {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.estimator-range > div {
+  padding: 14px 16px;
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+}
+
+.estimator-range span {
+  display: block;
+  color: var(--faint);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.estimator-range strong {
+  display: block;
+  margin-top: 5px;
+  font-size: 15px;
+  font-weight: 650;
+}
+
+.estimator-empty {
+  margin: 0;
+  padding: 22px;
+  color: var(--muted);
+  font-size: 13px;
+  text-align: center;
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px dashed var(--line-strong);
+  border-radius: var(--radius-sm);
+}
+
+/* ------------------------------------------------------------
+   보조금·감면 계산기
+   ------------------------------------------------------------ */
+
+.subsidy {
+  display: grid;
+  gap: 16px;
+}
+
+.subsidy-inputs {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.subsidy-inputs label {
+  display: grid;
+  gap: 6px;
+}
+
+.subsidy-inputs span {
+  color: var(--faint);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.subsidy-inputs input {
+  width: 100%;
+  min-height: 40px;
+  padding: 10px 12px;
+  color: var(--ink);
+  background: rgba(255, 255, 255, 0.045);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  outline: none;
+  font-feature-settings: "tnum" 1;
+  transition: border-color 0.15s ease;
+}
+
+.subsidy-inputs input:focus {
+  border-color: rgba(232, 33, 39, 0.6);
+}
+
+.subsidy-multichild {
+  display: grid;
+  gap: 8px;
+}
+
+.subsidy-multichild > span {
+  color: var(--faint);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.subsidy-multichild > div {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.subsidy-multichild button {
+  display: grid;
+  gap: 3px;
+  min-height: 48px;
+  padding: 8px;
+  color: var(--muted);
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-weight: 600;
+  transition: border-color 0.15s ease, color 0.15s ease, background 0.15s ease;
+}
+
+.subsidy-multichild button:hover {
+  color: var(--ink);
+  border-color: var(--line-strong);
+}
+
+.subsidy-multichild button.is-active {
+  color: var(--ink);
+  background: var(--panel-strong);
+  border-color: rgba(232, 33, 39, 0.5);
+}
+
+.subsidy-multichild em {
+  color: var(--red-bright);
+  font-style: normal;
+  font-size: 11.5px;
+  font-weight: 600;
+  font-feature-settings: "tnum" 1;
+}
+
+.subsidy-toggles {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.subsidy-toggle {
+  display: grid;
+  grid-template-columns: 18px minmax(0, 1fr);
+  gap: 11px;
+  align-items: start;
+  padding: 13px 14px;
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.subsidy-toggle:hover {
+  border-color: var(--line-strong);
+}
+
+.subsidy-toggle.is-on {
+  background: var(--red-soft);
+  border-color: rgba(232, 33, 39, 0.32);
+}
+
+.subsidy-toggle input {
+  margin-top: 2px;
+  width: 16px;
+  height: 16px;
+  accent-color: var(--red);
+}
+
+.subsidy-toggle strong {
+  display: block;
+  font-size: 13.5px;
+  font-weight: 600;
+}
+
+.subsidy-toggle small {
+  display: block;
+  margin-top: 3px;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.subsidy-result {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
+  gap: 12px;
+  padding: 18px;
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+}
+
+.subsidy-breakdown {
+  display: grid;
+  gap: 8px;
+  align-content: start;
+}
+
+.subsidy-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 13px;
+}
+
+.subsidy-row span {
+  color: var(--muted);
+}
+
+.subsidy-row em {
+  color: var(--ink);
+  font-style: normal;
+  font-weight: 600;
+  font-feature-settings: "tnum" 1;
+}
+
+.subsidy-row-base {
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--line);
+}
+
+.subsidy-row-base span,
+.subsidy-row-base em {
+  color: var(--ink);
+  font-weight: 650;
+}
+
+.subsidy-total {
+  display: grid;
+  gap: 10px;
+  align-content: center;
+  padding-left: 18px;
+  border-left: 1px solid var(--line);
+}
+
+.subsidy-total span {
+  display: block;
+  color: var(--faint);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.subsidy-total strong {
+  display: block;
+  margin-top: 4px;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  font-feature-settings: "tnum" 1;
+}
+
+.subsidy-net strong {
+  font-size: 26px;
+  font-weight: 750;
+  color: var(--red-bright);
+}
+
+/* ------------------------------------------------------------
    인수 준비 (체크리스트)
    ------------------------------------------------------------ */
 
@@ -2922,8 +3262,20 @@ textarea {
   .prep-split,
   .system-strip,
   .doc-grid,
-  .doc-band {
+  .doc-band,
+  .estimator-form,
+  .estimator-result,
+  .subsidy-inputs,
+  .subsidy-toggles,
+  .subsidy-result {
     grid-template-columns: 1fr;
+  }
+
+  .subsidy-total {
+    padding-left: 0;
+    padding-top: 14px;
+    border-left: 0;
+    border-top: 1px solid var(--line);
   }
 
   .doc-page {

@@ -23,6 +23,7 @@ import {
   aliShoppingList,
   budgetBuckets,
   deliveryChecklist,
+  deliveryLeadStats,
   deliveryProcessSteps,
   deliveryTarget,
   deliveryTrackers,
@@ -45,7 +46,9 @@ import {
 } from "@/data/home";
 import { CafeSearchPanel } from "./CafeSearchPanel";
 import { ChecklistManager } from "./ChecklistManager";
+import { DeliveryEstimator, DELIVERY_STORE_KEY } from "./DeliveryEstimator";
 import { PersonalNotes } from "./PersonalNotes";
+import { SubsidyCalculator } from "./SubsidyCalculator";
 
 type ViewId = "today" | "intel" | "prep" | "owner";
 type IntelTab = "search" | "basics";
@@ -148,16 +151,57 @@ function useChecklistReadiness() {
   return readiness;
 }
 
-function useDday(targetDate: string) {
-  const [dday, setDday] = useState<number | null>(null);
+// 저장된 계약일이 있으면 트림 실측 중앙값으로 예상 인도일을 계산하고,
+// 없으면 기본 목표일(자리표시자)로 대체한다.
+function useDeliveryEstimate() {
+  const [estimate, setEstimate] = useState<{
+    dday: number | null;
+    label: string;
+    basedOnContract: boolean;
+  }>({ dday: null, label: deliveryTarget.note, basedOnContract: false });
 
   useEffect(() => {
-    const target = new Date(`${targetDate}T00:00:00+09:00`).getTime();
-    const now = Date.now();
-    setDday(Math.max(0, Math.ceil((target - now) / 86_400_000)));
-  }, [targetDate]);
+    function compute() {
+      let contractDate = "";
+      let trimId = "rwd";
+      try {
+        const parsed = JSON.parse(window.localStorage.getItem(DELIVERY_STORE_KEY) ?? "{}");
+        contractDate = parsed.contractDate ?? "";
+        trimId = parsed.trim ?? "rwd";
+      } catch {
+        // 저장값이 없으면 기본 목표일을 쓴다.
+      }
 
-  return dday;
+      const now = Date.now();
+      if (contractDate) {
+        const trim = deliveryLeadStats.trims.find((t) => t.id === trimId) ?? deliveryLeadStats.trims[0];
+        const base = new Date(`${contractDate}T00:00:00+09:00`);
+        if (!Number.isNaN(base.getTime())) {
+          const expected = new Date(base);
+          expected.setDate(expected.getDate() + trim.median);
+          setEstimate({
+            dday: Math.max(0, Math.ceil((expected.getTime() - now) / 86_400_000)),
+            label: `내 계약일 + ${trim.label} 실측 중앙값 ${trim.median}일 기준`,
+            basedOnContract: true
+          });
+          return;
+        }
+      }
+
+      const target = new Date(`${deliveryTarget.date}T00:00:00+09:00`).getTime();
+      setEstimate({
+        dday: Math.max(0, Math.ceil((target - now) / 86_400_000)),
+        label: "계약일 미입력 · 기본 목표일 기준 (준비 탭에서 설정)",
+        basedOnContract: false
+      });
+    }
+
+    compute();
+    window.addEventListener("my-tesla-delivery-change", compute);
+    return () => window.removeEventListener("my-tesla-delivery-change", compute);
+  }, []);
+
+  return estimate;
 }
 
 function SectionHeader({
@@ -331,7 +375,7 @@ export function TeslaCommandCenter() {
 }
 
 function TodayView({ goTo }: { goTo: (view: ViewId, segment?: IntelTab | PrepTab | OwnerTab) => void }) {
-  const dday = useDday(deliveryTarget.date);
+  const delivery = useDeliveryEstimate();
   const readiness = useChecklistReadiness();
   const intelMetric = statusMetrics[1];
   const candidateMetric = statusMetrics[2];
@@ -344,9 +388,10 @@ function TodayView({ goTo }: { goTo: (view: ViewId, segment?: IntelTab | PrepTab
         <div className="bento-hero-content">
           <p className="hero-kicker">Model Y · Premium RWD</p>
           <h2>
-            인수까지 <span className="dday">{dday === null ? "D-?" : `D-${dday}`}</span>
+            인수까지{" "}
+            <span className="dday">{delivery.dday === null ? "D-?" : `D-${delivery.dday}`}</span>
           </h2>
-          <p>{deliveryTarget.note}</p>
+          <p>{delivery.label}</p>
           <div className="hero-chips">
             <span>
               <Zap size={13} aria-hidden="true" />
@@ -645,6 +690,14 @@ function OfficialSection() {
     <>
       <section className="section-band">
         <SectionHeader
+          eyebrow="예상 인도일"
+          title="계약일로 인도 시점을 추정한다"
+        />
+        <DeliveryEstimator />
+      </section>
+
+      <section className="section-band">
+        <SectionHeader
           eyebrow="인도 프로세스"
           title="계약부터 인수까지 흐름"
           action={
@@ -810,6 +863,11 @@ function BuyingSection() {
             );
           })}
         </div>
+      </section>
+
+      <section className="section-band">
+        <SectionHeader eyebrow="보조금·감면 계산기" title="해당 항목을 켜면 실구매가가 나온다" />
+        <SubsidyCalculator />
       </section>
 
       <section className="buying-columns">
