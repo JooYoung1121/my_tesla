@@ -117,6 +117,9 @@ export function ShipmentTracker() {
                 </span>
                 <div className="ship-badges">
                   {v.inMyWindow ? <span className="pill ship-pill-mine">내 차 후보</span> : null}
+                  {v.strength === "high" ? (
+                    <span className="pill ship-pill-high">테슬라 가능성↑</span>
+                  ) : null}
                   {dDayLabel(v.dDay) ? <span className="ship-dday">{dDayLabel(v.dDay)}</span> : null}
                 </div>
               </div>
@@ -137,9 +140,9 @@ export function ShipmentTracker() {
       ) : null}
 
       <p className="source-note">
-        입항 스케줄은 PORT-MIS 선박운항정보(해수부) 실시간 데이터다. 후보 판정은 선사·출발항
-        기준 추정이며, 모델별 적재 대수는 공개 API에 없어 표시하지 않는다. 정확한 모델 구성은
-        아래 외부 트래커(제보 기반)를 참고.
+        평택항 입항 자동차운반선을 PORT-MIS 선박운항정보(해수부) 실시간 데이터로 보여준다.
+        선대명·기가팩토리 출발항이 맞으면 &ldquo;테슬라 가능성↑&rdquo;로 표시한다. 어느 배에
+        몇 대가 실렸는지는 공개 API에 없어, 모델 구성은 아래 외부 트래커(제보 기반)를 참고.
       </p>
 
       <div className="tracker-list">

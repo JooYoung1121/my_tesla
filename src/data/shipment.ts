@@ -19,9 +19,9 @@ import { deliveryLeadStats, myOrder, pickLeadStat } from "./home";
 export const PORTMIS = {
   baseUrl: "https://apis.data.go.kr/1192000/VsslEtrynd5",
   operation: "Info5",
-  // 평택지방해양수산청 항만청코드. 키 활성화 후 응답의 prtAgNm이 "평택"인지로 확정한다.
-  // (/api/port/arrivals?prtAgCd=NNN&debug=1 로 코드 바꿔가며 확인 가능)
-  prtAgCd: "030",
+  // 평택지방해양수산청 항만청코드. 2026-06-26 실측 확정(응답 prtAgNm="평택").
+  // 참고: 030=인천, 050=경인. (/api/port/arrivals?prtAgCd=NNN&debug=1 로 확인 가능)
+  prtAgCd: "031",
   portName: "평택",
   maxRows: 50
 };
@@ -56,8 +56,12 @@ export type PortArrival = {
   berth: string | null; // 계선시설명
 };
 
+// high = 테슬라 선대명/기가팩토리 출발항, medium = 자동차운반선+해외출항, low = 자동차운반선
+export type CandidateStrength = "high" | "medium" | "low";
+
 export type CandidateVessel = PortArrival & {
   isTeslaCandidate: boolean;
+  strength: CandidateStrength;
   reasons: string[]; // 후보로 본 근거
   dDay: number | null; // 오늘 기준 입항까지 남은 일수(음수=이미 입항)
   inMyWindow: boolean; // 내 추정 입항 윈도우 안에 들어오는가
@@ -109,22 +113,35 @@ export const leadStatsSource = {
   collectedAt: deliveryLeadStats.collectedAt
 };
 
+// 국내항 판정용(한글 포함 또는 주요 국내 무역항). 해외출항 자동차선을 골라내기 위함.
+const KOREAN_PORT_PATTERN =
+  /[가-힣]|평택|당진|인천|부산|울산|광양|여수|목포|군산|마산|포항|동해|대산|보령|BUSAN|INCHEON|ULSAN|GWANGYANG|PYEONGTAEK|MASAN/i;
+
 // ── 분류/매칭 ──────────────────────────────────────────────────────────
-function isTeslaVessel(v: PortArrival) {
+function classifyVessel(v: PortArrival): { strength: CandidateStrength; reasons: string[] } | null {
   const nameHit = TESLA_VESSEL_PATTERN.test(v.shipName);
   const typeHit = Boolean(v.vesselType && CAR_CARRIER_PATTERN.test(v.vesselType));
   const originHit = Boolean(v.fromPort && TESLA_ORIGIN_PATTERN.test(v.fromPort));
+  const foreignOrigin = Boolean(v.fromPort && !KOREAN_PORT_PATTERN.test(v.fromPort));
 
-  // 후보 판정: (1) 테슬라 운송 선대 이름이거나, (2) 자동차전용선 + 기가팩토리 출발항.
-  const isCandidate = nameHit || (typeHit && originHit);
-  if (!isCandidate) return [];
+  // 자동차운반선도 아니고 테슬라 선대명도 아니면 제외.
+  if (!nameHit && !typeHit) return null;
 
   const reasons: string[] = [];
   if (nameHit) reasons.push("테슬라 운송 선대");
-  else if (typeHit && v.vesselType) reasons.push(v.vesselType);
+  else if (v.vesselType) reasons.push(v.vesselType);
   if (originHit) reasons.push(`출발 ${v.fromPort} (기가팩토리)`);
-  return reasons;
+  else if (typeHit && foreignOrigin && v.fromPort) reasons.push(`출발 ${v.fromPort}`);
+
+  // 강도: 선대명/기가팩토리 출발항 = high, 자동차선+해외출항 = medium, 그 외 자동차선 = low
+  let strength: CandidateStrength = "low";
+  if (nameHit || originHit) strength = "high";
+  else if (typeHit && foreignOrigin) strength = "medium";
+
+  return { strength, reasons };
 }
+
+const STRENGTH_RANK: Record<CandidateStrength, number> = { high: 0, medium: 1, low: 2 };
 
 export function classifyArrivals(
   arrivals: PortArrival[],
@@ -132,24 +149,27 @@ export function classifyArrivals(
   window: ArrivalWindow
 ): CandidateVessel[] {
   return arrivals
-    .map((v) => {
-      const reasons = isTeslaVessel(v);
+    .map((v): CandidateVessel | null => {
+      const hit = classifyVessel(v);
+      if (!hit) return null;
       const dDay = v.arrivalAt ? daysBetween(nowISO, v.arrivalAt.slice(0, 10)) : null;
       const inMyWindow = v.arrivalAt
         ? v.arrivalAt.slice(0, 10) >= window.from && v.arrivalAt.slice(0, 10) <= window.to
         : false;
       return {
         ...v,
-        isTeslaCandidate: reasons.length > 0,
-        reasons,
+        isTeslaCandidate: true,
+        strength: hit.strength,
+        reasons: hit.reasons,
         dDay,
         inMyWindow
       };
     })
-    .filter((v) => v.isTeslaCandidate)
+    .filter((v): v is CandidateVessel => v !== null)
     .sort((a, b) => {
-      // 내 윈도우 우선, 그 다음 입항 임박순
+      // 내 윈도우 우선 → 강도순(테슬라 가능성) → 입항 임박순
       if (a.inMyWindow !== b.inMyWindow) return a.inMyWindow ? -1 : 1;
+      if (a.strength !== b.strength) return STRENGTH_RANK[a.strength] - STRENGTH_RANK[b.strength];
       if (a.dDay == null) return 1;
       if (b.dDay == null) return -1;
       return a.dDay - b.dDay;

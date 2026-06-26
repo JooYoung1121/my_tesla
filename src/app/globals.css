@@ -3447,6 +3447,12 @@ textarea {
   border-color: var(--red);
 }
 
+.ship-pill-high {
+  background: var(--red-soft);
+  color: var(--red-bright);
+  border-color: var(--red-soft);
+}
+
 .ship-dday {
   font-variant-numeric: tabular-nums;
   font-weight: 600;
