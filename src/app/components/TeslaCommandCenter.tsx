@@ -24,7 +24,6 @@ import {
   budgetBuckets,
   deliveryChecklist,
   deliveryProcessSteps,
-  deliveryTrackers,
   essentialSupplies,
   intelItems,
   modelYPremiumRwdSpecs,
@@ -48,6 +47,7 @@ import { CafeSearchPanel } from "./CafeSearchPanel";
 import { ChecklistManager } from "./ChecklistManager";
 import { DeliveryEstimator, DELIVERY_STORE_KEY } from "./DeliveryEstimator";
 import { PersonalNotes } from "./PersonalNotes";
+import { ShipmentTracker } from "./ShipmentTracker";
 import { SubsidyCalculator } from "./SubsidyCalculator";
 
 type ViewId = "today" | "intel" | "prep" | "owner";
@@ -774,46 +774,21 @@ function OfficialSection() {
         </div>
       </section>
 
-      <section className="prep-split">
-        <article className="section-band">
-          <div className="mini-heading">
-            <p className="eyebrow">입항·인도 추적</p>
-            <h3>선박과 보조금 잔여 확인</h3>
-          </div>
-          <div className="tracker-list">
-            {deliveryTrackers.map((tracker) => (
-              <a
-                className="tracker-row"
-                href={tracker.url}
-                key={tracker.url}
-                target="_blank"
-                rel="noreferrer"
-              >
-                <div>
-                  <strong>{tracker.name}</strong>
-                  <span>{tracker.detail}</span>
-                </div>
-                <ExternalLink size={15} aria-hidden="true" />
-              </a>
-            ))}
-          </div>
-          <p className="source-note">원천 데이터는 MarineTraffic AIS 선박 추적 기반.</p>
-        </article>
+      <ShipmentTracker />
 
-        <article className="section-band">
-          <div className="mini-heading">
-            <p className="eyebrow">공식 바로가기</p>
-            <h3>자주 여는 페이지</h3>
-          </div>
-          <div className="quick-link-chips">
-            {officialQuickLinks.map((link) => (
-              <a href={link.url} key={link.url} target="_blank" rel="noreferrer">
-                {link.label}
-                <ArrowUpRight size={14} aria-hidden="true" />
-              </a>
-            ))}
-          </div>
-        </article>
+      <section className="section-band">
+        <div className="mini-heading">
+          <p className="eyebrow">공식 바로가기</p>
+          <h3>자주 여는 페이지</h3>
+        </div>
+        <div className="quick-link-chips">
+          {officialQuickLinks.map((link) => (
+            <a href={link.url} key={link.url} target="_blank" rel="noreferrer">
+              {link.label}
+              <ArrowUpRight size={14} aria-hidden="true" />
+            </a>
+          ))}
+        </div>
       </section>
     </>
   );

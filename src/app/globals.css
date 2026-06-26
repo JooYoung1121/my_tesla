@@ -3370,3 +3370,135 @@ textarea {
     padding-right: 0;
   }
 }
+
+/* ── 입항 실시간 추적(ShipmentTracker) ─────────────────────────────── */
+.ship-tracker-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.ship-window {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  margin-top: 12px;
+  padding: 12px 14px;
+  border: 1px solid var(--red-soft);
+  border-radius: var(--radius-sm);
+  background: var(--red-soft);
+}
+
+.ship-window strong {
+  font-size: 1.05rem;
+  letter-spacing: -0.01em;
+}
+
+.ship-window-sub {
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+
+.ship-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.ship-card {
+  padding: 13px 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.ship-card-mine {
+  border-color: var(--red);
+  background: var(--red-soft);
+}
+
+.ship-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.ship-name {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.ship-badges {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ship-pill-mine {
+  background: var(--red);
+  color: #fff;
+  border-color: var(--red);
+}
+
+.ship-dday {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  font-size: 0.82rem;
+  color: var(--red-bright);
+}
+
+.ship-route {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+  margin-top: 8px;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.ship-route-dest {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--ink);
+}
+
+.ship-route-when {
+  margin-left: auto;
+  font-variant-numeric: tabular-nums;
+}
+
+.ship-reason {
+  margin-top: 6px;
+  color: var(--muted);
+  font-size: 0.78rem;
+}
+
+.ship-empty {
+  margin-top: 12px;
+  padding: 14px;
+  border: 1px dashed var(--line-strong);
+  border-radius: var(--radius-sm);
+}
+
+.ship-tracker .tracker-list {
+  margin-top: 14px;
+}
+
+.spin {
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
