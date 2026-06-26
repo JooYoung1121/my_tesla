@@ -66,6 +66,44 @@ function extractItems(payload: unknown): Record<string, unknown>[] {
   return [];
 }
 
+// 이 API의 데이터포맷은 XML 고정(_type=json 무시). 단순 평면 구조라 정규식으로 파싱한다.
+function parseXmlItems(xml: string): Record<string, unknown>[] {
+  const items: Record<string, unknown>[] = [];
+  const itemRe = /<item>([\s\S]*?)<\/item>/g;
+  let m: RegExpExecArray | null;
+  while ((m = itemRe.exec(xml)) !== null) {
+    const obj: Record<string, unknown> = {};
+    const fieldRe = /<([a-zA-Z0-9_]+)>([\s\S]*?)<\/\1>/g;
+    let f: RegExpExecArray | null;
+    while ((f = fieldRe.exec(m[1])) !== null) {
+      obj[f[1]] = f[2].replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, "$1").trim();
+    }
+    items.push(obj);
+  }
+  return items;
+}
+
+// data.go.kr 오류 봉투(XML/JSON 공통)에서 메시지 추출.
+function extractError(text: string): string | null {
+  const code = text.match(/<(?:resultCode|returnReasonCode)>([^<]+)<\/(?:resultCode|returnReasonCode)>/)?.[1];
+  const msg = text.match(/<(?:resultMsg|returnAuthMsg|errMsg)>([^<]+)<\/(?:resultMsg|returnAuthMsg|errMsg)>/)?.[1];
+  if (msg && !/정상|NORMAL|SUCCESS|^00$/i.test(`${code} ${msg}`)) return `${code ?? ""} ${msg}`.trim();
+  return null;
+}
+
+// 본문이 JSON이든 XML이든 item 배열을 뽑는다.
+function parseItems(text: string): Record<string, unknown>[] {
+  const trimmed = text.trimStart();
+  if (trimmed.startsWith("{") || trimmed.startsWith("[")) {
+    try {
+      return extractItems(JSON.parse(text));
+    } catch {
+      return [];
+    }
+  }
+  return parseXmlItems(text);
+}
+
 function ymd(d: Date) {
   return `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, "0")}${String(d.getDate()).padStart(2, "0")}`;
 }
@@ -98,7 +136,7 @@ export async function GET(request: Request) {
 
   // numOfRows 최대 50 → 최대 4페이지(200건)까지 모은다.
   const all: Record<string, unknown>[] = [];
-  let lastPayload: unknown = null;
+  let lastText = "";
   for (let page = 1; page <= 4; page += 1) {
     const endpoint = new URL(`${PORTMIS.baseUrl}/${PORTMIS.operation}`);
     endpoint.searchParams.set("serviceKey", key); // hex 키라 인코딩 이슈 없음
@@ -108,12 +146,11 @@ export async function GET(request: Request) {
     endpoint.searchParams.set("deGb", "I"); // 입항일 기준
     endpoint.searchParams.set("numOfRows", String(PORTMIS.maxRows));
     endpoint.searchParams.set("pageNo", String(page));
-    endpoint.searchParams.set("_type", "json");
 
-    let payload: unknown;
+    let text = "";
     try {
       const res = await fetch(endpoint, { next: { revalidate: 1800 } });
-      const text = await res.text();
+      text = await res.text();
       if (!res.ok) {
         return NextResponse.json(
           {
@@ -122,20 +159,8 @@ export async function GET(request: Request) {
             detail: text.slice(0, 300),
             hint:
               res.status === 410 || /unauthor/i.test(text)
-                ? "키가 아직 이 API에 인가/전파되지 않았습니다. data.go.kr에서 #15006353 '활용신청'이 승인됐는지 확인하고, 발급 직후면 수십 분~수 시간 대기 후 재시도하세요."
+                ? "키가 아직 이 API에 인가/전파되지 않았습니다. 발급 직후면 수십 분~수 시간 대기 후 재시도하세요."
                 : undefined
-          },
-          { status: 502 }
-        );
-      }
-      try {
-        payload = JSON.parse(text);
-      } catch {
-        return NextResponse.json(
-          {
-            error: "JSON 파싱 실패(상류가 XML 반환).",
-            hint: "?debug=1 로 원본 확인 후 _type/dataType 조정.",
-            sample: text.slice(0, 400)
           },
           { status: 502 }
         );
@@ -147,19 +172,29 @@ export async function GET(request: Request) {
       );
     }
 
-    lastPayload = payload;
-    const items = extractItems(payload);
+    lastText = text;
+    if (debug && page === 1) {
+      return NextResponse.json({
+        endpoint: `${PORTMIS.baseUrl}/${PORTMIS.operation}`,
+        params: { prtAgCd, sde, ede, deGb: "I" },
+        rawSample: text.slice(0, 4000)
+      });
+    }
+
+    const items = parseItems(text);
     all.push(...items);
     if (items.length < PORTMIS.maxRows) break; // 마지막 페이지
   }
 
-  if (debug) {
-    return NextResponse.json({
-      endpoint: `${PORTMIS.baseUrl}/${PORTMIS.operation}`,
-      params: { prtAgCd, sde, ede, deGb: "I" },
-      count: all.length,
-      sampleRaw: lastPayload
-    });
+  // 데이터가 0건이고 오류 봉투가 있으면 그 메시지를 노출.
+  if (all.length === 0) {
+    const errMsg = extractError(lastText);
+    if (errMsg) {
+      return NextResponse.json(
+        { error: "PORT-MIS 응답 오류", detail: errMsg, hint: "활용신청 승인/키 전파 또는 prtAgCd 확인" },
+        { status: 502 }
+      );
+    }
   }
 
   const normalized = all.map(normalize);
