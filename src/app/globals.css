@@ -3379,6 +3379,13 @@ textarea {
   gap: 12px;
 }
 
+.ship-head-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  flex: none;
+}
+
 .ship-provenance {
   display: flex;
   flex-wrap: wrap;

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Anchor, ExternalLink, RefreshCw, Ship, ShieldCheck } from "lucide-react";
+import { Anchor, BellRing, ExternalLink, RefreshCw, Ship, ShieldCheck } from "lucide-react";
 import { deliveryTrackers } from "@/data/home";
 import type { ArrivalWindow, CandidateStrength, CandidateVessel } from "@/data/shipment";
 
@@ -165,6 +165,18 @@ export function ShipmentTracker() {
   const [data, setData] = useState<ApiResponse | null>(null);
   const [error, setError] = useState<ApiError | null>(null);
   const [loading, setLoading] = useState(true);
+  const [notifyState, setNotifyState] = useState<"idle" | "sending" | "sent" | "failed">("idle");
+
+  async function sendToDiscord() {
+    setNotifyState("sending");
+    try {
+      const res = await fetch("/api/port/notify", { method: "POST" });
+      setNotifyState(res.ok ? "sent" : "failed");
+    } catch {
+      setNotifyState("failed");
+    }
+    window.setTimeout(() => setNotifyState("idle"), 4000);
+  }
 
   async function load() {
     setLoading(true);
@@ -199,15 +211,30 @@ export function ShipmentTracker() {
           <p className="eyebrow">입항 실시간 추적</p>
           <h3>평택항 테슬라 후보 선박</h3>
         </div>
-        <button
-          type="button"
-          className="ghost-button"
-          onClick={load}
-          disabled={loading}
-        >
-          <RefreshCw size={15} aria-hidden="true" className={loading ? "spin" : undefined} />
-          새로고침
-        </button>
+        <div className="ship-head-actions">
+          <button
+            type="button"
+            className="ghost-button"
+            onClick={sendToDiscord}
+            disabled={notifyState === "sending"}
+            title="현재 후보 선박을 디스코드 웹훅으로 보낸다 (매일 오전 9시 자동 알림과 동일)"
+          >
+            <BellRing size={15} aria-hidden="true" />
+            {notifyState === "idle" ? "디스코드로 보내기" : null}
+            {notifyState === "sending" ? "보내는 중…" : null}
+            {notifyState === "sent" ? "보냈다 ✓" : null}
+            {notifyState === "failed" ? "실패 — 웹훅 설정 확인" : null}
+          </button>
+          <button
+            type="button"
+            className="ghost-button"
+            onClick={load}
+            disabled={loading}
+          >
+            <RefreshCw size={15} aria-hidden="true" className={loading ? "spin" : undefined} />
+            새로고침
+          </button>
+        </div>
       </div>
 
       {data ? (
