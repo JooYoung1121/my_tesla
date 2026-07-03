@@ -43,6 +43,7 @@ import {
   teslaBasicsSources,
   watchedCafes
 } from "@/data/home";
+import { PORT_LEAD_DAYS } from "@/data/shipment";
 import { CafeSearchPanel } from "./CafeSearchPanel";
 import { ChecklistManager } from "./ChecklistManager";
 import { DeliveryEstimator, DELIVERY_STORE_KEY } from "./DeliveryEstimator";
@@ -151,12 +152,24 @@ function useChecklistReadiness() {
   return readiness;
 }
 
+// 인수 항로 단계. pos = 리드타임 중앙값 대비 위치(%), passed는 progress로 판정.
+type VoyageStage = { label: string; pos: number };
+
+type DeliveryEstimate = {
+  dday: number | null;
+  label: string;
+  progress: number | null; // 계약→인수 진행률(0~100)
+  stages: VoyageStage[];
+};
+
 // 저장된(또는 내 주문 기본값) 계약일과 트림으로 예상 인도일을 계산한다.
 // 트림별 최근 코호트 중앙값을 쓰며, 준비 탭에서 값을 바꾸면 즉시 반영된다.
 function useDeliveryEstimate() {
-  const [estimate, setEstimate] = useState<{ dday: number | null; label: string }>({
+  const [estimate, setEstimate] = useState<DeliveryEstimate>({
     dday: null,
-    label: "계약일 기준 예상 인도일"
+    label: "계약일 기준 예상 인도일",
+    progress: null,
+    stages: []
   });
 
   useEffect(() => {
@@ -176,21 +189,42 @@ function useDeliveryEstimate() {
 
       const now = Date.now();
       if (!contractDate) {
-        setEstimate({ dday: null, label: "준비 탭에서 계약일을 입력하면 D-day가 계산된다" });
+        setEstimate({
+          dday: null,
+          label: "준비 탭에서 계약일을 입력하면 D-day가 계산된다",
+          progress: null,
+          stages: []
+        });
         return;
       }
 
       const lead = pickLeadStat(trimId);
       const base = new Date(`${contractDate}T00:00:00+09:00`);
       if (Number.isNaN(base.getTime())) {
-        setEstimate({ dday: null, label: "계약일 형식을 확인해 주세요" });
+        setEstimate({ dday: null, label: "계약일 형식을 확인해 주세요", progress: null, stages: [] });
         return;
       }
       const expected = new Date(base);
       expected.setDate(expected.getDate() + lead.median);
+
+      // 항로 단계 위치: 입항 = 인도 - PORT_LEAD_DAYS, 선적 = 입항 - 해상운송 약 10일.
+      const arrivalPos = ((lead.median - PORT_LEAD_DAYS) / lead.median) * 100;
+      const shipPos = Math.max(arrivalPos - (10 / lead.median) * 100, 26);
+      const stages: VoyageStage[] = [
+        { label: "계약", pos: 0 },
+        { label: "생산", pos: 14 },
+        { label: "선적", pos: shipPos },
+        { label: "입항", pos: arrivalPos },
+        { label: "인수", pos: 100 }
+      ];
+      const elapsedDays = (now - base.getTime()) / 86_400_000;
+      const progress = Math.min(Math.max((elapsedDays / lead.median) * 100, 0), 100);
+
       setEstimate({
         dday: Math.max(0, Math.ceil((expected.getTime() - now) / 86_400_000)),
-        label: `${lead.trimLabel} · ${lead.cohortLabel} 중앙값 ${lead.median}일 기준`
+        label: `${lead.trimLabel} · ${lead.cohortLabel} 중앙값 ${lead.median}일 기준`,
+        progress,
+        stages
       });
     }
 
@@ -200,6 +234,39 @@ function useDeliveryEstimate() {
   }, []);
 
   return estimate;
+}
+
+// 시그니처 요소: 계약→인수를 하나의 계기 스트립으로 그린 "인수 항로 게이지".
+// 마커 위치는 코호트 중앙값 대비 경과일로 추정한 값이라 '추정 위치'로 라벨링한다.
+function VoyageStrip({ estimate }: { estimate: DeliveryEstimate }) {
+  if (estimate.progress == null || estimate.stages.length === 0) return null;
+  const progress = estimate.progress;
+  return (
+    <div className="voyage" aria-label="인수 항로 추정 위치">
+      <div className="voyage-track">
+        <span className="voyage-fill" style={{ width: `${progress}%` }} />
+        {estimate.stages.map((stage) => (
+          <span
+            key={stage.label}
+            className={`voyage-tick${progress >= stage.pos ? " is-passed" : ""}`}
+            style={{ left: `${stage.pos}%` }}
+          />
+        ))}
+        <span className="voyage-marker" style={{ left: `${progress}%` }} title="추정 위치" />
+      </div>
+      <div className="voyage-labels">
+        {estimate.stages.map((stage) => (
+          <span
+            key={stage.label}
+            className={progress >= stage.pos ? "is-passed" : ""}
+            style={{ left: `${stage.pos}%` }}
+          >
+            {stage.label}
+          </span>
+        ))}
+      </div>
+    </div>
+  );
 }
 
 function SectionHeader({
@@ -390,6 +457,7 @@ function TodayView({ goTo }: { goTo: (view: ViewId, segment?: IntelTab | PrepTab
             <span className="dday">{delivery.dday === null ? "D-?" : `D-${delivery.dday}`}</span>
           </h2>
           <p>{delivery.label}</p>
+          <VoyageStrip estimate={delivery} />
           <div className="hero-chips">
             <span>
               <Zap size={13} aria-hidden="true" />

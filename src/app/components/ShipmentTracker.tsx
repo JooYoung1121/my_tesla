@@ -96,7 +96,7 @@ function ArrivalTimeline({ data }: { data: ApiResponse }) {
         {dots.map((v, i) => (
           <span
             key={`${v.shipName}-${i}`}
-            className={`ship-timeline-dot dot-${v.strength}${v.inMyWindow ? " dot-mine" : ""}`}
+            className={`ship-timeline-dot dot-${v.strength}${v.inMyWindow ? " dot-mine" : ""}${v.dDay === 0 ? " dot-today" : ""}`}
             style={{ left: `${pct(v.arrivalAt!)}%` }}
             title={`${v.shipName} · ${fmtDate(v.arrivalAt)}`}
           />
