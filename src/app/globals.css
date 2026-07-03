@@ -3379,6 +3379,49 @@ textarea {
   gap: 12px;
 }
 
+.ship-head-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  flex: none;
+}
+
+.ship-provenance {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 12px;
+  margin-top: 12px;
+  color: var(--muted);
+  font-size: 0.78rem;
+}
+
+.ship-provenance-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 9px;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  color: var(--ink);
+  font-weight: 600;
+  font-size: 0.75rem;
+}
+
+.ship-provenance a {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  margin-left: auto;
+  color: var(--muted);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.ship-provenance a:hover {
+  color: var(--ink);
+}
+
 .ship-window {
   display: flex;
   flex-wrap: wrap;
@@ -3401,11 +3444,135 @@ textarea {
   font-size: 0.82rem;
 }
 
+/* 조회 구간 타임라인 */
+.ship-timeline {
+  margin-top: 14px;
+}
+
+.ship-timeline-track {
+  position: relative;
+  height: 26px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.02);
+  overflow: hidden;
+}
+
+.ship-timeline-window {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  background: var(--red-soft);
+  border-inline: 1px solid var(--red);
+}
+
+.ship-timeline-today {
+  position: absolute;
+  top: 2px;
+  bottom: 2px;
+  width: 2px;
+  transform: translateX(-50%);
+  background: var(--ink);
+  opacity: 0.8;
+}
+
+.ship-timeline-dot {
+  position: absolute;
+  top: 50%;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  background: var(--muted);
+  opacity: 0.65;
+}
+
+.ship-timeline-dot.dot-high,
+.ship-legend-dot.dot-high {
+  background: var(--red);
+  opacity: 1;
+}
+
+.ship-timeline-dot.dot-medium,
+.ship-legend-dot.dot-medium {
+  background: var(--red-bright);
+  opacity: 0.75;
+}
+
+.ship-timeline-dot.dot-mine {
+  width: 11px;
+  height: 11px;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.35);
+}
+
+.ship-timeline-axis {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  margin-top: 5px;
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.ship-timeline-today-label {
+  position: absolute;
+  transform: translateX(-50%);
+  color: var(--ink);
+  font-weight: 600;
+}
+
+/* 판정 기준 범례 */
+.ship-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px 16px;
+  margin-top: 10px;
+  color: var(--muted);
+  font-size: 0.74rem;
+}
+
+.ship-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.ship-legend strong {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.ship-legend-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--muted);
+  opacity: 0.65;
+  flex: none;
+}
+
+.ship-group {
+  margin-top: 16px;
+}
+
+.ship-group-title {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  font-size: 0.85rem;
+}
+
+.ship-group-title span {
+  color: var(--muted);
+  font-size: 0.76rem;
+}
+
 .ship-list {
   display: flex;
   flex-direction: column;
   gap: 10px;
-  margin-top: 14px;
+  margin-top: 8px;
 }
 
 .ship-card {
@@ -3447,16 +3614,32 @@ textarea {
   border-color: var(--red);
 }
 
-.ship-pill-high {
+.ship-strength-high {
   background: var(--red-soft);
   color: var(--red-bright);
   border-color: var(--red-soft);
 }
 
+.ship-strength-medium {
+  color: var(--ink);
+}
+
+.ship-strength-low {
+  color: var(--muted);
+}
+
+.ship-callsign {
+  margin-left: 6px;
+  color: var(--muted);
+  font-weight: 400;
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+}
+
 .ship-dday {
   font-variant-numeric: tabular-nums;
   font-weight: 600;
-  font-size: 0.82rem;
+  font-style: normal;
   color: var(--red-bright);
 }
 
@@ -3482,10 +3665,18 @@ textarea {
   font-variant-numeric: tabular-nums;
 }
 
+.ship-facts {
+  margin-top: 7px;
+  color: var(--ink);
+  opacity: 0.85;
+  font-size: 0.79rem;
+  font-variant-numeric: tabular-nums;
+}
+
 .ship-reason {
-  margin-top: 6px;
+  margin-top: 4px;
   color: var(--muted);
-  font-size: 0.78rem;
+  font-size: 0.76rem;
 }
 
 .ship-empty {
@@ -3499,6 +3690,14 @@ textarea {
   margin-top: 14px;
 }
 
+.tracker-method {
+  display: block;
+  margin-top: 3px;
+  color: var(--muted);
+  font-size: 0.72rem;
+  opacity: 0.85;
+}
+
 .spin {
   animation: spin 0.8s linear infinite;
 }
@@ -3506,5 +3705,191 @@ textarea {
 @keyframes spin {
   to {
     transform: rotate(360deg);
+  }
+}
+
+/* ============================================================
+   콕핏 계기판 레이어 (frontend-design 보강, 2026-07-03)
+   규칙: 계기판 서체(Chakra Petch)는 숫자·라틴 라벨에만 쓴다.
+   한글 본문·라벨은 Pretendard를 유지한다(절제 원칙).
+   ============================================================ */
+
+.dday,
+.bento-ready strong,
+.bento-mini strong,
+.hero-kicker,
+.brand-mark,
+.eyebrow,
+.ship-window strong,
+.ship-dday,
+.prep-card-head span {
+  font-family: var(--font-display), "Pretendard Variable", Pretendard, sans-serif;
+}
+
+.ship-callsign,
+.ship-facts,
+.ship-timeline-axis,
+.ship-route-when {
+  font-family: var(--font-mono), ui-monospace, "SF Mono", monospace;
+  letter-spacing: 0;
+  font-size: 0.76rem;
+}
+
+/* ── 시그니처: 인수 항로 게이지 ─────────────────────────────── */
+.voyage {
+  max-width: 460px;
+  margin: 2px 0 18px;
+}
+
+.voyage-track {
+  position: relative;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.18);
+  border-radius: 999px;
+}
+
+.voyage-fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  background: linear-gradient(90deg, rgba(232, 33, 39, 0.55), var(--red-bright));
+  border-radius: 999px;
+}
+
+.voyage-tick {
+  position: absolute;
+  top: 50%;
+  width: 7px;
+  height: 7px;
+  transform: translate(-50%, -50%);
+  background: rgba(255, 255, 255, 0.35);
+  border-radius: 50%;
+}
+
+.voyage-tick.is-passed {
+  background: #fff;
+}
+
+.voyage-marker {
+  position: absolute;
+  top: 50%;
+  width: 9px;
+  height: 9px;
+  transform: translate(-50%, -50%) rotate(45deg);
+  background: var(--red-bright);
+  border-radius: 2px;
+  box-shadow:
+    0 0 0 3px rgba(232, 33, 39, 0.35),
+    0 0 16px rgba(232, 33, 39, 0.9);
+}
+
+.voyage-labels {
+  position: relative;
+  height: 15px;
+  margin-top: 8px;
+  color: var(--faint);
+  font-family: var(--font-display), "Pretendard Variable", Pretendard, sans-serif;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+}
+
+.voyage-labels span {
+  position: absolute;
+  transform: translateX(-50%);
+  transition: color 0.2s ease;
+  white-space: nowrap;
+}
+
+.voyage-labels span:first-child {
+  transform: none;
+}
+
+.voyage-labels span:last-child {
+  transform: translateX(-100%);
+}
+
+.voyage-labels span.is-passed {
+  color: rgba(244, 244, 245, 0.9);
+}
+
+/* ── 마이크로 인터랙션 ─────────────────────────────────────── */
+.bento-tile,
+.ship-card,
+.topic-card,
+.basic-card,
+.resource-card,
+.budget-card {
+  transition: border-color 0.18s ease, transform 0.18s ease, background 0.18s ease;
+}
+
+.bento-tile:hover,
+.ship-card:hover,
+.topic-card:hover,
+.basic-card:hover,
+.resource-card:hover,
+.budget-card:hover {
+  border-color: var(--line-strong);
+  transform: translateY(-1px);
+}
+
+.ship-card-mine:hover {
+  border-color: var(--red-bright);
+}
+
+/* ── 모션(모두 reduced-motion 존중) ────────────────────────── */
+@media (prefers-reduced-motion: no-preference) {
+  .bento-grid > * {
+    animation: rise-in 520ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .bento-grid > *:nth-child(2) { animation-delay: 50ms; }
+  .bento-grid > *:nth-child(3) { animation-delay: 100ms; }
+  .bento-grid > *:nth-child(4) { animation-delay: 150ms; }
+  .bento-grid > *:nth-child(5) { animation-delay: 200ms; }
+  .bento-grid > *:nth-child(6) { animation-delay: 250ms; }
+  .bento-grid > *:nth-child(7) { animation-delay: 300ms; }
+
+  .voyage-fill {
+    transform-origin: left center;
+    animation: voyage-fill 900ms 250ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .voyage-marker,
+  .voyage-tick {
+    animation: fade-in 400ms 950ms both;
+  }
+
+  /* 오늘 입항하는 배만 조용히 맥동한다 */
+  .ship-timeline-dot.dot-today {
+    animation: dot-pulse 2.4s ease-in-out infinite;
+  }
+}
+
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+}
+
+@keyframes voyage-fill {
+  from {
+    transform: scaleX(0);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes dot-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(232, 33, 39, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 0 5px rgba(232, 33, 39, 0);
   }
 }

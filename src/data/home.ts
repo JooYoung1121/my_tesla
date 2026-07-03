@@ -329,7 +329,7 @@ export const budgetBuckets = [
     icon: Boxes,
     title: "알리 필수템",
     amount: "15만~45만 원",
-    detail: "보호필름, 매트, 선쉐이드, 머드플랩, 수납류처럼 테슬라 공용 후기가 많고 실패 리스크가 낮은 품목부터 산다."
+    detail: "스크린 보호(앞·뒤), 매트, 선쉐이드, 전방 카메라 보호처럼 실패 리스크가 낮은 것부터. 주니퍼 전용 규격 확인이 필수다."
   }
 ];
 
@@ -344,76 +344,99 @@ export const essentialSupplies = [
   { item: "모바일 커넥터", timing: "집밥 검토 후", priority: "상황별", memo: "단독주택·비상 충전 환경이 있으면 유용" }
 ];
 
+// 2026-07-03 커뮤니티 조사 반영(근거·출처: docs/ali-accessories.md).
+// 주니퍼는 구형과 규격이 달라(스크린·송풍구·트렁크 분할·콘솔·루프) 거의 전 품목 "주니퍼 전용" 확인 필수.
 export const aliShoppingList = [
   {
-    item: "센터/후석 디스플레이 강화유리",
-    range: "1만~3만 원",
-    timing: "먼저 구매",
-    memo: "저렴하고 실패 리스크가 낮다. 2025~2026 Juniper/Highland 호환 표기를 확인한다.",
+    item: "전면 15.4인치 스크린 강화유리",
+    range: "8천~2만 원",
+    timing: "인수 직후",
+    memo: "무광·지문방지 인기. 구형과 규격이 달라 주니퍼 전용 필수. 국내가(1.8만대)와 차이가 크지 않아 급하면 국내 구매도 무방.",
     url: "https://www.aliexpress.com/wholesale?SearchText=Tesla+Model+Y+Juniper+screen+protector"
   },
   {
-    item: "TPE 바닥·트렁크 매트",
-    range: "4만~12만 원",
-    timing: "먼저 구매",
-    memo: "국내 브랜드 대비 저렴하지만 냄새, 들뜸, 고정 핀 위치 후기를 확인한다.",
+    item: "뒷좌석 8인치 스크린 보호필름",
+    range: "5천~1.2만 원",
+    timing: "인수 직후",
+    memo: "주니퍼 신규 리어 스크린. 뒷좌석 게임·아이들 사용으로 기스 나기 쉬워 초기 시공 권장.",
+    url: "https://www.aliexpress.com/wholesale?SearchText=Tesla+Model+Y+Juniper+rear+screen+protector"
+  },
+  {
+    item: "TPE 매트 풀세트(실내+트렁크+프렁크)",
+    range: "3만~7만 원",
+    timing: "인수 전~직후",
+    memo: "주니퍼 트렁크 바닥은 앞뒤 분할 구조라 분할형 라이너 확인. 저가품은 냄새·미세한 사이즈 불일치 후기 확인.",
     url: "https://www.aliexpress.com/wholesale?SearchText=Tesla+Model+Y+Juniper+TPE+floor+mat"
   },
   {
-    item: "루프 선쉐이드",
-    range: "3만~11만 원",
-    timing: "여름 전",
-    memo: "모델 Y 글라스 루프 체감 온도 때문에 여름 인수라면 우선순위가 높다.",
+    item: "루프 선쉐이드(자석형)",
+    range: "1.5만~4만 원",
+    timing: "인수 전",
+    memo: "8월 인수라 우선순위 최상. 자석형이 탈부착 편하다. 주니퍼 루프 유리 크기가 달라 전용 확인.",
     url: "https://www.aliexpress.com/wholesale?SearchText=Tesla+Model+Y+Juniper+roof+sunshade"
   },
   {
-    item: "짧은 머드플랩",
-    range: "1만~3만 원",
-    timing: "인수 전",
-    memo: "돌빵과 하단 오염 방지용. 너무 긴 제품은 간섭 후기를 확인한다.",
-    url: "https://www.aliexpress.com/wholesale?SearchText=Tesla+Model+Y+Juniper+mud+flaps"
+    item: "앞 범퍼 전방 카메라 보호(투명 PC 가드/PPF)",
+    range: "5천~1.5만 원",
+    timing: "인수 직후",
+    memo: "주니퍼 신규 전방 카메라 돌빵 방지. 반드시 투명 렌즈 가드/PPF만 — 유색·불투명 커버는 오토파일럿 기능 제한 위험.",
+    url: "https://www.aliexpress.com/wholesale?SearchText=Tesla+Model+Y+Juniper+front+camera+protector"
   },
   {
-    item: "트렁크 문턱 보호대",
+    item: "뒷좌석 송풍구 커버",
+    range: "3천~1만 원",
+    timing: "인수 직후",
+    memo: "콘솔 뒤 송풍구 이물질 유입 방지. 주니퍼는 송풍구 모양이 바뀌어 구형 호환 불가.",
+    url: "https://www.aliexpress.com/wholesale?SearchText=Tesla+Model+Y+Juniper+air+vent+cover"
+  },
+  {
+    item: "트렁크 문턱 보호 가드",
+    range: "8천~2만 원",
+    timing: "인수 후",
+    memo: "짐 싣다 생기는 기스 방지. 주니퍼 전용 TPE형, 접착식은 탈거 흔적 고려.",
+    url: "https://www.aliexpress.com/wholesale?SearchText=Tesla+Model+Y+Juniper+trunk+sill+protector"
+  },
+  {
+    item: "글로브박스 USB 허브/도킹",
     range: "1만~3만 원",
     timing: "인수 후",
-    memo: "캐리어와 짐을 자주 싣는다면 체감된다. 접착식은 탈거 흔적을 고려한다.",
-    url: "https://www.aliexpress.com/wholesale?SearchText=Tesla+Model+Y+trunk+sill+protector"
+    memo: "블랙박스·게임패드·하이패스 포트 확장. 급속충전 지원과 셀러 후기 확인.",
+    url: "https://www.aliexpress.com/wholesale?SearchText=Tesla+Model+Y+Juniper+glovebox+USB+hub"
   },
   {
-    item: "시트 하단 에어벤트 커버",
+    item: "도어 프로젝션(웰컴) 라이트",
     range: "5천~1.5만 원",
-    timing: "나중",
-    memo: "작은 물건이 뒷좌석 송풍구로 들어가는 것을 막는 용도다.",
-    url: "https://www.aliexpress.com/wholesale?SearchText=Tesla+Model+Y+seat+air+vent+cover"
+    timing: "인수 후",
+    memo: "'가성비 만족도 1위' 언급 다수. DIY 5분, 공홈 5만 원대 대비 저렴.",
+    url: "https://www.aliexpress.com/wholesale?SearchText=Tesla+Model+Y+puddle+light+projector"
   },
   {
-    item: "센터 콘솔/스크린 하단 수납함",
-    range: "1만~4만 원",
+    item: "센터 콘솔 수납함/트레이",
+    range: "5천~2만 원",
     timing: "나중",
-    memo: "수납 습관이 생긴 뒤 필요한 위치만 산다.",
+    memo: "취향차가 커서('없는 게 편하다'는 의견도) 실사용 후 필요한 위치만. 주니퍼 콘솔 형상 전용 확인.",
     url: "https://www.aliexpress.com/wholesale?SearchText=Tesla+Model+Y+Juniper+center+console+organizer"
   },
   {
-    item: "휠 커버",
-    range: "6만~20만 원",
+    item: "맥세이프 무선충전 거치대(쿨링팬형)",
+    range: "1.5만~5만 원",
     timing: "보류",
-    memo: "외관 만족도는 높지만 고속 주행 소음, 체결력, 순정 휠 흠집 후기를 확인한다.",
+    memo: "기본 무선 충전이 불편할 때만. 저가품은 발열·충전속도 이슈 — 쿨링팬 내장형 위주로.",
+    url: "https://www.aliexpress.com/wholesale?SearchText=Tesla+Model+Y+MagSafe+cooling+mount"
+  },
+  {
+    item: "짧은 머드플랩",
+    range: "1만~2.5만 원",
+    timing: "필요 시",
+    memo: "도심 위주면 불필요. 뒷바퀴용 저가품은 주차 스토퍼에 걸려 깨진 사례가 있어 후기 확인.",
+    url: "https://www.aliexpress.com/wholesale?SearchText=Tesla+Model+Y+Juniper+mud+flaps"
+  },
+  {
+    item: "휠(에어로) 커버",
+    range: "2만~5만 원",
+    timing: "보류",
+    memo: "주니퍼 휠 규격(크로스플로우/제미니) 확인. 고속 소음·체결력·순정 휠 흠집 후기 필수.",
     url: "https://www.aliexpress.com/wholesale?SearchText=Tesla+Model+Y+Juniper+wheel+cover"
-  },
-  {
-    item: "Qi2 맥세이프 거치대",
-    range: "3만~7만 원",
-    timing: "보류",
-    memo: "차량 기본 무선 충전이 불편할 때만 산다. Qi2 인증 여부를 확인한다.",
-    url: "https://www.aliexpress.com/wholesale?SearchText=Tesla+Model+Y+Qi2+MagSafe+mount"
-  },
-  {
-    item: "전면 흡기구/카메라 커버류",
-    range: "5천~2만 원",
-    timing: "검증 후",
-    memo: "센서, 냉각, 배수에 영향을 줄 수 있는 제품은 후기 확인 전 구매하지 않는다.",
-    url: "https://www.aliexpress.com/wholesale?SearchText=Tesla+Model+Y+Juniper+camera+cover"
   }
 ];
 
@@ -735,26 +758,31 @@ export const subsidyConfig = {
   ]
 };
 
-// 입항·선박 추적 외부 서비스. 원천 데이터는 MarineTraffic AIS 기반.
+// 입항·선박 추적 외부 서비스. 각 서비스의 데이터 출처·정제 방식은 2026-07-03 조사
+// (docs/tracker-apps.md) 기준. method = 원천 데이터와 정제 방식 요약.
 export const deliveryTrackers = [
   {
     name: "TKC 입항 물량",
-    detail: "모델별 입항 차량 수를 한눈에 본다.",
+    detail: "모델별 입항 대수를 확정/확인 중 후보로 나눠 본다.",
+    method: "카페 회원 제보(색상·결제일·인도예약일)를 운영자가 매일 수동 정리. 공식 API 연계 없음",
     url: "https://tkc.kr/ship"
   },
   {
     name: "지지직",
-    detail: "전체 입항 정보와 내 주문 입항 시점을 추정해 보여준다.",
+    detail: "선박 카드와 모델별 월간 입항 집계를 본다.",
+    method: "과거 운항 이력으로 '테슬라 적재 확률'을 추정하고 회원 제보로 대수 보강(자체 고지)",
     url: "https://zizizik.app/contents/kr/vessel-arrival"
   },
   {
     name: "EvTmate",
-    detail: "선박 입항일을 실시간으로 확인한다.",
+    detail: "입항 현황과 VIN 발급·인도 이력 통계를 본다.",
+    method: "Tesla Owner API로 사용자 계정(VIN·계약일)을 직접 연동해 집계하는 비공식 개인 개발 앱",
     url: "https://www.evtmate.com/"
   },
   {
     name: "전국 보조금 잔여",
     detail: "지자체별 보조금 잔여 물량을 확인한다.",
+    method: "무공해차 통합누리집 공고 데이터 정리",
     url: "https://longrange.gg/location/1100"
   }
 ];

@@ -131,12 +131,15 @@ function classifyVessel(v: PortArrival): { strength: CandidateStrength; reasons:
   if (nameHit) reasons.push("테슬라 운송 선대");
   else if (v.vesselType) reasons.push(v.vesselType);
   if (originHit) reasons.push(`출발 ${v.fromPort} (기가팩토리)`);
-  else if (typeHit && foreignOrigin && v.fromPort) reasons.push(`출발 ${v.fromPort}`);
+  else if (foreignOrigin && v.fromPort) reasons.push(`출발 ${v.fromPort}`);
+  else if (nameHit && v.fromPort) reasons.push(`출발 ${v.fromPort} (국내 연안 운항)`);
 
-  // 강도: 선대명/기가팩토리 출발항 = high, 자동차선+해외출항 = medium, 그 외 자동차선 = low
+  // 강도: 기가팩토리 출발 또는 선대명+해외출항 = high,
+  // 선대명이지만 국내 항 출발(연안 운항, 테슬라 수입분 가능성 낮음) = medium,
+  // 자동차선+해외출항 = medium, 그 외 자동차선 = low
   let strength: CandidateStrength = "low";
-  if (nameHit || originHit) strength = "high";
-  else if (typeHit && foreignOrigin) strength = "medium";
+  if (originHit || (nameHit && foreignOrigin)) strength = "high";
+  else if (nameHit || (typeHit && foreignOrigin)) strength = "medium";
 
   return { strength, reasons };
 }
