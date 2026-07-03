@@ -3379,6 +3379,42 @@ textarea {
   gap: 12px;
 }
 
+.ship-provenance {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 12px;
+  margin-top: 12px;
+  color: var(--muted);
+  font-size: 0.78rem;
+}
+
+.ship-provenance-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 9px;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  color: var(--ink);
+  font-weight: 600;
+  font-size: 0.75rem;
+}
+
+.ship-provenance a {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  margin-left: auto;
+  color: var(--muted);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.ship-provenance a:hover {
+  color: var(--ink);
+}
+
 .ship-window {
   display: flex;
   flex-wrap: wrap;
@@ -3401,11 +3437,135 @@ textarea {
   font-size: 0.82rem;
 }
 
+/* 조회 구간 타임라인 */
+.ship-timeline {
+  margin-top: 14px;
+}
+
+.ship-timeline-track {
+  position: relative;
+  height: 26px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.02);
+  overflow: hidden;
+}
+
+.ship-timeline-window {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  background: var(--red-soft);
+  border-inline: 1px solid var(--red);
+}
+
+.ship-timeline-today {
+  position: absolute;
+  top: 2px;
+  bottom: 2px;
+  width: 2px;
+  transform: translateX(-50%);
+  background: var(--ink);
+  opacity: 0.8;
+}
+
+.ship-timeline-dot {
+  position: absolute;
+  top: 50%;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  background: var(--muted);
+  opacity: 0.65;
+}
+
+.ship-timeline-dot.dot-high,
+.ship-legend-dot.dot-high {
+  background: var(--red);
+  opacity: 1;
+}
+
+.ship-timeline-dot.dot-medium,
+.ship-legend-dot.dot-medium {
+  background: var(--red-bright);
+  opacity: 0.75;
+}
+
+.ship-timeline-dot.dot-mine {
+  width: 11px;
+  height: 11px;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.35);
+}
+
+.ship-timeline-axis {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  margin-top: 5px;
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.ship-timeline-today-label {
+  position: absolute;
+  transform: translateX(-50%);
+  color: var(--ink);
+  font-weight: 600;
+}
+
+/* 판정 기준 범례 */
+.ship-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px 16px;
+  margin-top: 10px;
+  color: var(--muted);
+  font-size: 0.74rem;
+}
+
+.ship-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.ship-legend strong {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.ship-legend-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--muted);
+  opacity: 0.65;
+  flex: none;
+}
+
+.ship-group {
+  margin-top: 16px;
+}
+
+.ship-group-title {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  font-size: 0.85rem;
+}
+
+.ship-group-title span {
+  color: var(--muted);
+  font-size: 0.76rem;
+}
+
 .ship-list {
   display: flex;
   flex-direction: column;
   gap: 10px;
-  margin-top: 14px;
+  margin-top: 8px;
 }
 
 .ship-card {
@@ -3447,16 +3607,32 @@ textarea {
   border-color: var(--red);
 }
 
-.ship-pill-high {
+.ship-strength-high {
   background: var(--red-soft);
   color: var(--red-bright);
   border-color: var(--red-soft);
 }
 
+.ship-strength-medium {
+  color: var(--ink);
+}
+
+.ship-strength-low {
+  color: var(--muted);
+}
+
+.ship-callsign {
+  margin-left: 6px;
+  color: var(--muted);
+  font-weight: 400;
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+}
+
 .ship-dday {
   font-variant-numeric: tabular-nums;
   font-weight: 600;
-  font-size: 0.82rem;
+  font-style: normal;
   color: var(--red-bright);
 }
 
@@ -3482,10 +3658,18 @@ textarea {
   font-variant-numeric: tabular-nums;
 }
 
+.ship-facts {
+  margin-top: 7px;
+  color: var(--ink);
+  opacity: 0.85;
+  font-size: 0.79rem;
+  font-variant-numeric: tabular-nums;
+}
+
 .ship-reason {
-  margin-top: 6px;
+  margin-top: 4px;
   color: var(--muted);
-  font-size: 0.78rem;
+  font-size: 0.76rem;
 }
 
 .ship-empty {
@@ -3497,6 +3681,14 @@ textarea {
 
 .ship-tracker .tracker-list {
   margin-top: 14px;
+}
+
+.tracker-method {
+  display: block;
+  margin-top: 3px;
+  color: var(--muted);
+  font-size: 0.72rem;
+  opacity: 0.85;
 }
 
 .spin {

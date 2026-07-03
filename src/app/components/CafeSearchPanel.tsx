@@ -24,7 +24,7 @@ type CafeResult = {
 
 const SAVED_KEY = "my-tesla-saved-cafe-links";
 const HIDDEN_KEY = "my-tesla-hidden-cafe-links";
-const CATEGORY_ORDER = ["썬팅", "PPF", "블랙박스", "보험", "보조금", "충전", "액세서리", "인수", "기타"];
+const CATEGORY_ORDER = ["입항·배정", "인수", "썬팅", "PPF", "블랙박스", "보험", "보조금", "충전", "액세서리", "기타"];
 
 function inferCategory(item: Partial<CafeResult>, fallbackKeyword: string) {
   const text = `${fallbackKeyword} ${item.title ?? ""} ${item.description ?? ""}`;
@@ -35,6 +35,7 @@ function inferCategory(item: Partial<CafeResult>, fallbackKeyword: string) {
   if (/보조금|취득세|등록비|지방비/i.test(text)) return "보조금";
   if (/충전|충전카드|슈퍼차저|집밥|어댑터|커넥터/i.test(text)) return "충전";
   if (/알리|악세사리|액세서리|매트|선쉐이드|하이패스|거치대|수납|머드플랩/i.test(text)) return "액세서리";
+  if (/입항|선적|평택|글로비스|VIN|배정|탁송/i.test(text)) return "입항·배정";
   if (/인수|출고|검수|체크/i.test(text)) return "인수";
   return "기타";
 }

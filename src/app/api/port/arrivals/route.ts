@@ -66,18 +66,46 @@ function extractItems(payload: unknown): Record<string, unknown>[] {
   return [];
 }
 
-// 이 API의 데이터포맷은 XML 고정(_type=json 무시). 단순 평면 구조라 정규식으로 파싱한다.
+// 이 API의 데이터포맷은 XML 고정(_type=json 무시). 정규식으로 파싱한다.
+function parseXmlFields(xml: string): Record<string, string> {
+  const obj: Record<string, string> = {};
+  const fieldRe = /<([a-zA-Z0-9_]+)>([\s\S]*?)<\/\1>/g;
+  let f: RegExpExecArray | null;
+  while ((f = fieldRe.exec(xml)) !== null) {
+    obj[f[1]] = f[2].replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, "$1").trim();
+  }
+  return obj;
+}
+
+// item 안에 <details><detail> 목록(입항/출항 신고별)이 중첩돼 있다.
+// 입항일시·선석·톤수는 detail에만 있으므로 입항 detail(최종 신고 우선)을 평면 병합한다.
 function parseXmlItems(xml: string): Record<string, unknown>[] {
   const items: Record<string, unknown>[] = [];
   const itemRe = /<item>([\s\S]*?)<\/item>/g;
   let m: RegExpExecArray | null;
   while ((m = itemRe.exec(xml)) !== null) {
-    const obj: Record<string, unknown> = {};
-    const fieldRe = /<([a-zA-Z0-9_]+)>([\s\S]*?)<\/\1>/g;
-    let f: RegExpExecArray | null;
-    while ((f = fieldRe.exec(m[1])) !== null) {
-      obj[f[1]] = f[2].replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, "$1").trim();
+    let body = m[1];
+    const detailObjs: Record<string, string>[] = [];
+    const detailsMatch = body.match(/<details>([\s\S]*?)<\/details>/);
+    if (detailsMatch) {
+      const detailRe = /<detail>([\s\S]*?)<\/detail>/g;
+      let d: RegExpExecArray | null;
+      while ((d = detailRe.exec(detailsMatch[1])) !== null) {
+        detailObjs.push(parseXmlFields(d[1]));
+      }
+      body = body.replace(detailsMatch[0], "");
     }
+
+    const obj: Record<string, unknown> = parseXmlFields(body);
+    const arrivals = detailObjs.filter((d) => d.etryndNm === "입항");
+    const arrival = arrivals.find((d) => d.reqstSeNm === "최종") ?? arrivals[0];
+    const departure = detailObjs.find((d) => d.etryndNm === "출항");
+    if (arrival) {
+      for (const [k, v] of Object.entries(arrival)) {
+        if (!(k in obj)) obj[k] = v;
+      }
+    }
+    if (departure?.tkoffDt && !("tkoffDt" in obj)) obj.tkoffDt = departure.tkoffDt;
     items.push(obj);
   }
   return items;

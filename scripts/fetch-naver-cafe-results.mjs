@@ -44,11 +44,17 @@ const KEYWORDS = [
   "모델Y 선쉐이드",
   "테슬라 선쉐이드",
   "모델Y 매트",
-  "테슬라 매트"
+  "테슬라 매트",
+  "모델Y 입항",
+  "테슬라 평택항",
+  "모델Y VIN 배정",
+  "테슬라 배정 문자",
+  "모델Y 탁송",
+  "모델Y LFP 충전 습관"
 ];
 
 const MAX_RESULTS_PER_KEYWORD = 6;
-const MAX_TOTAL_RESULTS = 120;
+const MAX_TOTAL_RESULTS = 180;
 
 function loadEnv(text) {
   for (const line of text.split(/\r?\n/)) {
@@ -92,6 +98,7 @@ function categorizeText(text) {
   if (/보조금|국비|지방비|지원금/.test(text)) return "보조금";
   if (/충전|충전카드|슈퍼차저|집밥|회사밥|어댑터|커넥터/.test(text)) return "충전";
   if (/알리|악세사리|액세서리|선쉐이드|매트|수납|하이패스|거치대|보호필름|머드플랩/.test(text)) return "액세서리";
+  if (/입항|선적|평택|글로비스|VIN|배정|탁송/i.test(text)) return "입항·배정";
   if (/인수|출고|검수|체크/.test(text)) return "인수";
   return "기타";
 }
@@ -115,6 +122,10 @@ function keywordFocusPattern(keyword) {
   if (/블랙박스/.test(keyword)) return /블랙박스|주차녹화|상시전원|보조배터리|센트리/i;
   if (/보험/.test(keyword)) return /보험|특약|자차|자기부담/i;
   if (/보조금/.test(keyword)) return /보조금|국비|지방비|지원금/i;
+  if (/입항|평택/.test(keyword)) return /입항|선적|평택|선박|글로비스|배\s*(왔|들어|떴)/i;
+  if (/VIN|배정/.test(keyword)) return /VIN|배정|문자|잔금/i;
+  if (/탁송/.test(keyword)) return /탁송|인도센터|비대면|출고/i;
+  if (/LFP/.test(keyword)) return /LFP|100%|완충|충전\s*습관|리튬인산철/i;
   if (/인수|체크/.test(keyword)) return /인수|인도|출고|검수|체크/i;
   if (/알리|액세서리/.test(keyword)) return /알리|악세사리|액세서리|수납|거치대|보호필름|머드플랩/i;
   if (/선쉐이드/.test(keyword)) return /선쉐이드|선세이드|차양|햇빛|루프\s*커버/i;
