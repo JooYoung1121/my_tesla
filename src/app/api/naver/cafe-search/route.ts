@@ -54,6 +54,7 @@ function categorizeText(text: string) {
   if (/보조금|국비|지방비|지원금/.test(text)) return "보조금";
   if (/충전|충전카드|슈퍼차저|집밥|회사밥|어댑터|커넥터/.test(text)) return "충전";
   if (/알리|악세사리|액세서리|선쉐이드|매트|수납|하이패스|거치대|보호필름|머드플랩/.test(text)) return "액세서리";
+  if (/입항|선적|평택|글로비스|VIN|배정|탁송/i.test(text)) return "입항·배정";
   if (/인수|출고|검수|체크/.test(text)) return "인수";
   return "기타";
 }
@@ -77,6 +78,9 @@ function keywordFocusPattern(keyword: string) {
   if (/블랙박스/.test(keyword)) return /블랙박스|주차녹화|상시전원|보조배터리|센트리/i;
   if (/보험/.test(keyword)) return /보험|특약|자차|자기부담/i;
   if (/보조금/.test(keyword)) return /보조금|국비|지방비|지원금/i;
+  if (/입항|평택/.test(keyword)) return /입항|선적|평택|선박|글로비스|배\s*(왔|들어|떴)/i;
+  if (/VIN|배정/.test(keyword)) return /VIN|배정|문자|잔금/i;
+  if (/탁송/.test(keyword)) return /탁송|인도센터|비대면|출고/i;
   if (/인수|체크/.test(keyword)) return /인수|인도|출고|검수|체크/i;
   if (/알리|액세서리/.test(keyword)) return /알리|악세사리|액세서리|수납|거치대|보호필름|머드플랩/i;
   if (/선쉐이드/.test(keyword)) return /선쉐이드|선세이드|차양|햇빛|루프\s*커버/i;

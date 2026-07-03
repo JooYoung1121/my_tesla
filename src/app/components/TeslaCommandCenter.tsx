@@ -31,6 +31,7 @@ import {
   officialQuickLinks,
   officialResources,
   pickLeadStat,
+  portToDeliverySteps,
   ownerLogItems,
   prepGroups,
   searchGroups,
@@ -44,6 +45,7 @@ import {
   watchedCafes
 } from "@/data/home";
 import { PORT_LEAD_DAYS } from "@/data/shipment";
+import { naverCafeResults } from "@/data/naver-cafe-results";
 import { CafeSearchPanel } from "./CafeSearchPanel";
 import { ChecklistManager } from "./ChecklistManager";
 import { DeliveryEstimator, DELIVERY_STORE_KEY } from "./DeliveryEstimator";
@@ -589,15 +591,27 @@ function IntelSearchSection({
       </section>
 
       <section className="section-band">
-        <SectionHeader eyebrow="검색 주제" title="찾아볼 키워드와 현재 판단" />
+        <SectionHeader eyebrow="검색 주제" title="주제를 누르면 아래에서 바로 검색된다" />
         <div className="search-groups">
           {searchGroups.map((group) => {
             const Icon = group.icon;
+            const count = naverCafeResults.filter((item) =>
+              (group.categories as readonly string[]).includes(item.category)
+            ).length;
             return (
-              <button className="search-chip" key={group.label} type="button">
+              <button
+                className="search-chip"
+                key={group.label}
+                type="button"
+                onClick={() =>
+                  window.dispatchEvent(
+                    new CustomEvent("my-tesla-cafe-search", { detail: group.query })
+                  )
+                }
+              >
                 <Icon size={16} aria-hidden="true" />
                 <span>{group.label}</span>
-                <strong>{group.count}</strong>
+                <strong>{count}</strong>
               </button>
             );
           })}
@@ -843,6 +857,42 @@ function OfficialSection() {
       </section>
 
       <ShipmentTracker />
+
+      <section className="section-band">
+        <SectionHeader
+          eyebrow="입항 후 절차"
+          title="배에서 내 손까지, 통관과 등록의 순서"
+        />
+        <ol className="process-timeline">
+          {portToDeliverySteps.map((step, index) => {
+            const Icon = step.icon;
+            return (
+              <li className="process-step" key={step.phase}>
+                <span className="process-rail" aria-hidden="true">
+                  <span className="process-dot">
+                    <Icon size={16} aria-hidden="true" />
+                  </span>
+                </span>
+                <div className="process-body">
+                  <div className="process-head">
+                    <strong>
+                      <em>{String(index + 1).padStart(2, "0")}</em>
+                      {step.phase}
+                    </strong>
+                    <span>{step.timing}</span>
+                  </div>
+                  <p>{step.detail}</p>
+                </div>
+              </li>
+            );
+          })}
+        </ol>
+        <p className="source-note">
+          소요일은 TKC 커뮤니티 실측 안내와 테슬라 공식 인도 가이드 기반 추정치다. 전 단계
+          합계를 약 12일로 보고, 위 입항 추적의 &ldquo;내 차 예상 입항 구간&rdquo;도 같은
+          가정(인도 예상일 − 12일)으로 계산한다.
+        </p>
+      </section>
 
       <section className="section-band">
         <div className="mini-heading">

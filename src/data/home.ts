@@ -203,11 +203,14 @@ export const ownerLogItems = [
   }
 ];
 
+// 검색 주제 칩. query = 클릭 시 실행할 실시간 검색어, categories = 수집 데이터 건수 계산용.
 export const searchGroups = [
-  { icon: Tags, label: "썬팅·틴팅", count: 21 },
-  { icon: CircleDollarSign, label: "보조금", count: 8 },
-  { icon: Sparkles, label: "공용 액세서리", count: 15 },
-  { icon: FileText, label: "보험·인수", count: 11 }
+  { icon: Tags, label: "썬팅·PPF", query: "모델Y 썬팅", categories: ["썬팅", "PPF"] },
+  { icon: Ship, label: "입항·배정", query: "모델Y 입항", categories: ["입항·배정"] },
+  { icon: CircleDollarSign, label: "보조금", query: "모델Y 보조금", categories: ["보조금"] },
+  { icon: Sparkles, label: "액세서리", query: "테슬라 알리 액세서리", categories: ["액세서리"] },
+  { icon: FileText, label: "보험·인수", query: "모델Y 보험", categories: ["보험", "인수"] },
+  { icon: PlugZap, label: "충전", query: "테슬라 충전카드", categories: ["충전"] }
 ];
 
 export const teslaBasics = [
@@ -625,6 +628,47 @@ export const deliveryProcessSteps = [
     phase: "인수",
     detail: "인도센터 방문 또는 비대면 인수. 외관·실내·기능을 점검하고 서류를 보관한다.",
     timing: "인도 당일"
+  }
+];
+
+// 입항 후 인도까지의 세부 절차. 소요일은 TKC 커뮤니티 실측 안내(하역~등록 며칠~몇 주)와
+// 공식 인도 가이드 기반 추정치. 합계 약 12일 = 입항→인도 가정치(PORT_LEAD_DAYS)와 맞춘다.
+export const portToDeliverySteps = [
+  {
+    icon: Boxes,
+    phase: "하역",
+    detail: "평택 동부두 접안 후 차량을 야적장으로 내린다. PORT-MIS 입항 시각이 이 단계의 시작점이다.",
+    timing: "입항 당일~1일"
+  },
+  {
+    icon: ReceiptText,
+    phase: "수입신고·통관",
+    detail: "테슬라 측 관세사가 수입신고를 하고 세관이 심사·수리한다. 신차 수입은 대체로 서류 심사로 끝난다.",
+    timing: "1~3일"
+  },
+  {
+    icon: Wrench,
+    phase: "PDI·국내 설정",
+    detail: "인도 전 점검(PDI), 한국어 소프트웨어·내비 설정, 외관 세차까지 인도센터 출고 준비를 마친다.",
+    timing: "2~5일"
+  },
+  {
+    icon: CreditCard,
+    phase: "VIN 배정·잔금",
+    detail: "앱에 VIN이 표시되면 잔금 결제와 보험 가입을 진행한다. 이때부터 인도 예약이 잡힌다.",
+    timing: "배정 후 2~4일"
+  },
+  {
+    icon: Landmark,
+    phase: "등록·번호판",
+    detail: "취득세 납부와 신규 등록, 번호판 발급. 보조금 서류 처리도 이 단계에 걸린다.",
+    timing: "1~2일"
+  },
+  {
+    icon: KeyRound,
+    phase: "탁송·인수",
+    detail: "인도센터 방문 수령 또는 자택 탁송. 도착하면 인수 체크리스트로 외관·기능을 검수한다.",
+    timing: "1~3일"
   }
 ];
 
