@@ -79,6 +79,30 @@ export function CafeSearchPanel() {
     setHiddenLinks(readStoredSet(HIDDEN_KEY));
   }, []);
 
+  // "검색 주제" 칩 등 패널 밖에서 오는 검색 요청. 패널로 스크롤한 뒤 바로 검색한다.
+  useEffect(() => {
+    function onExternalSearch(event: Event) {
+      const keyword = (event as CustomEvent<string>).detail;
+      if (!keyword) return;
+      document.getElementById("intel-search")?.scrollIntoView({ behavior: "smooth", block: "start" });
+      void runSearch(keyword);
+    }
+    window.addEventListener("my-tesla-cafe-search", onExternalSearch);
+    return () => window.removeEventListener("my-tesla-cafe-search", onExternalSearch);
+    // runSearch는 ref·setState만 사용하므로 최초 등록으로 충분하다.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // 실시간 검색을 기다리는 동안 수집 데이터에서 먼저 보여줄 항목.
+  function localMatches(cleanQuery: string) {
+    const terms = cleanQuery.split(/\s+/).filter(Boolean);
+    return initialItems.filter(
+      (item) =>
+        item.keyword === cleanQuery ||
+        terms.every((term) => `${item.keyword} ${item.title} ${item.description}`.includes(term))
+    );
+  }
+
   const fetchedLabel = naverCafeFetchedAt
     ? new Intl.DateTimeFormat("ko-KR", {
         dateStyle: "medium",
@@ -148,7 +172,16 @@ export function CafeSearchPanel() {
     const seq = (requestSeq.current += 1);
 
     setIsLoading(true);
-    setMessage("");
+
+    // 네이버 API 응답을 기다리는 동안 수집 데이터 매칭분을 먼저 보여준다(체감 속도).
+    const instant = localMatches(cleanQuery);
+    if (instant.length > 0) {
+      setItems(instant);
+      setIsInitialData(false);
+      setMessage(`수집 데이터 ${instant.length}건 먼저 표시, 실시간 결과 불러오는 중`);
+    } else {
+      setMessage("");
+    }
 
     try {
       const response = await fetch(
@@ -168,10 +201,16 @@ export function CafeSearchPanel() {
         category: item.category ?? inferCategory(item, cleanQuery),
         keyword: cleanQuery
       }));
-      resultCache.current.set(cleanQuery, nextItems);
-      setItems(nextItems);
+      if (nextItems.length === 0 && instant.length > 0) {
+        // 실시간 결과가 비면 먼저 띄운 수집 데이터를 유지한다.
+        resultCache.current.set(cleanQuery, instant);
+        setMessage(`실시간 신규 결과 없음 · 수집 데이터 ${instant.length}건 표시`);
+      } else {
+        resultCache.current.set(cleanQuery, nextItems);
+        setItems(nextItems);
+        setMessage(`${cleanQuery} 검색 결과 ${nextItems.length}건`);
+      }
       setIsInitialData(false);
-      setMessage(`${cleanQuery} 검색 결과 ${nextItems.length}건`);
     } catch (error) {
       if (error instanceof DOMException && error.name === "AbortError") return;
       if (seq !== requestSeq.current) return;
@@ -271,21 +310,28 @@ export function CafeSearchPanel() {
         ))}
       </div>
 
+      {!isInitialData ? (
+        <div className="active-search-banner">
+          <span>
+            <Search size={14} aria-hidden="true" />
+            &ldquo;{query}&rdquo; {isLoading ? "실시간 검색 중…" : "검색 결과 보는 중"}
+          </span>
+          <button onClick={restoreInitialData} type="button">
+            <RotateCcw size={14} aria-hidden="true" />
+            수집 데이터 전체로 돌아가기
+          </button>
+        </div>
+      ) : null}
+
       <div className="result-toolbar">
         <span>
           {isLoading
-            ? "검색 중…"
+            ? message || "검색 중…"
             : message
               ? `${message} · ${activeCategory} ${activeCount}건 표시`
               : `${activeCategory} ${activeCount}건 표시`}
         </span>
         <div className="result-toolbar-actions">
-          {!isInitialData ? (
-            <button className="ghost-button" onClick={restoreInitialData} type="button">
-              <RotateCcw size={14} aria-hidden="true" />
-              수집 데이터로
-            </button>
-          ) : null}
           <button className="ghost-button" onClick={resetHidden} type="button">
             숨김 초기화
           </button>

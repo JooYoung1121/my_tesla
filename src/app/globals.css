@@ -3893,3 +3893,44 @@ textarea {
     box-shadow: 0 0 0 5px rgba(232, 33, 39, 0);
   }
 }
+
+/* ── 카페 검색: 실시간 검색 상태 배너 ──────────────────────── */
+.active-search-banner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 14px;
+  margin-top: 14px;
+  padding: 10px 14px;
+  background: var(--red-soft);
+  border: 1px solid rgba(232, 33, 39, 0.35);
+  border-radius: var(--radius-sm);
+}
+
+.active-search-banner > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-weight: 600;
+  font-size: 0.86rem;
+}
+
+.active-search-banner button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 12px;
+  color: #fff;
+  background: var(--red);
+  border: 0;
+  border-radius: 999px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-weight: 600;
+  transition: background 0.15s ease;
+}
+
+.active-search-banner button:hover {
+  background: var(--red-bright);
+}
