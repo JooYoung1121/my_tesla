@@ -2,10 +2,8 @@
 
 import { Check, Plus, Trash2, type LucideIcon } from "lucide-react";
 import { FormEvent, useEffect, useMemo, useState } from "react";
-import { deliveryChecklist } from "@/data/home";
 
-// 인수 후 오너 체크리스트와 아카이브의 인수 전 체크리스트가 같은 UI를 쓴다.
-// groups와 storeKey를 갈아끼우면 서로 다른 목록이 서로 다른 저장소에 남는다.
+// 단계별 그룹을 받아 렌더한다. 상태와 메모는 storeKey 단위로 localStorage에 남는다.
 export type ChecklistGroup = {
   phase: string;
   summary: string;
@@ -30,8 +28,6 @@ type ChecklistStore = {
   states: Record<string, ItemState>;
   customItems: CustomItem[];
 };
-
-export const LEGACY_CHECKLIST_STORE_KEY = "my-tesla-checklist-v1";
 
 function itemId(phase: string, text: string) {
   return `${phase}::${text}`;
@@ -59,14 +55,14 @@ function saveStore(storeKey: string, store: ChecklistStore) {
 }
 
 export function ChecklistManager({
-  groups = deliveryChecklist,
-  storeKey = LEGACY_CHECKLIST_STORE_KEY,
+  groups,
+  storeKey,
   changeEvent
 }: {
-  groups?: ChecklistGroup[];
-  storeKey?: string;
+  groups: ChecklistGroup[];
+  storeKey: string;
   changeEvent?: string; // 완료율이 바뀔 때 window에 쏘는 이벤트 이름(오늘 탭 갱신용)
-} = {}) {
+}) {
   const deliveryChecklistGroups = groups;
   const [store, setStore] = useState<ChecklistStore>({ states: {}, customItems: [] });
   const [newPhase, setNewPhase] = useState(deliveryChecklistGroups[0]?.phase ?? "");

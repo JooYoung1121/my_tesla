@@ -223,14 +223,6 @@ export const scheduleSeed: SeedEvent[] = [
     note: "인도 시점 공기압이 규정보다 높게 들어간 경우가 있다. 운전석 도어 스티커 기준값과 대조."
   },
   {
-    id: "seed-teslamate",
-    date: "2026-09-18",
-    time: null,
-    title: "TeslaMate 도입 판단 (수령 +1개월)",
-    kind: "할일",
-    note: "한 달 동안 공식 앱만 써보고, 충전비·효율 추세를 자동 기록할 필요가 실제로 있는지 판단한 뒤 설치."
-  },
-  {
     id: "seed-first-month-review",
     date: "2026-09-18",
     time: null,
@@ -344,7 +336,6 @@ export const ownerChecklist = [
       { text: "블랙박스 별도 설치가 필요한지 센트리 모드로 판단", status: "대기" },
       { text: "PPF 미시공 부위에 돌빵이 실제로 생기는지 관찰 (범위 확대 판단)", status: "대기" },
       { text: "알리 2차 주문: 실제로 불편했던 것만", status: "대기" },
-      { text: "TeslaMate 도입 여부 판단 및 서버 준비", status: "대기" },
       { text: "안 쓴 액세서리 기록 (다음에 안 사기 위해)", status: "대기" },
       { text: "1개월 무상 점검 대상 하자 정리해서 서비스 접수", status: "대기" }
     ]
@@ -843,61 +834,21 @@ export const appGroups: Array<{
     ]
   },
   {
-    id: "data",
-    title: "데이터·기록 — 첫 달 이후",
-    intro: "인수 직후엔 필요 없다. 한 달쯤 타고 나서 \"지난달 충전비가 얼마였지?\"가 궁금해지면 그때 고른다.",
+    id: "extra",
+    title: "편의·커뮤니티",
+    intro: "없어도 되지만 있으면 편한 것들. 전부 테슬라 계정 연동 없이 쓴다.",
     items: [
-      {
-        name: "TeslaMate",
-        platform: "셀프호스팅 (Docker)",
-        cost: "무료 (서버 비용 별도)",
-        purpose: "주행·충전·효율·배터리 추세를 내 서버 PostgreSQL에 영구 저장하고 Grafana로 본다. 데이터가 내 손에 남는 게 핵심.",
-        when: "인수 +1개월, 아래 설치 가이드 참고",
-        note: "개인 사용자는 아직 무료 Owner API로 동작한다(공식 문서 확인). 항상 켜둘 서버와 운영 부담이 조건.",
-        url: "https://docs.teslamate.org/",
-        priority: "권장",
-        evidence: "공식"
-      },
-      {
-        name: "Tessie",
-        platform: "iOS · Android · 웹",
-        cost: "유료 구독",
-        purpose: "TeslaMate와 비슷한 기록·분석을 서버 운영 없이 제공한다. 배터리 열화 추정, 충전 세션 비용, 자동화까지.",
-        when: "서버 운영이 부담스러우면 TeslaMate 대신",
-        note: "편한 대신 데이터가 상용 서버에 남고 구독료가 든다. 셀프호스팅을 이미 정했다면 굳이 병행하지 않는다.",
-        url: "https://tessie.com/",
-        priority: "선택",
-        evidence: "공식"
-      },
-      {
-        name: "MyTeslaBot",
-        platform: "웹 (설치 불필요)",
-        cost: "무료",
-        purpose: "주행·충전·효율 요약을 카카오톡으로 보내준다. 설치 없이 웹에서 연결만 하면 된다.",
-        when: "가볍게 알림만 받고 싶을 때",
-        note: "국내 오너 커뮤니티(클리앙)에서 추천된 개인 개발 서비스. 테슬라 계정 연동이 필요하다는 점을 감안할 것.",
-        url: "https://myteslabot.netlify.app/",
-        priority: "선택",
-        evidence: "커뮤니티"
-      },
       {
         name: "Tesla Cam Converter",
         platform: "웹 (설치 불필요)",
         cost: "무료",
-        purpose: "센트리·대시캠 녹화 영상에 타임스탬프를 찍어준다. 사고나 블랙박스 신고 영상 제출 시 필요.",
-        when: "영상을 제출할 일이 생기면",
-        note: "테슬라 원본 영상에는 화면상 시각 표기가 없어 신고용으로 그대로 쓰기 곤란한 경우가 있다.",
+        purpose: "센트리·대시캠 영상에 타임스탬프를 찍어준다. 테슬라 원본에는 화면상 시각 표기가 없어 신고용으로 그대로 쓰기 곤란하다.",
+        when: "사고 영상을 제출할 일이 생기면",
+        note: "USB에서 꺼낸 영상 파일만 올리면 되고 테슬라 계정 연동은 필요 없다.",
         url: "https://teslacamconverter.netlify.app/",
         priority: "선택",
         evidence: "커뮤니티"
-      }
-    ]
-  },
-  {
-    id: "extra",
-    title: "편의·커뮤니티",
-    intro: "없어도 되지만 있으면 편한 것들. 안드로이드 사용자에게 특히 쓸모가 갈린다.",
-    items: [
+      },
       {
         name: "WebAA",
         platform: "Android 폰 필요",
@@ -933,62 +884,6 @@ export const appGroups: Array<{
       }
     ]
   }
-];
-
-// ── TeslaMate 설치 단계 ────────────────────────────────────────────────
-// 출처: TeslaMate 공식 문서 https://docs.teslamate.org/
-// 2026-08-05 확인: 개인 사용자는 여전히 비공식 Owner API를 쓸 수 있고,
-// Fleet API 전환은 Owner API가 완전히 닫힐 때까지 강제되지 않는다.
-// https://docs.teslamate.org/docs/configuration/api/
-export const teslamateSteps = [
-  {
-    step: "서버 준비",
-    detail: "항상 켜둘 머신이 필요하다. RAM 2GB 이상 권장. 집 NAS, 미니 PC, 라즈베리파이 4 이상, 또는 개인 VPS 중 하나.",
-    caution: "노트북이나 데스크톱을 켜뒀다 껐다 하면 데이터에 구멍이 난다. 24시간 켜둘 수 있는 장비여야 의미가 있다."
-  },
-  {
-    step: "Docker 설치",
-    detail: "Docker와 Docker Compose를 설치한다. TeslaMate는 teslamate / postgres / grafana / mosquitto 네 컨테이너를 같이 띄우는 구성이다.",
-    caution: "mosquitto(MQTT)는 홈오토메이션 연동용이라 처음엔 빼도 된다."
-  },
-  {
-    step: "docker-compose.yml 작성",
-    detail: "공식 문서의 예제 compose 파일을 그대로 쓰고 DB 비밀번호와 암호화 키만 바꾼다.",
-    caution: "ENCRYPTION_KEY를 잃어버리면 저장된 토큰을 복호화할 수 없다. 따로 백업해 둘 것."
-  },
-  {
-    step: "테슬라 계정 인증",
-    detail: "개인 사용자는 아직 Owner API 방식이 가능하다. TeslaMate 웹 화면에서 Refresh Token을 넣으면 연결된다.",
-    caution: "Fleet API 전환은 개인에게 아직 강제되지 않는다(공식 문서). 다만 정책이 바뀔 수 있으니 설치 시점에 문서를 다시 확인한다."
-  },
-  {
-    step: "외부 노출 차단",
-    detail: "Tailscale, VPN, 또는 Cloudflare Tunnel로만 접근하게 한다. 공인 IP에 포트를 그냥 열지 않는다.",
-    caution: "TeslaMate는 차량 제어가 가능한 토큰을 들고 있다. 노출되면 차 문이 열릴 수 있다는 뜻이다."
-  },
-  {
-    step: "지오펜스·전기요금 설정",
-    detail: "집·회사 좌표를 지오펜스로 등록하고 kWh당 요금을 넣는다. 이걸 넣어야 충전비가 자동 계산된다.",
-    caution: "집밥/외부 충전 비중 통계가 여기서 나온다. 초기에 안 넣으면 나중에 소급이 번거롭다."
-  },
-  {
-    step: "차량 수면 확인",
-    detail: "설치 후 며칠간 차량이 정상적으로 잠드는지 확인한다. TeslaMate 설정에 suspend 관련 옵션이 있다.",
-    caution: "다른 서드파티 앱(Tessie 등)과 병행하면 차가 계속 깨어 있어 대기 전력 소모가 늘어난다."
-  },
-  {
-    step: "정기 백업",
-    detail: "PostgreSQL을 pg_dump로 주기 백업한다. 이게 없으면 서버가 죽는 순간 기록이 전부 사라진다.",
-    caution: "TeslaMate를 쓰는 이유가 장기 기록이므로 백업이 없으면 도입 의미가 없다."
-  }
-];
-
-export const teslamateLinks = [
-  { label: "TeslaMate 공식 문서", url: "https://docs.teslamate.org/" },
-  { label: "Docker 설치 가이드", url: "https://docs.teslamate.org/docs/installation/docker/" },
-  { label: "API 설정 (Owner vs Fleet)", url: "https://docs.teslamate.org/docs/configuration/api/" },
-  { label: "GitHub 저장소", url: "https://github.com/teslamate-org/teslamate" },
-  { label: "FAQ", url: "https://docs.teslamate.org/docs/faq/" }
 ];
 
 // ── 인수 후 지출 ───────────────────────────────────────────────────────
@@ -1199,7 +1094,7 @@ export const displayGroups: Array<{
 // ── 데이터·프라이버시 ──────────────────────────────────────────────────
 // "내 데이터가 어디에 쌓이고, 내가 뭘 제어할 수 있는가"를 종류별로 정리한다.
 // 출처: Tesla 고객 개인정보 취급방침(https://www.tesla.com/ko_KR/legal/privacy),
-//       Tesla 지원 문서, TeslaMate 공식 문서. 확실한 사실과 추정을 구분해 표기.
+//       Tesla 지원 문서. 확실한 사실과 추정을 구분해 표기.
 export type DataTopic = {
   id: string;
   topic: string;
@@ -1266,30 +1161,9 @@ export const dataTopics: DataTopic[] = [
     url: "https://www.tesla.com/ko_kr/support/how-create-update-delete-tesla-account"
   },
   {
-    id: "third-party-token",
-    topic: "서드파티 앱 토큰",
-    what: "TeslaMate, Tessie, MyTeslaBot 같은 앱을 연동하면 발급되는 접근 토큰.",
-    where: "해당 앱의 서버 또는 내 서버.",
-    control: "안 쓰는 앱의 연동은 해제한다. 토큰이 유출되면 차량 제어까지 가능하다.",
-    action: "연동 앱은 필요한 것만 남긴다. 여러 개를 동시에 붙이면 차가 잠들지 못해 대기 전력도 늘어난다.",
-    source: "커뮤니티",
-    url: "https://docs.teslamate.org/docs/faq/"
-  },
-  {
-    id: "teslamate-data",
-    topic: "TeslaMate 데이터 (도입 시)",
-    what: "주행·충전·효율·배터리 추세 전체 이력.",
-    where: "내가 운영하는 서버의 PostgreSQL.",
-    control: "전부 내 손에 있다. 대신 백업과 보안도 전부 내 책임이다.",
-    action:
-      "pg_dump 정기 백업과 ENCRYPTION_KEY 별도 보관. 공인 IP에 그냥 열지 말고 Tailscale·VPN으로만 접근한다.",
-    source: "공식",
-    url: "https://docs.teslamate.org/docs/maintenance/backup_restore/"
-  },
-  {
     id: "site-data",
     topic: "이 사이트의 데이터",
-    what: "일정, 체크리스트, 용품 구매 상태, 개인 메모.",
+    what: "일정, 체크리스트, 용품 구매 상태, 충전·정비 기록 메모.",
     where: "이 브라우저의 localStorage. 서버 DB가 없어서 다른 기기와 동기화되지 않는다.",
     control: "브라우저 데이터를 지우면 같이 사라진다. 시크릿 모드에서는 저장되지 않는다.",
     action:
@@ -1308,4 +1182,62 @@ export const dataTopics: DataTopic[] = [
     source: "공식",
     url: "https://www.tesla.com/ko_kr/support/how-add-or-remove-vehicles-tesla-app"
   }
+];
+
+// ── 내 차 제원 (Model Y Premium RWD 전용) ──────────────────────────────
+// 출처: tesla.com 공식 제원(docs/model-y-premium-rwd.md 조사 기준).
+// 다른 트림(AWD·롱바디) 데이터는 내 차와 무관해서 두지 않는다.
+export const specs = [
+  { label: "차량가", value: "4,999만 원", note: "2026-06-11 확인 기준" },
+  { label: "구동", value: "RWD", note: "후륜구동" },
+  { label: "배터리", value: "Standard Range", note: "공식 제원 표기" },
+  { label: "주행 가능 거리", value: "400km", note: "실주행은 계절·속도 영향" },
+  { label: "0-100km/h", value: "5.9초", note: "일상 주행 충분" },
+  { label: "중량", value: "1,920kg", note: "Premium RWD 기준" },
+  { label: "수퍼차저", value: "최대 175kW", note: "사용량 기반 과금" },
+  { label: "적재공간", value: "2,138L", note: "5인승 기준" },
+  { label: "디스플레이", value: "16인치+8인치", note: "중앙·후석 터치스크린" },
+  { label: "전장/전고", value: "4,790/1,625mm", note: "공식 치수" },
+  { label: "전폭", value: "1,980/2,130mm", note: "접이식/확장 미러 기준" },
+  { label: "보증", value: "4년/8만km", note: "배터리·구동장치 8년/16만km" }
+];
+
+// ── 오너 로그: 계정 연동 없이 직접 남기는 기록 ─────────────────────────
+// 서드파티 데이터 로거를 붙이지 않기로 했으므로, 기록은 메모 탭에서 수동으로 남긴다.
+// 아래는 "무엇을 어떤 형식으로 적을지"에 대한 최소 규칙이다.
+export const logGuides = [
+  {
+    icon: PlugZap,
+    title: "충전",
+    text: "날짜 · 장소 · kWh · 결제금액 · 충전 전후 %. 한 달만 모아도 월 충전비와 실효율이 나온다.",
+    example: "8/19 · 하남 슈퍼차저 · 32kWh · 11,200원 · 24%→78%"
+  },
+  {
+    icon: Gauge,
+    title: "효율",
+    text: "주행 후 계기판의 Wh/km와 그날 기온을 같이 적는다. 여름·겨울 기준선이 생긴다.",
+    example: "8/20 · 152Wh/km · 31도 · 시내 위주"
+  },
+  {
+    icon: Wrench,
+    title: "정비·소모품",
+    text: "날짜 · 주행거리 · 항목 · 비용. 주행거리를 같이 적어야 다음 주기가 계산된다.",
+    example: "타이어 로테이션 · 10,240km · 4만 원"
+  },
+  {
+    icon: CarFront,
+    title: "하자·이상",
+    text: "발견 즉시 사진과 함께. 서비스센터 접수할 때 날짜가 있어야 보증 처리가 쉽다.",
+    example: "8/23 · 조수석 도어 트림 들뜸 · 사진 3장"
+  }
+];
+
+// ── 자주 여는 공식 페이지 ──────────────────────────────────────────────
+export const quickLinks = [
+  { label: "Tesla 앱 지원", url: "https://www.tesla.com/ko_kr/support/tesla-app" },
+  { label: "Model Y 오너 매뉴얼", url: "https://www.tesla.com/ko_kr/support/model-y" },
+  { label: "소프트웨어 업데이트", url: "https://www.tesla.com/ko_kr/support/software-updates" },
+  { label: "Tesla 하이패스", url: "https://shop.tesla.com/ko_kr/product/hi-pass" },
+  { label: "CCS Combo1 어댑터", url: "https://shop.tesla.com/ko_kr/product/ccs-combo-1-adapter---south-korea" },
+  { label: "서비스 예약", url: "https://www.tesla.com/ko_kr/support/service-visits" }
 ];
