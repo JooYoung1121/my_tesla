@@ -1,8 +1,17 @@
 "use client";
 
-import { Check, Plus, Trash2 } from "lucide-react";
+import { Check, Plus, Trash2, type LucideIcon } from "lucide-react";
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { deliveryChecklist } from "@/data/home";
+
+// 인수 후 오너 체크리스트와 아카이브의 인수 전 체크리스트가 같은 UI를 쓴다.
+// groups와 storeKey를 갈아끼우면 서로 다른 목록이 서로 다른 저장소에 남는다.
+export type ChecklistGroup = {
+  phase: string;
+  summary: string;
+  icon: LucideIcon;
+  items: ReadonlyArray<{ text: string; status: string }>;
+};
 
 type ItemState = {
   done: boolean;
@@ -22,7 +31,7 @@ type ChecklistStore = {
   customItems: CustomItem[];
 };
 
-const STORE_KEY = "my-tesla-checklist-v1";
+export const LEGACY_CHECKLIST_STORE_KEY = "my-tesla-checklist-v1";
 
 function itemId(phase: string, text: string) {
   return `${phase}::${text}`;
@@ -32,10 +41,10 @@ function defaultDone(status: string) {
   return status === "완료";
 }
 
-function loadStore(): ChecklistStore {
+function loadStore(storeKey: string): ChecklistStore {
   if (typeof window === "undefined") return { states: {}, customItems: [] };
   try {
-    const parsed = JSON.parse(window.localStorage.getItem(STORE_KEY) ?? "{}");
+    const parsed = JSON.parse(window.localStorage.getItem(storeKey) ?? "{}");
     return {
       states: parsed.states ?? {},
       customItems: Array.isArray(parsed.customItems) ? parsed.customItems : []
@@ -45,24 +54,33 @@ function loadStore(): ChecklistStore {
   }
 }
 
-function saveStore(store: ChecklistStore) {
-  window.localStorage.setItem(STORE_KEY, JSON.stringify(store));
+function saveStore(storeKey: string, store: ChecklistStore) {
+  window.localStorage.setItem(storeKey, JSON.stringify(store));
 }
 
-export function ChecklistManager() {
+export function ChecklistManager({
+  groups = deliveryChecklist,
+  storeKey = LEGACY_CHECKLIST_STORE_KEY,
+  changeEvent
+}: {
+  groups?: ChecklistGroup[];
+  storeKey?: string;
+  changeEvent?: string; // 완료율이 바뀔 때 window에 쏘는 이벤트 이름(오늘 탭 갱신용)
+} = {}) {
+  const deliveryChecklistGroups = groups;
   const [store, setStore] = useState<ChecklistStore>({ states: {}, customItems: [] });
-  const [newPhase, setNewPhase] = useState(deliveryChecklist[0]?.phase ?? "계약·일정");
+  const [newPhase, setNewPhase] = useState(deliveryChecklistGroups[0]?.phase ?? "");
   const [newText, setNewText] = useState("");
   const [openPhases, setOpenPhases] = useState<Set<string>>(
-    () => new Set(deliveryChecklist[0]?.phase ? [deliveryChecklist[0].phase] : [])
+    () => new Set(deliveryChecklistGroups[0]?.phase ? [deliveryChecklistGroups[0].phase] : [])
   );
 
   useEffect(() => {
-    setStore(loadStore());
-  }, []);
+    setStore(loadStore(storeKey));
+  }, [storeKey]);
 
   const totals = useMemo(() => {
-    const defaultItems = deliveryChecklist.flatMap((group) =>
+    const defaultItems = deliveryChecklistGroups.flatMap((group) =>
       group.items.map((item) => {
         const id = itemId(group.phase, item.text);
         const stored = store.states[id];
@@ -73,11 +91,13 @@ export function ChecklistManager() {
     const all = [...defaultItems, ...customDone];
     const done = all.filter(Boolean).length;
     return { done, total: all.length, percent: all.length ? Math.round((done / all.length) * 100) : 0 };
-  }, [store]);
+  }, [store, deliveryChecklistGroups]);
 
   function updateStore(next: ChecklistStore) {
     setStore(next);
-    saveStore(next);
+    saveStore(storeKey, next);
+    // 오늘 탭의 준비율 타일이 같은 화면에 없어도 다음 진입 때 바로 반영되도록 알린다.
+    if (changeEvent) window.dispatchEvent(new CustomEvent(changeEvent));
   }
 
   function getItemDone(phase: string, text: string, fallbackStatus: string) {
@@ -86,7 +106,7 @@ export function ChecklistManager() {
     return stored?.done ?? defaultDone(fallbackStatus);
   }
 
-  function getGroupStats(group: (typeof deliveryChecklist)[number]) {
+  function getGroupStats(group: ChecklistGroup) {
     const defaultDoneCount = group.items.filter((item) =>
       getItemDone(group.phase, item.text, item.status)
     ).length;
@@ -115,7 +135,7 @@ export function ChecklistManager() {
   }
 
   function expandAll() {
-    setOpenPhases(new Set(deliveryChecklist.map((group) => group.phase)));
+    setOpenPhases(new Set(deliveryChecklistGroups.map((group) => group.phase)));
   }
 
   function collapseAll() {
@@ -225,7 +245,7 @@ export function ChecklistManager() {
       </div>
 
       <div className="checklist-roadmap" aria-label="인수 준비 단계">
-        {deliveryChecklist.map((group, index) => {
+        {deliveryChecklistGroups.map((group, index) => {
           const stats = getGroupStats(group);
           const isOpen = openPhases.has(group.phase);
           return (
@@ -247,7 +267,7 @@ export function ChecklistManager() {
 
       <form className="add-check-form" onSubmit={addCustomItem}>
         <select value={newPhase} onChange={(event) => setNewPhase(event.target.value)}>
-          {deliveryChecklist.map((group) => (
+          {deliveryChecklistGroups.map((group) => (
             <option key={group.phase} value={group.phase}>
               {group.phase}
             </option>
@@ -265,7 +285,7 @@ export function ChecklistManager() {
       </form>
 
       <div className="checklist-board" aria-label="상세 인수 준비 체크리스트">
-        {deliveryChecklist.map((group) => {
+        {deliveryChecklistGroups.map((group) => {
           const Icon = group.icon;
           const customItems = store.customItems.filter((item) => item.phase === group.phase);
           const stats = getGroupStats(group);

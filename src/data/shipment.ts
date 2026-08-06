@@ -48,7 +48,9 @@ export type PortArrival = {
   callSign: string | null;
   arrivalAt: string | null; // ISO(YYYY-MM-DD 또는 ...THH:mm)
   departureAt: string | null;
-  fromPort: string | null; // 최초출항지(없으면 전출항지)
+  fromPort: string | null; // 최초출항지(없으면 전출항지) — 표시·알림용 요약
+  firstPort: string | null; // 최초출항지(frstDpmprtPrtNm) — 항차의 시작점
+  prevPort: string | null; // 직전출항지(prvsDpmprtPrtNm) — 평택 직전에 떠난 항
   toPort: string | null; // 차출항지
   vesselType: string | null; // 선박종류명(예: 자동차운반선)
   grossTon: number | null;
@@ -59,10 +61,18 @@ export type PortArrival = {
 // high = 테슬라 선대명/기가팩토리 출발항, medium = 자동차운반선+해외출항, low = 자동차운반선
 export type CandidateStrength = "high" | "medium" | "low";
 
+// 판정에 쓴 개별 검사 결과. UI에서 ✓/✗ 체크리스트로 그대로 보여준다.
+export type JudgmentCheck = {
+  label: string; // 검사 이름(예: "테슬라 운송 선대명")
+  hit: boolean;
+  detail: string | null; // 검사한 값 또는 매칭된 값
+};
+
 export type CandidateVessel = PortArrival & {
   isTeslaCandidate: boolean;
   strength: CandidateStrength;
-  reasons: string[]; // 후보로 본 근거
+  reasons: string[]; // 후보로 본 근거(요약 — 디스코드 알림에도 씀)
+  checks: JudgmentCheck[]; // 판정 근거 전체(카드 펼침에서 표시)
   dDay: number | null; // 오늘 기준 입항까지 남은 일수(음수=이미 입항)
   inMyWindow: boolean; // 내 추정 입항 윈도우 안에 들어오는가
 };
@@ -118,11 +128,25 @@ const KOREAN_PORT_PATTERN =
   /[가-힣]|평택|당진|인천|부산|울산|광양|여수|목포|군산|마산|포항|동해|대산|보령|BUSAN|INCHEON|ULSAN|GWANGYANG|PYEONGTAEK|MASAN/i;
 
 // ── 분류/매칭 ──────────────────────────────────────────────────────────
-function classifyVessel(v: PortArrival): { strength: CandidateStrength; reasons: string[] } | null {
+function classifyVessel(
+  v: PortArrival
+): { strength: CandidateStrength; reasons: string[]; checks: JudgmentCheck[] } | null {
   const nameHit = TESLA_VESSEL_PATTERN.test(v.shipName);
   const typeHit = Boolean(v.vesselType && CAR_CARRIER_PATTERN.test(v.vesselType));
-  const originHit = Boolean(v.fromPort && TESLA_ORIGIN_PATTERN.test(v.fromPort));
-  const foreignOrigin = Boolean(v.fromPort && !KOREAN_PORT_PATTERN.test(v.fromPort));
+
+  // 출발항 검사는 최초출항지·직전출항지 둘 다 본다. 자동차선은 여러 항을 도는
+  // 순환 노선이라 최초출항지가 상하이가 아니어도 중간에 상하이에서 실었을 수 있고,
+  // 그 경우 직전출항지가 힌트가 된다. (중간 기항지 자체는 PORT-MIS 신고에 없음)
+  const gigaOrigin =
+    v.prevPort && TESLA_ORIGIN_PATTERN.test(v.prevPort)
+      ? { field: "직전 출항", port: v.prevPort }
+      : v.firstPort && TESLA_ORIGIN_PATTERN.test(v.firstPort)
+        ? { field: "최초 출항", port: v.firstPort }
+        : null;
+  const originHit = gigaOrigin != null;
+  // 어디서 바로 왔는가: 직전출항지 우선, 없으면 최초출항지.
+  const directPort = v.prevPort ?? v.firstPort;
+  const foreignOrigin = Boolean(directPort && !KOREAN_PORT_PATTERN.test(directPort));
 
   // 자동차운반선도 아니고 테슬라 선대명도 아니면 제외.
   if (!nameHit && !typeHit) return null;
@@ -130,9 +154,36 @@ function classifyVessel(v: PortArrival): { strength: CandidateStrength; reasons:
   const reasons: string[] = [];
   if (nameHit) reasons.push("테슬라 운송 선대");
   else if (v.vesselType) reasons.push(v.vesselType);
-  if (originHit) reasons.push(`출발 ${v.fromPort} (기가팩토리)`);
-  else if (foreignOrigin && v.fromPort) reasons.push(`출발 ${v.fromPort}`);
-  else if (nameHit && v.fromPort) reasons.push(`출발 ${v.fromPort} (국내 연안 운항)`);
+  if (gigaOrigin) reasons.push(`${gigaOrigin.field} ${gigaOrigin.port} (기가팩토리)`);
+  else if (foreignOrigin && directPort) reasons.push(`직전 출항 ${directPort}`);
+  else if (nameHit && directPort) reasons.push(`출발 ${directPort} (국내 연안 운항)`);
+
+  const checks: JudgmentCheck[] = [
+    {
+      label: "테슬라 운송 선대명",
+      hit: nameHit,
+      detail: nameHit ? `선박명 "${v.shipName}" 이 알려진 선대 패턴과 일치` : `선박명 "${v.shipName}"`
+    },
+    {
+      label: "자동차운반선(선종)",
+      hit: typeHit,
+      detail: v.vesselType ?? "선종 미상"
+    },
+    {
+      label: "기가팩토리 출발항(최초·직전)",
+      hit: originHit,
+      detail: gigaOrigin
+        ? `${gigaOrigin.field}지 ${gigaOrigin.port}`
+        : [v.firstPort && `최초 ${v.firstPort}`, v.prevPort && `직전 ${v.prevPort}`]
+            .filter(Boolean)
+            .join(" · ") || "출항지 미상"
+    },
+    {
+      label: "해외에서 직행",
+      hit: foreignOrigin,
+      detail: directPort ? `직전 출항지 ${directPort}` : "출항지 미상"
+    }
+  ];
 
   // 강도: 기가팩토리 출발 또는 선대명+해외출항 = high,
   // 선대명이지만 국내 항 출발(연안 운항, 테슬라 수입분 가능성 낮음) = medium,
@@ -141,7 +192,7 @@ function classifyVessel(v: PortArrival): { strength: CandidateStrength; reasons:
   if (originHit || (nameHit && foreignOrigin)) strength = "high";
   else if (nameHit || (typeHit && foreignOrigin)) strength = "medium";
 
-  return { strength, reasons };
+  return { strength, reasons, checks };
 }
 
 const STRENGTH_RANK: Record<CandidateStrength, number> = { high: 0, medium: 1, low: 2 };
@@ -164,6 +215,7 @@ export function classifyArrivals(
         isTeslaCandidate: true,
         strength: hit.strength,
         reasons: hit.reasons,
+        checks: hit.checks,
         dDay,
         inMyWindow
       };
