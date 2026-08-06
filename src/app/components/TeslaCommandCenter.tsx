@@ -14,6 +14,7 @@ import {
   ExternalLink,
   KeyRound,
   Package,
+  MonitorSmartphone,
   Search,
   Server,
   Ship,
@@ -58,15 +59,18 @@ import { naverCafeResults } from "@/data/naver-cafe-results";
 import { AppsBoard } from "./AppsBoard";
 import { CafeSearchPanel } from "./CafeSearchPanel";
 import { ChecklistManager, LEGACY_CHECKLIST_STORE_KEY } from "./ChecklistManager";
+import { DataPolicyBoard } from "./DataPolicyBoard";
 import { DeliveryEstimator } from "./DeliveryEstimator";
+import { DisplayGuide } from "./DisplayGuide";
 import { GearBoard } from "./GearBoard";
 import { PersonalNotes } from "./PersonalNotes";
 import { ScheduleBoard, SCHEDULE_STORE_KEY } from "./ScheduleBoard";
 import { ShipmentTracker } from "./ShipmentTracker";
 import { SubsidyCalculator } from "./SubsidyCalculator";
 
-type ViewId = "today" | "schedule" | "checklist" | "gear" | "log";
-type GearTab = "items" | "apps" | "care";
+type ViewId = "today" | "schedule" | "checklist" | "car" | "gear" | "log";
+type CarTab = "display" | "data" | "care";
+type GearTab = "items" | "apps";
 type LogTab = "notes" | "cafe" | "basics" | "prearrival";
 
 const OWNER_CHECKLIST_STORE_KEY = "my-tesla-owner-checklist-v1";
@@ -99,6 +103,13 @@ const views: Array<{
     title: "인수 · 탁송 · 수령 · 첫 달",
     eyebrow: "Checklist",
     description: "8/14는 서류와 계정, 8/18은 검수. 두 날의 할 일이 다르다. 현장에서 그대로 열어 쓴다."
+  },
+  {
+    id: "car",
+    label: "차량",
+    title: "화면 조작 · 데이터 · 정비",
+    eyebrow: "Vehicle",
+    description: "물리 버튼이 거의 없는 차다. 화면 어디에 뭐가 있는지와 내 데이터가 어디 쌓이는지를 본다."
   },
   {
     id: "gear",
@@ -384,11 +395,13 @@ function Segmented<T extends string>({
 
 export function TeslaCommandCenter() {
   const [activeView, setActiveView] = useState<ViewId>("today");
+  const [carTab, setCarTab] = useState<CarTab>("display");
   const [gearTab, setGearTab] = useState<GearTab>("items");
   const [logTab, setLogTab] = useState<LogTab>("notes");
   const currentView = views.find((view) => view.id === activeView) ?? views[0];
 
-  function goTo(view: ViewId, segment?: GearTab | LogTab) {
+  function goTo(view: ViewId, segment?: CarTab | GearTab | LogTab) {
+    if (view === "car" && segment) setCarTab(segment as CarTab);
     if (view === "gear" && segment) setGearTab(segment as GearTab);
     if (view === "log" && segment) setLogTab(segment as LogTab);
     setActiveView(view);
@@ -470,6 +483,7 @@ export function TeslaCommandCenter() {
           {activeView === "today" ? <TodayView goTo={goTo} /> : null}
           {activeView === "schedule" ? <ScheduleView /> : null}
           {activeView === "checklist" ? <ChecklistView /> : null}
+          {activeView === "car" ? <CarView tab={carTab} setTab={setCarTab} /> : null}
           {activeView === "gear" ? <GearView tab={gearTab} setTab={setGearTab} /> : null}
           {activeView === "log" ? <LogView tab={logTab} setTab={setLogTab} /> : null}
         </section>
@@ -499,7 +513,7 @@ export function TeslaCommandCenter() {
 }
 
 // ── 오늘 ───────────────────────────────────────────────────────────────
-function TodayView({ goTo }: { goTo: (view: ViewId, segment?: GearTab | LogTab) => void }) {
+function TodayView({ goTo }: { goTo: (view: ViewId, segment?: CarTab | GearTab | LogTab) => void }) {
   const status = useOwnerStatus();
   const readiness = useOwnerReadiness();
   const upcoming = useUpcoming(6);
@@ -625,6 +639,11 @@ function TodayView({ goTo }: { goTo: (view: ViewId, segment?: GearTab | LogTab) 
           <Package size={19} aria-hidden="true" />
           <strong>용품 정하기</strong>
           <span>무엇을 왜 사는지, 안 사면 뭐가 문제인지부터 본다.</span>
+        </button>
+        <button onClick={() => goTo("car", "display")} type="button">
+          <MonitorSmartphone size={19} aria-hidden="true" />
+          <strong>화면 사용법</strong>
+          <span>물리 버튼이 거의 없다. 기어·글로브박스·센트리가 화면 어디 있는지.</span>
         </button>
         <button onClick={() => goTo("gear", "apps")} type="button">
           <Smartphone size={19} aria-hidden="true" />
@@ -790,8 +809,7 @@ function GearView({ tab, setTab }: { tab: GearTab; setTab: (tab: GearTab) => voi
       <Segmented
         options={[
           { value: "items", label: "용품" },
-          { value: "apps", label: "앱·프로그램" },
-          { value: "care", label: "정비·비용" }
+          { value: "apps", label: "앱·프로그램" }
         ]}
         value={tab}
         onChange={setTab}
@@ -817,6 +835,44 @@ function GearView({ tab, setTab }: { tab: GearTab; setTab: (tab: GearTab) => voi
         </section>
       ) : null}
       {tab === "apps" ? <AppsBoard /> : null}
+    </>
+  );
+}
+
+// ── 차량 ───────────────────────────────────────────────────────────────
+function CarView({ tab, setTab }: { tab: CarTab; setTab: (tab: CarTab) => void }) {
+  return (
+    <>
+      <Segmented
+        options={[
+          { value: "display", label: "화면 사용법" },
+          { value: "data", label: "데이터·프라이버시" },
+          { value: "care", label: "정비·비용" }
+        ]}
+        value={tab}
+        onChange={setTab}
+      />
+      {tab === "display" ? <DisplayGuide /> : null}
+      {tab === "data" ? (
+        <section className="section-band">
+          <SectionHeader
+            eyebrow="데이터·프라이버시"
+            title="내 데이터가 어디에 쌓이고, 뭘 끌 수 있는가"
+            action={
+              <a
+                className="ghost-button"
+                href="https://www.tesla.com/ko_KR/legal/privacy"
+                target="_blank"
+                rel="noreferrer"
+              >
+                Tesla 개인정보 방침
+                <ExternalLink size={16} aria-hidden="true" />
+              </a>
+            }
+          />
+          <DataPolicyBoard />
+        </section>
+      ) : null}
       {tab === "care" ? <CareSection /> : null}
     </>
   );

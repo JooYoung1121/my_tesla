@@ -306,6 +306,8 @@ export const ownerChecklist = [
       { text: "기능: 공조, 와이퍼, 조명, 파노라마 루프 차광", status: "대기" },
       { text: "충전 포트 개폐 및 모바일 커넥터 동봉 여부 확인", status: "대기" },
       { text: "운전자 프로필 생성 (시트·미러·핸들 위치 저장)", status: "대기" },
+      { text: "천장 비상등 옆 기어 백업 물리 버튼 위치 손으로 확인", status: "대기" },
+      { text: "글로브박스 여는 법 확인 (화면에서만 열린다)", status: "대기" },
       { text: "틴팅·PPF 시공 보증서 수령 (보증 기간·범위 확인)", status: "대기" },
       { text: "발견한 문제는 업체를 떠나기 전에 접수", status: "대기" }
     ]
@@ -325,6 +327,9 @@ export const ownerChecklist = [
       { text: "오토파일럿 첫 사용은 한산한 고속도로에서", status: "대기" },
       { text: "센트리 모드·블랙박스용 USB 저장장치 포맷·장착", status: "대기" },
       { text: "지오펜스용 집·회사 주소를 내비에 저장", status: "대기" },
+      { text: "집 Wi-Fi를 차량에 등록 (소프트웨어 업데이트용)", status: "대기" },
+      { text: "Tesla 계정 2단계 인증 켜기 + 등록된 폰키 목록 확인", status: "대기" },
+      { text: "데이터 공유 설정 확인 (컨트롤 > 소프트웨어)", status: "대기" },
       { text: "경화 후 틴팅 얼룩이 남아 있으면 업체에 연락", status: "대기" }
     ]
   },
@@ -1023,5 +1028,284 @@ export const ownerCostBuckets = [
     title: "연간 유지비",
     amount: "보험료 + 정비",
     detail: "정기 정비 항목이 적어서 첫 2년은 타이어 외 지출이 거의 없다. 4년/8만km 보증 안에서 처리."
+  }
+];
+
+// ── 화면(디스플레이) 사용법 ────────────────────────────────────────────
+// 테슬라는 물리 버튼이 거의 없어서 "이 기능이 화면 어디에 있는가"를 모르면 조작 자체가 막힌다.
+// 출처: Tesla Model Y 오너 매뉴얼(항목별 URL) + 주니퍼 세대 확인 사항은 커뮤니티 교차 확인.
+// ⚠️ 세대별 조작계가 다르다. 주니퍼(2025~)는 모델3 하이랜드와 달리 좌측 방향지시등
+//    스토크가 유지됐다(2026-08-07 국내 매체·오너 후기 다수 확인).
+export type DisplaySource = "공식" | "커뮤니티";
+
+export type DisplayItem = {
+  id: string;
+  title: string;
+  how: string; // 어디를 눌러야 하는가
+  note: string; // 왜 알아둬야 하는가 / 함정
+  source: DisplaySource;
+  url: string;
+};
+
+export const displayGroups: Array<{
+  id: string;
+  title: string;
+  intro: string;
+  items: DisplayItem[];
+}> = [
+  {
+    id: "basic",
+    title: "기본 조작 — 물리 버튼이 어디까지인가",
+    intro:
+      "주니퍼에 남아 있는 물리 조작은 방향지시등 스토크, 스티어링 휠 버튼·스크롤휠, 도어 열림 버튼, 천장 비상등 정도다. 나머지는 전부 화면이다.",
+    items: [
+      {
+        id: "gear",
+        title: "기어 변속 (P/R/N/D)",
+        how: "화면 왼쪽 가장자리의 세로 바를 위로 밀면 D, 아래로 밀면 R. P는 화면 상단 아이콘.",
+        note: "★ 화면이 먹통이 되면 천장(헤드라이너) 비상등 옆 물리 버튼이 백업이다. 인수 첫날 이 위치를 손으로 짚어보고 외워둘 것 — 급할 때 찾으면 늦다.",
+        source: "공식",
+        url: "https://www.tesla.com/ko_kr/support/model-y"
+      },
+      {
+        id: "turn-signal",
+        title: "방향지시등",
+        how: "핸들 왼쪽 뒤 스토크. 주니퍼는 기존 방식 그대로다.",
+        note: "모델3 하이랜드는 스티어링 휠 버튼으로 바뀌었지만 주니퍼는 스토크가 유지됐다. 하이랜드를 같이 타면 헷갈린다는 후기가 많다.",
+        source: "커뮤니티",
+        url: "https://www.clien.net/service/board/cm_car/18898021"
+      },
+      {
+        id: "wiper",
+        title: "와이퍼",
+        how: "스티어링 휠 왼쪽 버튼을 누르면 화면에 와이퍼 설정이 뜬다. 거기서 속도와 오토 감도를 고른다.",
+        note: "오토 와이퍼는 카메라 기반이라 국내 안개비·눈에서 반응이 굼뜨다는 후기가 흔하다. 답답하면 수동 속도로 고정해서 쓴다.",
+        source: "커뮤니티",
+        url: "https://www.clien.net/service/board/cm_car/18898021"
+      },
+      {
+        id: "scroll-wheel",
+        title: "미러·스티어링 위치 조정",
+        how: "화면에서 조정할 항목(미러/스티어링)을 먼저 고른 뒤, 스티어링 휠의 좌우 스크롤휠을 굴려서 맞춘다.",
+        note: "스크롤휠은 상황에 따라 기능이 바뀌는 다목적 컨트롤이다. 볼륨·미디어·오토파일럿 속도도 여기서 조작한다.",
+        source: "공식",
+        url: "https://www.tesla.com/ko_kr/support/model-y"
+      },
+      {
+        id: "glovebox",
+        title: "글로브박스",
+        how: "물리 손잡이가 없다. 화면 컨트롤 메뉴에서 열기를 눌러야 열린다.",
+        note: "동승자가 못 열어서 당황하는 대표 항목이다. 하이패스 단말이나 USB 허브를 여기 넣을 거라면 접근성을 미리 고려할 것.",
+        source: "공식",
+        url: "https://www.tesla.com/ko_kr/support/model-y"
+      },
+      {
+        id: "profile",
+        title: "운전자 프로필",
+        how: "시트·미러·핸들 위치, 주행 설정, 내비 즐겨찾기를 프로필로 저장한다. 폰키를 인식하면 자동으로 불러온다.",
+        note: "부부가 같이 타면 인수 첫날 각자 프로필을 만들어 두는 게 낫다. 나중에 만들면 설정을 다시 잡아야 한다.",
+        source: "공식",
+        url: "https://www.tesla.com/ko_kr/support/model-y"
+      }
+    ]
+  },
+  {
+    id: "parked",
+    title: "정차·주차 중 기능",
+    intro: "차를 세워둔 상태에서만 켜지는 기능들. 여름·겨울에 실제로 쓸 일이 생긴다.",
+    items: [
+      {
+        id: "dog-mode",
+        title: "도그 모드",
+        how: "화면 아래 공조(팬) 아이콘 → 도그 모드 켜기. 화면에 현재 실내 온도와 '반려동물이 있습니다' 안내가 뜬다.",
+        note: "배터리 20% 이상이어야 동작하고, 그 아래로 떨어지면 앱으로 알림이 온다. 사람에게도 유용하지만 주행하면 자동 해제된다.",
+        source: "공식",
+        url: "https://www.tesla.com/ownersmanual/modely/ko_us/GUID-4F3599A1-20D9-4A49-B4A0-5261F957C096.html"
+      },
+      {
+        id: "camp-mode",
+        title: "캠프 모드",
+        how: "같은 공조 메뉴에서 캠프 모드. 차를 꺼도 공조와 USB 전원이 유지된다.",
+        note: "차박뿐 아니라 차 안에서 대기할 때 쓴다. 배터리를 계속 먹으므로 잔량을 보고 켤 것.",
+        source: "공식",
+        url: "https://web.getcha.kr/blog/tesla-model-y-camping-complete-guide"
+      },
+      {
+        id: "theater",
+        title: "극장·아케이드·토이박스",
+        how: "주차 중에만 접근된다. 화면 하단 앱 런처에서 실행.",
+        note: "충전 대기 시간에 쓸 거리. 주행 중에는 잠긴다.",
+        source: "공식",
+        url: "https://www.tesla.com/ownersmanual/modely/ko_us/GUID-79A49D40-A028-435B-A7F6-8E48846AB9E9.html"
+      }
+    ]
+  },
+  {
+    id: "safety",
+    title: "감시·기록",
+    intro: "USB 저장장치를 꽂아야 켜지는 기능들. 별도 블랙박스를 살지 말지가 여기서 갈린다.",
+    items: [
+      {
+        id: "sentry",
+        title: "감시 모드 (센트리)",
+        how: "USB 저장장치를 글로브박스 포트에 꽂고 차량에서 포맷 → 컨트롤 > 안전 > 감시 모드.",
+        note: "주차 중 충격·접근을 감지해 녹화한다. 배터리를 계속 소모하므로 아파트 장기 주차에서는 소모량을 한 번 재보고 판단할 것.",
+        source: "공식",
+        url: "https://www.tesla.com/ownersmanual/modely/ko_kr/GUID-3C7A4D8B-2904-4093-9841-35596A110DE7.html"
+      },
+      {
+        id: "dashcam",
+        title: "블랙박스 녹화",
+        how: "같은 USB를 공유한다. 화면 상단 카메라 아이콘을 누르면 직전 구간이 별도 폴더로 저장된다.",
+        note: "★ 저장을 안 누르면 용량이 찼을 때 오래된 것부터 덮어쓴다. 사고가 나면 그 자리에서 카메라 아이콘부터 누를 것.",
+        source: "공식",
+        url: "https://www.tesla.com/ownersmanual/modely/ko_kr/GUID-3C7A4D8B-2904-4093-9841-35596A110DE7.html"
+      }
+    ]
+  },
+  {
+    id: "settings",
+    title: "설정·업데이트",
+    intro: "한 번 잡아두면 되는 것들. 인수 첫 주에 한 바퀴 돌아보면 충분하다.",
+    items: [
+      {
+        id: "ota",
+        title: "소프트웨어 업데이트",
+        how: "컨트롤 > 소프트웨어. Wi-Fi에 연결돼 있으면 자동으로 내려받고, 설치 시점은 직접 고른다.",
+        note: "집 Wi-Fi를 차에 등록해 두는 게 첫 주 할 일이다. 셀룰러만으로는 큰 업데이트가 잘 안 내려온다.",
+        source: "공식",
+        url: "https://www.tesla.com/ko_kr/support/software-updates"
+      },
+      {
+        id: "assisted-driving",
+        title: "어시스티드 드라이빙 컴퓨터 확인",
+        how: "컨트롤 > 소프트웨어에서 하드웨어 세대와 오토파일럿 구성이 표시된다.",
+        note: "FSD 관련 글을 읽을 때 내 차가 어느 세대인지 알아야 비교가 된다. 인수 후 한 번 확인해서 메모에 적어둘 것.",
+        source: "공식",
+        url: "https://www.tesla.com/support/fsd"
+      },
+      {
+        id: "data-sharing",
+        title: "데이터 공유 설정",
+        how: "컨트롤 > 소프트웨어 > 데이터 공유. 언제든 켜고 끌 수 있다.",
+        note: "자세한 내용은 데이터·프라이버시 탭에 정리했다.",
+        source: "공식",
+        url: "https://www.tesla.com/ko_KR/legal/privacy"
+      }
+    ]
+  }
+];
+
+// ── 데이터·프라이버시 ──────────────────────────────────────────────────
+// "내 데이터가 어디에 쌓이고, 내가 뭘 제어할 수 있는가"를 종류별로 정리한다.
+// 출처: Tesla 고객 개인정보 취급방침(https://www.tesla.com/ko_KR/legal/privacy),
+//       Tesla 지원 문서, TeslaMate 공식 문서. 확실한 사실과 추정을 구분해 표기.
+export type DataTopic = {
+  id: string;
+  topic: string;
+  what: string; // 무슨 데이터인가
+  where: string; // 어디에 저장되는가
+  control: string; // 내가 무엇을 제어할 수 있는가
+  action: string; // 지금 할 일
+  source: DisplaySource;
+  url: string;
+};
+
+export const dataTopics: DataTopic[] = [
+  {
+    id: "vehicle-telemetry",
+    topic: "주행·차량 로그",
+    what: "주행 기록, 오토파일럿 작동 데이터, 차량 상태 진단 로그.",
+    where:
+      "테슬라 서버. 테슬라는 개인정보를 판매·대여하지 않으며, 인도 시점부터 주행으로 생성되는 차량 데이터를 기본적으로 계정·ID와 연결하지 않는다고 공식 고지한다.",
+    control: "차량 화면에서 데이터 공유를 언제든 켜고 끌 수 있다.",
+    action: "인수 후 컨트롤 > 소프트웨어 > 데이터 공유에서 현재 설정이 뭔지 한 번 확인한다.",
+    source: "공식",
+    url: "https://www.tesla.com/ko_KR/legal/privacy"
+  },
+  {
+    id: "sentry-footage",
+    topic: "센트리·블랙박스 영상",
+    what: "주차 감시 녹화와 주행 중 대시캠 영상.",
+    where: "차량에 꽂은 USB 저장장치에만 저장된다. 테슬라 서버로 올라가지 않는다(공식 고지).",
+    control: "USB를 뽑으면 그걸로 끝이다. 용량이 차면 오래된 것부터 덮어쓴다.",
+    action:
+      "사고·접촉이 생기면 그 자리에서 화면 상단 카메라 아이콘을 눌러 별도 저장한다. 안 누르면 덮어써서 사라진다.",
+    source: "공식",
+    url: "https://www.tesla.com/ownersmanual/modely/ko_kr/GUID-3C7A4D8B-2904-4093-9841-35596A110DE7.html"
+  },
+  {
+    id: "cabin-camera",
+    topic: "실내 캐빈 카메라",
+    what: "룸미러 위 실내 카메라 영상.",
+    where: "운전자 모니터링에 쓰인다. 물리 커버로 가릴 수 있다.",
+    control: "가리면 일부 운전자 모니터링 기능이 제한될 수 있다. 개폐형 커버를 쓰면 필요할 때 열 수 있다.",
+    action: "신경 쓰이면 장비 > 용품의 캐빈 카메라 커버 항목을 참고한다. 아니면 그냥 둬도 된다.",
+    source: "공식",
+    url: "https://www.tesla.com/ko_KR/legal/privacy"
+  },
+  {
+    id: "nav-history",
+    topic: "위치·내비 기록",
+    what: "최근 목적지, 즐겨찾기, 집·회사 주소.",
+    where: "차량과 테슬라 계정. 프로필 단위로 남는다.",
+    control: "화면에서 최근 목적지를 개별 삭제할 수 있다.",
+    action: "차를 남에게 빌려주거나 서비스센터에 맡기기 전에 집 주소가 노출되는지 한 번 생각해 볼 것.",
+    source: "공식",
+    url: "https://www.tesla.com/ko_KR/legal/privacy"
+  },
+  {
+    id: "tesla-account",
+    topic: "Tesla 계정",
+    what: "계정 자체가 차 키다. 로그인되면 원격으로 문을 열고 시동을 걸 수 있다.",
+    where: "테슬라 서버. 폰키로 등록된 기기 목록이 계정에 붙는다.",
+    control: "2단계 인증을 켤 수 있고, 등록된 폰키를 개별 해제할 수 있다.",
+    action:
+      "★ 인수 첫 주에 2단계 인증을 켠다. 그리고 등록된 폰키 목록에 모르는 기기가 없는지 확인한다.",
+    source: "공식",
+    url: "https://www.tesla.com/ko_kr/support/how-create-update-delete-tesla-account"
+  },
+  {
+    id: "third-party-token",
+    topic: "서드파티 앱 토큰",
+    what: "TeslaMate, Tessie, MyTeslaBot 같은 앱을 연동하면 발급되는 접근 토큰.",
+    where: "해당 앱의 서버 또는 내 서버.",
+    control: "안 쓰는 앱의 연동은 해제한다. 토큰이 유출되면 차량 제어까지 가능하다.",
+    action: "연동 앱은 필요한 것만 남긴다. 여러 개를 동시에 붙이면 차가 잠들지 못해 대기 전력도 늘어난다.",
+    source: "커뮤니티",
+    url: "https://docs.teslamate.org/docs/faq/"
+  },
+  {
+    id: "teslamate-data",
+    topic: "TeslaMate 데이터 (도입 시)",
+    what: "주행·충전·효율·배터리 추세 전체 이력.",
+    where: "내가 운영하는 서버의 PostgreSQL.",
+    control: "전부 내 손에 있다. 대신 백업과 보안도 전부 내 책임이다.",
+    action:
+      "pg_dump 정기 백업과 ENCRYPTION_KEY 별도 보관. 공인 IP에 그냥 열지 말고 Tailscale·VPN으로만 접근한다.",
+    source: "공식",
+    url: "https://docs.teslamate.org/docs/maintenance/backup_restore/"
+  },
+  {
+    id: "site-data",
+    topic: "이 사이트의 데이터",
+    what: "일정, 체크리스트, 용품 구매 상태, 개인 메모.",
+    where: "이 브라우저의 localStorage. 서버 DB가 없어서 다른 기기와 동기화되지 않는다.",
+    control: "브라우저 데이터를 지우면 같이 사라진다. 시크릿 모드에서는 저장되지 않는다.",
+    action:
+      "일정은 ics로 내보내 캘린더 앱에 넣어두면 기기가 바뀌어도 남는다. 중요한 메모는 따로 복사해 둘 것.",
+    source: "공식",
+    url: ""
+  },
+  {
+    id: "resale",
+    topic: "차를 팔 때",
+    what: "프로필, 폰키, 내비 기록, HomeLink, USB 영상까지 전부 차에 남아 있다.",
+    where: "차량 내부 저장소 + 테슬라 계정 연결.",
+    control: "공장 초기화로 차량 내 사용자 데이터를 지우고, 계정에서 차량을 삭제해 소유권을 넘긴다.",
+    action:
+      "① USB 저장장치 회수 ② 차량에서 공장 초기화 ③ Tesla 앱에서 차량 삭제 및 소유권 이전. 순서를 지켜야 다음 소유자가 앱을 정상적으로 쓴다.",
+    source: "공식",
+    url: "https://www.tesla.com/ko_kr/support/how-add-or-remove-vehicles-tesla-app"
   }
 ];
