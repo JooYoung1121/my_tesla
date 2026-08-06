@@ -5295,3 +5295,281 @@ textarea {
     align-items: flex-start;
   }
 }
+
+/* ── 차량 탭: 화면 사용법 ───────────────────────────────────── */
+.display-guide,
+.data-board {
+  display: grid;
+  gap: 18px;
+}
+
+.display-intro {
+  display: grid;
+  grid-template-columns: 22px minmax(0, 1fr);
+  gap: 12px;
+  padding: 16px;
+  background: var(--red-soft);
+  border: 1px solid rgba(232, 33, 39, 0.3);
+  border-radius: var(--radius);
+}
+
+.display-intro svg {
+  margin-top: 2px;
+  color: var(--red-bright);
+}
+
+.display-intro strong {
+  display: block;
+  margin-bottom: 5px;
+  font-size: 14.5px;
+  font-weight: 650;
+}
+
+.display-intro p {
+  margin: 0;
+  max-width: 82ch;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.65;
+}
+
+.display-list {
+  display: grid;
+  gap: 8px;
+}
+
+.display-row {
+  display: grid;
+  gap: 7px;
+  padding: 15px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  transition: border-color 0.15s ease;
+}
+
+.display-row:hover {
+  border-color: var(--line-strong);
+}
+
+.display-row.is-critical {
+  border-left: 2px solid var(--red-bright);
+}
+
+.display-row-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.display-row-head strong {
+  font-size: 14.5px;
+  font-weight: 650;
+}
+
+.display-row-head .app-evidence {
+  margin-left: 0;
+}
+
+.display-row-head a {
+  margin-left: auto;
+  color: var(--faint);
+  transition: color 0.15s ease;
+}
+
+.display-row-head a:hover {
+  color: var(--red-bright);
+}
+
+.display-how {
+  margin: 0;
+  color: var(--ink);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.display-how em {
+  display: inline-block;
+  margin-right: 7px;
+  padding: 1px 6px;
+  color: var(--faint);
+  background: var(--panel-strong);
+  border-radius: 4px;
+  font-family: var(--font-display), "Pretendard Variable", Pretendard, sans-serif;
+  font-size: 10.5px;
+  font-style: normal;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  vertical-align: 1px;
+}
+
+.display-note {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  margin: 0;
+  color: var(--faint);
+  font-size: 12.5px;
+  line-height: 1.6;
+}
+
+.display-note.is-critical {
+  color: var(--muted);
+}
+
+.display-note svg {
+  flex: 0 0 auto;
+  color: var(--red-bright);
+  transform: translateY(1px);
+}
+
+/* ── 차량 탭: 데이터·프라이버시 ─────────────────────────────── */
+.data-priority {
+  padding: 16px;
+  background: var(--red-soft);
+  border: 1px solid rgba(232, 33, 39, 0.32);
+  border-radius: var(--radius);
+}
+
+.data-priority > strong {
+  display: block;
+  margin-bottom: 9px;
+  font-size: 14px;
+  font-weight: 650;
+}
+
+.data-priority ul {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.data-priority li {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.data-priority em {
+  display: inline-block;
+  margin-right: 8px;
+  color: var(--ink);
+  font-style: normal;
+  font-weight: 650;
+}
+
+.data-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(330px, 1fr));
+  gap: 12px;
+}
+
+.data-card {
+  display: grid;
+  align-content: start;
+  gap: 10px;
+  padding: 16px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  transition: border-color 0.18s ease, transform 0.18s ease;
+}
+
+.data-card:hover {
+  border-color: var(--line-strong);
+  transform: translateY(-1px);
+}
+
+.data-card-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.data-card-head strong {
+  font-size: 14.5px;
+  font-weight: 650;
+}
+
+.data-card-head .app-evidence {
+  margin-left: 0;
+}
+
+.data-card-head a {
+  margin-left: auto;
+  color: var(--faint);
+  transition: color 0.15s ease;
+}
+
+.data-card-head a:hover {
+  color: var(--red-bright);
+}
+
+.data-fields {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+}
+
+.data-fields > div {
+  display: grid;
+  grid-template-columns: 58px minmax(0, 1fr);
+  gap: 10px;
+}
+
+.data-fields dt {
+  color: var(--faint);
+  font-family: var(--font-display), "Pretendard Variable", Pretendard, sans-serif;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  padding-top: 2px;
+}
+
+.data-fields dd {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12.8px;
+  line-height: 1.6;
+}
+
+.data-fields .data-action {
+  padding-top: 9px;
+  border-top: 1px solid var(--line);
+}
+
+.data-fields .data-action dt {
+  color: var(--red-bright);
+}
+
+.data-fields .data-action dd {
+  color: var(--ink);
+}
+
+/* 오늘 탭 빠른 작업이 5개로 늘었다 */
+.bento-actions {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+@media (max-width: 1180px) {
+  .bento-actions {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 560px) {
+  .data-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .data-fields > div {
+    grid-template-columns: 1fr;
+    gap: 2px;
+  }
+
+  .bento-actions {
+    grid-template-columns: 1fr;
+  }
+}
