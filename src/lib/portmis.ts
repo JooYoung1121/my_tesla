@@ -1,5 +1,5 @@
 // PORT-MIS 선박운항정보 조회 공용 로직.
-// /api/port/arrivals(화면 조회)와 /api/port/notify(디스코드 알림)가 함께 쓴다.
+// /api/port/arrivals(아카이브 화면 조회)에서 쓴다.
 
 import { PORTMIS, type PortArrival } from "@/data/shipment";
 
@@ -34,6 +34,8 @@ function normalize(item: Record<string, unknown>): PortArrival & { prtAgNm: stri
     arrivalAt: toISO(pick(item, ["etryptDt", "dstnEtryptDt"])),
     departureAt: toISO(pick(item, ["tkoffDt", "tkoffPrrrnDt"])),
     fromPort: pick(item, ["frstDpmprtPrtNm", "prvsDpmprtPrtNm"]),
+    firstPort: pick(item, ["frstDpmprtPrtNm"]),
+    prevPort: pick(item, ["prvsDpmprtPrtNm"]),
     toPort: pick(item, ["nxlnptPrtNm", "dstnPrtNm"]),
     vesselType: pick(item, ["vsslKndNm"]),
     grossTon: gross != null && Number.isFinite(gross) ? gross : null,
@@ -191,7 +193,12 @@ export async function fetchPortArrivals(options: FetchArrivalsOptions = {}): Pro
 
     let text = "";
     try {
-      const res = await fetch(endpoint, { next: { revalidate: 1800 } });
+      // 게이트웨이가 curl 등 일부 User-Agent를 410 Gone으로 차단한다(2026-07-15 실측).
+      // Node 기본 UA는 통과되지만, 차단 정책이 넓어져도 안전하도록 명시한다.
+      const res = await fetch(endpoint, {
+        headers: { "User-Agent": "Mozilla/5.0 (compatible; my-tesla-tracker/1.0)" },
+        next: { revalidate: 1800 }
+      });
       text = await res.text();
       if (!res.ok) {
         return {

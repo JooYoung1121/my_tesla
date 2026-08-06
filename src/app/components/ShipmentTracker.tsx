@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Anchor, BellRing, ExternalLink, RefreshCw, Ship, ShieldCheck } from "lucide-react";
+import { Anchor, ChevronDown, ExternalLink, RefreshCw, Ship, ShieldCheck } from "lucide-react";
 import { deliveryTrackers } from "@/data/home";
 import type { ArrivalWindow, CandidateStrength, CandidateVessel } from "@/data/shipment";
 
@@ -19,10 +19,23 @@ type ApiResponse = {
 type ApiError = { error: string; hint?: string };
 
 const STRENGTH_META: Record<CandidateStrength, { label: string; desc: string }> = {
-  high: { label: "가능성 높음", desc: "기가팩토리 출발항 또는 테슬라 선대 + 해외 출발" },
-  medium: { label: "가능성 중간", desc: "테슬라 선대(국내 출발) 또는 자동차선 + 해외 출발" },
+  high: { label: "가능성 높음", desc: "기가팩토리 출발항(최초·직전) 또는 테슬라 선대 + 해외 직행" },
+  medium: { label: "가능성 중간", desc: "테슬라 선대(국내 연안 출발) 또는 자동차선 + 해외 직행" },
   low: { label: "참고", desc: "그 외 자동차운반선(국내 연안 위주)" }
 };
+
+// 선박명으로 항적을 교차 확인할 외부 AIS 서비스.
+const VESSEL_SEARCH = [
+  {
+    name: "VesselFinder",
+    url: (name: string) => `https://www.vesselfinder.com/vessels?name=${encodeURIComponent(name)}`
+  },
+  {
+    name: "MarineTraffic",
+    url: (name: string) =>
+      `https://www.marinetraffic.com/en/ais/index/search/all/keyword:${encodeURIComponent(name)}`
+  }
+];
 
 function ymdToISO(ymd: string) {
   return `${ymd.slice(0, 4)}-${ymd.slice(4, 6)}-${ymd.slice(6, 8)}`;
@@ -117,6 +130,7 @@ function ArrivalTimeline({ data }: { data: ApiResponse }) {
 }
 
 function VesselCard({ v }: { v: CandidateVessel }) {
+  const [open, setOpen] = useState(false);
   const meta = STRENGTH_META[v.strength];
   const time = fmtTime(v.arrivalAt);
   const facts = [
@@ -126,36 +140,120 @@ function VesselCard({ v }: { v: CandidateVessel }) {
     v.berth ? `접안 ${v.berth}` : null
   ].filter(Boolean);
 
+  // 출항지 표기: 최초출항지(항차 시작점)와 직전출항지(평택 직전 항)를 구분한다.
+  const firstPort = v.firstPort;
+  const prevPort = v.prevPort && v.prevPort !== v.firstPort ? v.prevPort : null;
+
+  const detailFields: [string, string | null][] = [
+    ["호출부호", v.callSign],
+    ["선종", v.vesselType],
+    ["총톤수", v.grossTon != null ? `${v.grossTon.toLocaleString()}t` : null],
+    ["국적", v.nationality],
+    ["최초출항지", v.firstPort],
+    ["직전출항지", v.prevPort],
+    ["다음 기항지", v.toPort],
+    ["입항일시", v.arrivalAt ? `${fmtDate(v.arrivalAt)}${time ? ` ${time}` : ""}` : null],
+    ["출항(예정)", v.departureAt ? fmtDate(v.departureAt) : null],
+    ["접안 선석", v.berth]
+  ];
+
   return (
     <article className={`ship-card${v.inMyWindow ? " ship-card-mine" : ""}`}>
-      <div className="ship-card-top">
-        <span className="ship-name">
-          <Ship size={16} aria-hidden="true" />
-          {v.shipName}
-          {v.callSign ? <small className="ship-callsign">{v.callSign}</small> : null}
-        </span>
-        <div className="ship-badges">
-          {v.inMyWindow ? <span className="pill ship-pill-mine">내 차 후보</span> : null}
-          <span className={`pill ship-strength ship-strength-${v.strength}`} title={meta.desc}>
-            {meta.label}
+      <button
+        type="button"
+        className="ship-card-toggle"
+        onClick={() => setOpen((o) => !o)}
+        aria-expanded={open}
+        title="누르면 판정 근거와 원본 신고 필드가 펼쳐진다"
+      >
+        <div className="ship-card-top">
+          <span className="ship-name">
+            <Ship size={16} aria-hidden="true" />
+            {v.shipName}
+            {v.callSign ? <small className="ship-callsign">{v.callSign}</small> : null}
+          </span>
+          <div className="ship-badges">
+            {v.inMyWindow ? <span className="pill ship-pill-mine">내 차 후보</span> : null}
+            <span className={`pill ship-strength ship-strength-${v.strength}`} title={meta.desc}>
+              {meta.label}
+            </span>
+            <ChevronDown size={15} className="ship-card-chevron" aria-hidden="true" />
+          </div>
+        </div>
+        <div className="ship-route">
+          {firstPort ? (
+            <span title="입항신고의 최초출항지 — 항차 시작점. 중간 기항지는 신고에 없다">
+              {firstPort} <small className="ship-route-tag">최초</small>
+            </span>
+          ) : null}
+          {prevPort ? (
+            <>
+              {firstPort ? <span aria-hidden="true">→</span> : null}
+              <span title="입항신고의 직전출항지 — 평택 직전에 떠난 항">
+                {prevPort} <small className="ship-route-tag">직전</small>
+              </span>
+            </>
+          ) : null}
+          {firstPort || prevPort ? <span aria-hidden="true">→</span> : null}
+          <span className="ship-route-dest">
+            <Anchor size={12} aria-hidden="true" /> 평택
+          </span>
+          <span className="ship-route-when">
+            입항 {fmtDate(v.arrivalAt)}
+            {time ? ` ${time}` : ""}
+            {dDayLabel(v.dDay) ? <em className="ship-dday"> · {dDayLabel(v.dDay)}</em> : null}
           </span>
         </div>
-      </div>
-      <div className="ship-route">
-        {v.fromPort ? <span>{v.fromPort}</span> : null}
-        {v.fromPort ? <span aria-hidden="true">→</span> : null}
-        <span className="ship-route-dest">
-          <Anchor size={12} aria-hidden="true" /> 평택
-        </span>
-        <span className="ship-route-when">
-          입항 {fmtDate(v.arrivalAt)}
-          {time ? ` ${time}` : ""}
-          {dDayLabel(v.dDay) ? <em className="ship-dday"> · {dDayLabel(v.dDay)}</em> : null}
-        </span>
-      </div>
+      </button>
       {facts.length > 0 ? <p className="ship-facts">{facts.join(" · ")}</p> : null}
       {v.reasons.length > 0 ? (
         <p className="ship-reason">근거: {v.reasons.join(" · ")}</p>
+      ) : null}
+      {open ? (
+        <div className="ship-detail">
+          <div>
+            <p className="ship-detail-label">판정 체크리스트</p>
+            <ul className="ship-checks">
+              {v.checks.map((c) => (
+                <li key={c.label} className={`ship-check${c.hit ? " ship-check-hit" : ""}`}>
+                  <i aria-hidden="true">{c.hit ? "✓" : "✗"}</i>
+                  <span>
+                    <strong>{c.label}</strong>
+                    {c.detail ? ` — ${c.detail}` : ""}
+                  </span>
+                </li>
+              ))}
+            </ul>
+            <p className="ship-detail-note">
+              → 등급 &ldquo;{meta.label}&rdquo;: {meta.desc}
+            </p>
+          </div>
+          <div>
+            <p className="ship-detail-label">PORT-MIS 원본 신고 필드</p>
+            <dl className="ship-fields">
+              {detailFields.map(([label, value]) =>
+                value ? (
+                  <div key={label}>
+                    <dt>{label}</dt>
+                    <dd>{value}</dd>
+                  </div>
+                ) : null
+              )}
+            </dl>
+            <p className="ship-detail-note">
+              출항지는 입항신고의 최초·직전출항지 필드다. 중간 기항(상하이 등) 여부는 신고에
+              없으므로 실제 항적은 아래에서 선박명으로 교차 확인한다.
+            </p>
+          </div>
+          <div className="ship-xlinks">
+            {VESSEL_SEARCH.map((s) => (
+              <a key={s.name} href={s.url(v.shipName)} target="_blank" rel="noreferrer">
+                {s.name}에서 항적 확인
+                <ExternalLink size={11} aria-hidden="true" />
+              </a>
+            ))}
+          </div>
+        </div>
       ) : null}
     </article>
   );
@@ -165,19 +263,6 @@ export function ShipmentTracker() {
   const [data, setData] = useState<ApiResponse | null>(null);
   const [error, setError] = useState<ApiError | null>(null);
   const [loading, setLoading] = useState(true);
-  const [notifyState, setNotifyState] = useState<"idle" | "sending" | "sent" | "failed">("idle");
-
-  async function sendToDiscord() {
-    setNotifyState("sending");
-    try {
-      const res = await fetch("/api/port/notify", { method: "POST" });
-      setNotifyState(res.ok ? "sent" : "failed");
-    } catch {
-      setNotifyState("failed");
-    }
-    window.setTimeout(() => setNotifyState("idle"), 4000);
-  }
-
   async function load() {
     setLoading(true);
     setError(null);
@@ -212,19 +297,6 @@ export function ShipmentTracker() {
           <h3>평택항 테슬라 후보 선박</h3>
         </div>
         <div className="ship-head-actions">
-          <button
-            type="button"
-            className="ghost-button"
-            onClick={sendToDiscord}
-            disabled={notifyState === "sending"}
-            title="현재 후보 선박을 디스코드 웹훅으로 보낸다 (매일 오전 9시 자동 알림과 동일)"
-          >
-            <BellRing size={15} aria-hidden="true" />
-            {notifyState === "idle" ? "디스코드로 보내기" : null}
-            {notifyState === "sending" ? "보내는 중…" : null}
-            {notifyState === "sent" ? "보냈다 ✓" : null}
-            {notifyState === "failed" ? "실패 — 웹훅 설정 확인" : null}
-          </button>
           <button
             type="button"
             className="ghost-button"
@@ -281,6 +353,9 @@ export function ShipmentTracker() {
               <strong>{STRENGTH_META[s].label}</strong> {STRENGTH_META[s].desc}
             </span>
           ))}
+          <span className="ship-legend-hint">
+            카드를 누르면 판정 근거·원본 신고 필드·항적 링크가 펼쳐진다
+          </span>
         </div>
       ) : null}
 
