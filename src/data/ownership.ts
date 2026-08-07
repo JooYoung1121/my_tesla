@@ -152,11 +152,11 @@ export const scheduleSeed: SeedEvent[] = [
   },
   {
     id: "seed-charge-card",
-    date: "2026-08-07",
+    date: "2026-08-14",
     time: null,
-    title: "충전카드 발급 신청",
+    title: "환경부 충전카드 신청 (번호판 나온 뒤)",
     kind: "할일",
-    note: "카드 실물 배송에 1~2주 걸리는 곳이 있다. 인수 전에 신청해야 첫 주에 쓴다."
+    note: "무공해차 통합누리집(ev.or.kr) > 회원카드 신청. 차량번호 입력이 필수라 번호판이 나오기 전에는 접수가 안 된다. 최초 1회 무료이고, 카드를 받은 뒤 결제카드를 따로 등록해야 실제로 결제된다. 배송 1~2주라 그 전에는 사업자 앱 결제로 버틴다."
   },
   {
     id: "seed-hipass",
@@ -170,9 +170,9 @@ export const scheduleSeed: SeedEvent[] = [
     id: "seed-ali-order",
     date: "2026-08-06",
     time: null,
-    title: "알리 1차 주문 (선쉐이드·매트·스크린 보호)",
+    title: "알리 주문 — 보호류만 최소로",
     kind: "할일",
-    note: "알리 배송 2~4주. 8월 인수라 루프 선쉐이드는 늦으면 의미가 없다. 나머지는 인수 후 실사용 뒤 주문."
+    note: "★ 커뮤니티 다수 의견은 '미리 사지 마라, 2~3개월 순정으로 타보고 결정하라'다. 예외는 (1) 안 하면 되돌릴 수 없는 손상이 생기는 것 = 스크린 보호, (2) 계절 = 루프 선쉐이드. 수납·거치대·조명 같은 편의 아이템은 지금 사면 대부분 안 쓴다."
   },
   {
     id: "seed-spec-confirm",
@@ -180,7 +180,7 @@ export const scheduleSeed: SeedEvent[] = [
     time: null,
     title: "시공 사양 목록 받아두기 (필름 제품명·농도·PPF 부위)",
     kind: "할일",
-    note: "8/18 수령 검수의 기준표가 된다. PPF를 어디까지 붙이는지 모르면 빠진 부위를 알아챌 수 없다. 문자나 카톡으로 남겨 달라고 하면 나중에 분쟁 시에도 근거가 된다."
+    note: "8/18 수령 검수의 기준표가 된다. PPF를 어디까지 붙이는지 모르면 빠진 부위를 알아챌 수 없다. ★ 같이 물어볼 것 — '불량시공이면 재시공 몇 번까지 해주냐'. 시인성·열차단은 중상급 이상이면 제품 차이보다 시공자 스킬이 크다는 게 오너 다수 의견이라, 제품명보다 재시공 조건이 실질적인 안전장치다."
   },
   {
     id: "seed-photo-request",
@@ -246,9 +246,10 @@ export const ownerChecklist = [
       { text: "잔금 결제 수단 확정 및 카드·이체 한도 상향", status: "대기" },
       { text: "취득세·등록비 예상액 확인 (전기차 감면 적용 후)", status: "대기" },
       { text: "번호판 등록을 테슬라 대행으로 할지 직접 할지 확정", status: "대기" },
-      { text: "충전카드 발급 신청 (배송 기간 고려)", status: "대기" },
+      { text: "환경부 충전카드 — 번호판 확정 후 ev.or.kr에서 신청", status: "대기" },
       { text: "하이패스 단말 주문 및 차량 등록", status: "대기" },
       { text: "시공 사양 목록 받기 (필름 제품명·창별 농도·PPF 부위)", status: "대기" },
+      { text: "불량시공 시 재시공 보장 조건 확인 (몇 회까지)", status: "대기" },
       { text: "업체에 '시공 전 차량 상태 사진' 요청해 두기", status: "대기" },
       { text: "8/14에 인도센터를 직접 갈 수 있는지 확정", status: "대기" }
     ]
@@ -537,7 +538,7 @@ export const gearItems: GearItem[] = [
     risk: "\"없는 게 더 편했다\"는 반응도 많아 취향차가 크다. 실제로 뭐가 굴러다니는지 보고 사는 게 낫다.",
     price: "5천~2만 원",
     channel: "알리",
-    timing: "인수 후 (실사용 뒤)",
+    timing: "2~3개월 타보고",
     priority: "보류",
     url: "https://www.aliexpress.com/wholesale?SearchText=Tesla+Model+Y+Juniper+center+console+organizer"
   },
@@ -587,7 +588,7 @@ export const gearItems: GearItem[] = [
     risk: "도심 위주면 없어도 된다. ⚠️ 뒷바퀴용 저가품이 주차장 스토퍼 턱에 걸려 깨진 사례가 보고된다.",
     price: "1만~2.5만 원",
     channel: "알리",
-    timing: "필요 시",
+    timing: "2~3개월 타보고",
     priority: "보류",
     url: "https://www.aliexpress.com/wholesale?SearchText=Tesla+Model+Y+Juniper+mud+flaps"
   },
@@ -637,7 +638,7 @@ export const gearItems: GearItem[] = [
     risk: "기본 패드로 충분한 사람이 많다. 저가품은 발열로 충전이 느려지니 쿨링팬 내장형을 고른다.",
     price: "1.5만~5만 원",
     channel: "알리",
-    timing: "보류",
+    timing: "2~3개월 타보고",
     priority: "보류",
     url: "https://www.aliexpress.com/wholesale?SearchText=Tesla+Model+Y+MagSafe+cooling+mount"
   },
@@ -686,7 +687,7 @@ export const gearItems: GearItem[] = [
     name: "썬팅 (패키지 · 8/14~8/18 시공)",
     category: "시공",
     why: "여름 열 차단과 사생활. 인수 즉시 업체로 탁송해 시공하므로 첫 주행부터 시공된 상태로 탄다.",
-    risk: "수령 후 3~5일(≈8/22)은 창문을 내리면 안 된다. 초기에 보이는 뿌연 얼룩은 대체로 수분이라 경화되며 사라지지만, 기포와 재단 들뜸은 수령 당일 업체에서 잡아야 한다.",
+    risk: "수령 후 3~5일(≈8/22)은 창문을 내리면 안 된다. 초기 뿌연 얼룩은 대체로 수분이라 경화되며 사라지지만, 기포와 재단 들뜸은 수령 당일 업체에서 잡아야 한다. 참고로 '야간 시인성'류 문구는 가시광선 차단율이 같으면 물리적으로 차이가 나기 어렵다는 지적이 있다 — 실제 변수는 내외부 빛 반사율과 시공자 스킬이다.",
     price: "패키지 포함",
     channel: "시공",
     timing: "8/14 입고 · 8/18 수령",
@@ -1240,4 +1241,97 @@ export const quickLinks = [
   { label: "Tesla 하이패스", url: "https://shop.tesla.com/ko_kr/product/hi-pass" },
   { label: "CCS Combo1 어댑터", url: "https://shop.tesla.com/ko_kr/product/ccs-combo-1-adapter---south-korea" },
   { label: "서비스 예약", url: "https://www.tesla.com/ko_kr/support/service-visits" }
+];
+
+// ── 사고·트러블 대응 ───────────────────────────────────────────────────
+// 근거: TKC 카페 4년차 오너 글(2022년부터 매년 Model Y 구매) — "미리 준비할 건
+// 액세서리가 아니라 사고 사례를 알아두는 것"이라는 지적에서 출발했다.
+// 각 항목의 대처법은 테슬라 공식 문서로 교차 확인한 것만 "공식"로 표기한다.
+export type TroubleTopic = {
+  id: string;
+  title: string;
+  symptom: string; // 어떤 상황인가
+  action: string; // 그때 뭘 해야 하나
+  prepare: string; // 지금 미리 해둘 것
+  source: DisplaySource;
+  url: string;
+};
+
+export const troubleTopics: TroubleTopic[] = [
+  {
+    id: "lv-battery",
+    title: "저전압 배터리 방전",
+    symptom:
+      "문이 안 열리고 화면도 안 켜진다. 고전압(주행) 배터리가 남아 있어도 저전압 배터리가 죽으면 이렇게 된다. 테슬라에서 가장 흔하게 당황하는 상황이다.",
+    action:
+      "앞 범퍼 견인고리 커버를 떼면 적색·흑색 와이어 단자가 나온다. 외부 12V 전원의 +/-를 각각 물리면 후드 래치가 풀려 프렁크를 열 수 있다. 그다음 저전압 배터리에 접근한다. ⚠️ 이 단자로 배터리를 충전할 수는 없다 — 래치만 열린다.",
+    prepare:
+      "실내 앞문 수동 릴리즈 레버 위치를 미리 확인한다(뒷문은 위치가 다르다). 보험사 긴급출동 번호를 차에 두지 말고 휴대폰에 저장한다.",
+    source: "공식",
+    url: "https://service.tesla.com/docs/Public/diy/modely/ko_kr/GUID-FE8439BB-18A6-494B-97A8-FA9063E81DF8.html"
+  },
+  {
+    id: "bad-charger",
+    title: "불량 충전기",
+    symptom:
+      "충전이 안 되거나 중간에 끊긴다. 드물게 커넥터가 과열되거나 차량 쪽 충전 포트에 무리가 간다.",
+    action: "이상 징후가 보이면 바로 중단하고 다른 충전기로 옮긴다. 무리해서 재시도하지 않는다.",
+    prepare:
+      "EV Infra 같은 앱에서 해당 충전소의 최근 후기를 먼저 본다. 고장·불량 제보가 실시간으로 올라온다.",
+    source: "커뮤니티",
+    url: "https://www.evinfra.io/"
+  },
+  {
+    id: "stone-chip",
+    title: "스톤칩 (돌빵)",
+    symptom: "고속도로 주행 후 앞범퍼·보닛에 도장이 파인 자국. 방치하면 그 자리에서 녹이 올라온다.",
+    action: "발견 즉시 크기를 확인하고, 도장면이 벗겨졌으면 터치업 또는 부분 재도장을 맡긴다.",
+    prepare:
+      "PPF 시공 부위 목록을 알아둔다. 필름이 덮인 곳은 필름만 교체하면 되고, 안 덮인 곳이 실제 노출 구간이다.",
+    source: "커뮤니티",
+    url: ""
+  },
+  {
+    id: "body-shop",
+    title: "집 근처 바디샵",
+    symptom: "긁히거나 찌그러졌을 때 어디로 갈지 그 자리에서 검색하면 판단이 흐려진다.",
+    action:
+      "테슬라 공식 서비스센터와 테슬라 인증 바디샵, 일반 공업사는 가격·기간·보험 처리 방식이 다르다. 경미한 건 일반 공업사가 빠르고 싸다.",
+    prepare:
+      "지금 집·회사 반경에서 후보 2~3곳을 찾아 연락처를 메모에 저장해 둔다. 실제로 쓸 일이 생겼을 때 검색부터 시작하지 않게.",
+    source: "커뮤니티",
+    url: "https://www.tesla.com/ko_kr/support/collision-support"
+  },
+  {
+    id: "repair-cost",
+    title: "사고 시 수리비",
+    symptom:
+      "전기차는 배터리팩 위치와 알루미늄 패널 때문에 같은 충격도 내연기관보다 수리비가 크게 나올 수 있다.",
+    action: "견적이 자기부담금을 크게 넘지 않으면 자비 처리가 유리할 때가 있다. 할증까지 계산해서 판단한다.",
+    prepare:
+      "내 보험의 자기부담금과 물적사고 할증 기준금액을 지금 확인해 메모해 둔다. 사고 직후에 찾아보면 이미 늦다.",
+    source: "커뮤니티",
+    url: ""
+  },
+  {
+    id: "seat-stain",
+    title: "시트 오염",
+    symptom:
+      "밝은 색 인조가죽 시트에 커피·청바지 이염이 생긴다. 시간이 지나면 잘 안 빠진다.",
+    action: "즉시 마른 천으로 흡수한 뒤 미지근한 물과 중성세제로 닦는다. 문지르지 말고 눌러서 뺀다.",
+    prepare:
+      "차 안에 물티슈와 마른 수건을 상시로 둔다. 값이 거의 안 드는 대비인데 효과는 가장 확실하다.",
+    source: "커뮤니티",
+    url: ""
+  },
+  {
+    id: "scratch",
+    title: "외장 스크래치",
+    symptom: "주차장 문콕, 세차 중 소용돌이 자국(스월마크).",
+    action: "얕은 것은 광택으로 지워진다. 도장까지 갔으면 부분 도장이 필요하다.",
+    prepare:
+      "자동세차의 브러시가 스월마크의 주범이다. 셀프세차나 손세차 위주로 습관을 잡는다. PPF가 덮인 부위는 상대적으로 안전하다.",
+    source: "커뮤니티",
+    url: ""
+  }
 ];

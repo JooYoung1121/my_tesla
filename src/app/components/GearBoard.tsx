@@ -4,7 +4,7 @@
 // 가격보다 먼저 보여주는 게 목적이다. 구매 상태는 localStorage에 저장한다.
 
 import { useEffect, useMemo, useState } from "react";
-import { ExternalLink, Filter, ShoppingCart } from "lucide-react";
+import { AlertTriangle, ExternalLink, Filter, ShoppingCart } from "lucide-react";
 import { gearItems, PRIORITY_SLUG, type GearChannel, type GearPriority } from "@/data/ownership";
 
 const STORE_KEY = "my-tesla-gear-v1";
@@ -90,6 +90,20 @@ export function GearBoard() {
 
   return (
     <div className="gear-board">
+      <div className="gear-principle">
+        <AlertTriangle size={18} aria-hidden="true" />
+        <div>
+          <strong>기본값은 &ldquo;사지 않는다&rdquo;다.</strong>
+          <p>
+            오너 커뮤니티의 다수 의견은 <em>순정으로 2~3개월 타보고 결정하라</em>는 것이다. 미리
+            지르면 안 맞거나 안 쓰는 게 나오고, 나중에 사도 더 비싸지지 않는다. 예외는 두 가지뿐 —
+            ① 안 하면 <b>되돌릴 수 없는 손상</b>이 생기는 것(스크린·카메라 보호), ② 기능이 아예
+            동작하지 않는 것(센트리용 USB, 하이패스 단말). 여름 선쉐이드는 계절 때문에 이번에만
+            예외로 둔다.
+          </p>
+        </div>
+      </div>
+
       <div className="gear-summary">
         <article>
           <span>필수 중 미처리</span>
