@@ -38,12 +38,13 @@ import { AppsBoard } from "./AppsBoard";
 import { ChecklistManager } from "./ChecklistManager";
 import { DataPolicyBoard } from "./DataPolicyBoard";
 import { DisplayGuide } from "./DisplayGuide";
+import { TroubleBoard } from "./TroubleBoard";
 import { GearBoard } from "./GearBoard";
 import { PersonalNotes } from "./PersonalNotes";
 import { ScheduleBoard, SCHEDULE_STORE_KEY } from "./ScheduleBoard";
 
 type ViewId = "today" | "schedule" | "checklist" | "car" | "gear" | "log";
-type CarTab = "display" | "data" | "care";
+type CarTab = "display" | "trouble" | "data" | "care";
 type GearTab = "items" | "apps";
 
 const OWNER_CHECKLIST_STORE_KEY = "my-tesla-owner-checklist-v1";
@@ -80,9 +81,9 @@ const views: Array<{
   {
     id: "car",
     label: "차량",
-    title: "화면 조작 · 데이터 · 정비",
+    title: "화면 조작 · 사고 대응 · 데이터 · 정비",
     eyebrow: "Vehicle",
-    description: "물리 버튼이 거의 없는 차다. 화면 어디에 뭐가 있는지와 내 데이터가 어디 쌓이는지를 본다."
+    description: "화면 조작, 사고 대응, 데이터 관리, 정비 주기. 차 자체를 다루는 데 필요한 것들."
   },
   {
     id: "gear",
@@ -745,6 +746,7 @@ function CarView({ tab, setTab }: { tab: CarTab; setTab: (tab: CarTab) => void }
       <Segmented
         options={[
           { value: "display", label: "화면 사용법" },
+          { value: "trouble", label: "트러블 대응" },
           { value: "data", label: "데이터·프라이버시" },
           { value: "care", label: "정비·비용" }
         ]}
@@ -752,6 +754,26 @@ function CarView({ tab, setTab }: { tab: CarTab; setTab: (tab: CarTab) => void }
         onChange={setTab}
       />
       {tab === "display" ? <DisplayGuide /> : null}
+      {tab === "trouble" ? (
+        <section className="section-band">
+          <SectionHeader
+            eyebrow="사고·트러블"
+            title="그 상황이 오기 전에 알아둘 것"
+            action={
+              <a
+                className="ghost-button"
+                href="https://www.tesla.com/ko_kr/support/roadside-assistance"
+                target="_blank"
+                rel="noreferrer"
+              >
+                로드사이드 어시스턴스
+                <ExternalLink size={16} aria-hidden="true" />
+              </a>
+            }
+          />
+          <TroubleBoard />
+        </section>
+      ) : null}
       {tab === "data" ? (
         <section className="section-band">
           <SectionHeader

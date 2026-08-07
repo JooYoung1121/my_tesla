@@ -2987,3 +2987,180 @@ textarea {
   padding: 18px;
   text-align: center;
 }
+
+/* ── 용품: 구매 원칙 배너 ───────────────────────────────────── */
+.gear-principle {
+  display: grid;
+  grid-template-columns: 20px minmax(0, 1fr);
+  gap: 12px;
+  padding: 16px;
+  background: var(--red-soft);
+  border: 1px solid rgba(232, 33, 39, 0.3);
+  border-radius: var(--radius);
+}
+
+.gear-principle svg {
+  margin-top: 2px;
+  color: var(--red-bright);
+}
+
+.gear-principle strong {
+  display: block;
+  margin-bottom: 5px;
+  font-size: 14.5px;
+  font-weight: 650;
+}
+
+.gear-principle p {
+  margin: 0;
+  max-width: 88ch;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.gear-principle em {
+  color: var(--ink);
+  font-style: normal;
+  font-weight: 650;
+}
+
+.gear-principle b {
+  color: var(--red-bright);
+  font-weight: 650;
+}
+
+/* ── 차량: 트러블 대응 ──────────────────────────────────────── */
+.trouble-board {
+  display: grid;
+  gap: 16px;
+}
+
+.trouble-intro {
+  display: grid;
+  grid-template-columns: 22px minmax(0, 1fr);
+  gap: 12px;
+  padding: 16px;
+  background: var(--red-soft);
+  border: 1px solid rgba(232, 33, 39, 0.3);
+  border-radius: var(--radius);
+}
+
+.trouble-intro svg {
+  margin-top: 2px;
+  color: var(--red-bright);
+}
+
+.trouble-intro strong {
+  display: block;
+  margin-bottom: 5px;
+  font-size: 14.5px;
+  font-weight: 650;
+}
+
+.trouble-intro p {
+  margin: 0;
+  max-width: 86ch;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.65;
+}
+
+.trouble-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 12px;
+}
+
+.trouble-card {
+  display: grid;
+  align-content: start;
+  gap: 10px;
+  padding: 16px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  transition: border-color 0.18s ease, transform 0.18s ease;
+}
+
+.trouble-card:hover {
+  border-color: var(--line-strong);
+  transform: translateY(-1px);
+}
+
+.trouble-card-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.trouble-card-head strong {
+  font-size: 14.5px;
+  font-weight: 650;
+}
+
+.trouble-card-head .app-evidence {
+  margin-left: 0;
+}
+
+.trouble-card-head a {
+  margin-left: auto;
+  color: var(--faint);
+  transition: color 0.15s ease;
+}
+
+.trouble-card-head a:hover {
+  color: var(--red-bright);
+}
+
+.trouble-fields {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+}
+
+.trouble-fields > div {
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr);
+  gap: 10px;
+}
+
+.trouble-fields dt {
+  padding-top: 2px;
+  color: var(--faint);
+  font-family: var(--font-display), "Pretendard Variable", Pretendard, sans-serif;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+
+.trouble-fields dd {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12.8px;
+  line-height: 1.6;
+}
+
+.trouble-fields .trouble-prepare {
+  padding-top: 9px;
+  border-top: 1px solid var(--line);
+}
+
+.trouble-fields .trouble-prepare dt {
+  color: var(--red-bright);
+}
+
+.trouble-fields .trouble-prepare dd {
+  color: var(--ink);
+}
+
+@media (max-width: 560px) {
+  .trouble-list {
+    grid-template-columns: 1fr;
+  }
+
+  .trouble-fields > div {
+    grid-template-columns: 1fr;
+    gap: 2px;
+  }
+}
