@@ -42,18 +42,18 @@ export const communityLinks: CommunityLink[] = [
     url: "https://cafe.naver.com/noljatravel"
   },
   {
-    name: "슬라고",
-    kind: "국내 오너 앱",
-    why: "국내 테슬라 오너들이 충전 정보와 팁을 공유한다.",
-    note: "Android 전용. TKC와 내용이 상당히 겹쳐서 둘 다 볼 필요는 없다.",
-    url: "https://play.google.com/store/apps/details?id=space.teslaworld.www"
+    name: "클리앙 자동차 게시판",
+    kind: "국내 커뮤니티",
+    why: "국내 테슬라·전기차 실사용 글이 꾸준히 올라온다. 검색이 자유롭고 로그인 없이 읽힌다.",
+    note: "테슬라 전용은 아니라서 검색어에 '테슬라'를 붙여야 한다. 앱 추천·충전 요금 비교 글이 특히 많다.",
+    url: "https://www.clien.net/service/board/cm_car"
   },
   {
-    name: "EV Infra 커뮤니티",
+    name: "EV Infra",
     kind: "충전 특화",
     why: "충전기 고장·대기 제보가 실시간으로 올라온다. 장거리 전에 경로상 충전소를 확인하는 용도.",
-    note: "앱 안의 충전소별 후기가 핵심이다. 공식 데이터가 '운영중'이어도 여기서 고장 제보를 먼저 본다.",
-    url: "https://www.evinfra.io/"
+    note: "앱 안의 충전소별 후기가 핵심이다. 공식 데이터가 '운영중'이어도 여기서 고장 제보를 먼저 본다. 별도 웹사이트가 없어 앱스토어로 연결한다.",
+    url: "https://apps.apple.com/kr/app/id1206679515"
   },
   {
     name: "Tesla Motors Club",
